@@ -3,15 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Unit School — ข้อสอบ</title>
+<title>ข้อสอบออนไลน์</title>
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --navy:   #1a237e;
-  --navy2:  #283593;
-  --gold:   #ffd700;
-  --gold2:  #ffb300;
+  /* Dynamic Variables */
+  --config-primary: #1a237e;
+  --config-secondary: #ffd700;
+  
+  --navy:   var(--config-primary);
+  --navy2:  var(--config-primary);
+  --gold:   var(--config-secondary);
+  --gold2:  var(--config-secondary);
   --bg:     #0f1322;
   --surface:#161c36;
   --surf2:  #1e2647;
@@ -136,7 +140,6 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
 .subject-greeting{font-size:14px;color:rgba(255,255,255,0.85);margin-top:10px;font-weight:600}
 .subject-list{padding:20px 16px;max-width:480px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
 
-/* รูปร่างวิชาที่ผ่านแล้ว */
 .subject-card{background:var(--surface);border:2px solid var(--border);border-radius:16px;padding:18px 20px;display:flex;align-items:center;gap:16px;cursor:pointer;transition:all .2s;-webkit-tap-highlight-color:transparent}
 .subject-card:active{transform:scale(.97)}
 .subject-card:not(.completed):hover, .subject-card:not(.completed):active{border-color:var(--gold);background:rgba(255,215,0,0.05)}
@@ -148,7 +151,6 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
 .subject-name{font-size:16px;font-weight:700;color:var(--text);margin-bottom:3px}
 .subject-count{font-size:12px;color:var(--muted);display:flex;align-items:center;}
 .subject-arrow{font-size:18px;color:var(--muted)}
-
 .badge-done-text { font-size: 11px; color: var(--green); font-weight: 800; background: rgba(0,200,83,0.15); padding: 2px 6px; border-radius: 4px; margin-left: 8px; }
 .subject-section-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;padding:0 16px;margin-bottom:4px;max-width:480px;margin-left:auto;margin-right:auto}
 </style>
@@ -157,14 +159,14 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
 
 <div id="ov-load" class="ov">
   <div class="ov-spinner"></div>
-  <div class="ov-title">📋 Unit School</div>
+  <div class="ov-title dynamic-app-name">📋 Unit School</div>
   <div class="ov-sub" id="load-txt">กำลังโหลดข้อสอบ...</div>
 </div>
 
 <div id="ov-noreg" class="ov hidden">
   <div style="font-size:60px">⚠️</div>
   <div class="ov-title" style="color:var(--red)">ยังไม่ได้ลงทะเบียน</div>
-  <div class="ov-sub">กรุณาลงทะเบียนก่อนทำข้อสอบ<br>กลับไปแชทกับ Unit School Bot</div>
+  <div class="ov-sub">กรุณาลงทะเบียนก่อนทำข้อสอบ<br>กลับไปแชทกับระบบ</div>
   <button class="btn" style="background:var(--navy);color:var(--gold);max-width:200px" onclick="liff.closeWindow()">← กลับ</button>
 </div>
 
@@ -203,7 +205,7 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
 
   <div class="rank-box">
     <div class="rank-num" id="r-rank">—</div>
-    <div class="rank-label">อันดับปัจจุบัน จากกำลังพล <span id="r-total">—</span> นาย</div>
+    <div class="rank-label">อันดับปัจจุบัน จาก <span class="dynamic-term-user">กำลังพล</span> <span id="r-total">—</span> คน</div>
   </div>
 
   <div style="font-size:14px;font-weight:700;color:var(--muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px">📝 เฉลยข้อสอบ</div>
@@ -217,21 +219,20 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
 <div id="subject-ov" class="subject-ov hidden">
   <div class="subject-hdr">
     <div class="subject-hdr-title">📚 เลือกวิชาที่ต้องการสอบ</div>
-    <div class="subject-hdr-sub">Unit School — ห้องเรียนอัจฉริยะ</div>
+    <div class="subject-hdr-sub"><span class="dynamic-app-name">Unit School</span> — ห้องเรียนอัจฉริยะ</div>
     <div class="subject-greeting" id="subject-greeting"></div>
   </div>
   <div style="padding:20px 16px 8px;max-width:480px;margin:0 auto">
     <div class="subject-section-label" style="padding:0;margin-bottom:8px">📋 วิชาที่เปิดสอบ</div>
   </div>
-  <div class="subject-list" id="subject-list">
-    </div>
+  <div class="subject-list" id="subject-list"></div>
 </div>
 
 <div id="exam-ui" class="hidden">
   <div class="hdr">
     <div class="hdr-info">
-      <div class="hdr-title">📋 Unit School</div>
-      <div class="hdr-sub" id="hdr-sub">ข้อสอบวัดผลกำลังพล</div>
+      <div class="hdr-title">📋 <span class="dynamic-app-name">Unit School</span></div>
+      <div class="hdr-sub" id="hdr-sub">ข้อสอบวัดผล</div>
     </div>
     <div class="hdr-timer" id="timer">--:--</div>
   </div>
@@ -265,12 +266,12 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
 
 <script>
 // ==============================================
-// CONFIG — เปลี่ยน LIFF_ID และ GAS_URL
+// CONFIG
 // ==============================================
-const LIFF_ID = '2009717287-nSod0Xpx';   
+const LIFF_ID = 'YOUR-LIFF-EXAM-ID';   
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbyRhVNOnNIAkwZxrTcJOzI2nh_fmSIzI8tgbVurJoUJlDaZrR2Kovo0AydC3Qs0PNyU/exec'; 
 
-// State
+let appConfig = null;
 let allQuestions = []; 
 let completedSubjects = [];
 let questions = [], answers = {}, currentQ = 0, member = null, userId = '';
@@ -282,35 +283,25 @@ let originalExamTime = 20 * 60;
 let examEndTime = 0; 
 let examStateKey = ''; 
 
-// Subject emoji map
-const SUBJECT_ICONS = {
-  'วิชาธุรการ':        '📁',
-  'วิชาระเบียบ':       '📜',
-  'วิชาธรรมเนียม':    '🎖️',
-  'วิชาทั่วไป':       '📖',
-  'วิชาประวัติศาสตร์':'🏛️',
-  'วิชาการทหาร':      '⚔️',
-  'วิชาอาวุธ':        '🔫',
-  'วิชาการแพทย์':     '🏥',
-  'วิชาการอ่านแผนที่':'🗺️',
-  'วิชาการสื่อสาร':   '📡',
-  'วิชายุทธวิธี':     '🎯',
-  'วิชาวินัย':        '⚖️',
-};
-
 // ==============================================
-// INIT
+// INIT & TEMPLATE ENGINE
 // ==============================================
 async function init() {
   try {
     await liff.init({ liffId: LIFF_ID });
     if (!liff.isLoggedIn()) { liff.login(); return; }
-    const profile = await liff.getProfile();
-    userId = profile.userId;
+    
+    // โหลด Config ก่อนเพื่อให้สีและข้อความเปลี่ยนทันที
+    const configRes = await callAPI('GET', { action: 'get_config' });
+    if(configRes.status === 'ok') {
+      appConfig = configRes.config;
+      applyTemplate(appConfig);
+    }
+    
+    userId = (await liff.getProfile()).userId;
     examStateKey = 'examState_' + userId;
 
     document.getElementById('load-txt').textContent = 'กำลังโหลดข้อมูลข้อสอบ...';
-
     const res = await callAPI('GET', { action:'get_questions', userId });
 
     if (!res || res.status === 'error') {
@@ -348,25 +339,35 @@ async function init() {
   }
 }
 
+function applyTemplate(c) {
+  if(!c) return;
+  document.documentElement.style.setProperty('--config-primary', c.colorPrimary);
+  document.documentElement.style.setProperty('--config-secondary', c.colorSecondary);
+  document.title = c.appName;
+  
+  document.querySelectorAll('.dynamic-app-name').forEach(el => el.textContent = c.appName);
+  document.querySelectorAll('.dynamic-org-name').forEach(el => el.textContent = c.orgName);
+  document.querySelectorAll('.dynamic-term-user').forEach(el => el.textContent = c.termUser);
+  document.querySelectorAll('.dynamic-term-coin').forEach(el => el.textContent = c.termCoin);
+}
+
 // ==============================================
 // SUBJECT PICKER
 // ==============================================
 function renderSubjectPicker(subjects) {
-  document.getElementById('subject-greeting').textContent =
-    `สวัสดีครับ ${member.rank} ${member.fullName}`;
+  const levelTerm = appConfig ? appConfig.termLevel : 'ระดับ';
+  document.getElementById('subject-greeting').textContent = `สวัสดีครับ ${member.rank} ${member.fullName}`;
 
   const list = document.getElementById('subject-list');
   list.innerHTML = '';
 
   subjects.forEach(sub => {
     const isCompleted = completedSubjects.includes(sub.name);
-    const icon = SUBJECT_ICONS[sub.name] || '📋';
-    
     const card = document.createElement('div');
     card.className = 'subject-card' + (isCompleted ? ' completed' : '');
     
     card.innerHTML = `
-      <div class="subject-icon">${icon}</div>
+      <div class="subject-icon">📝</div>
       <div class="subject-info">
         <div class="subject-name" style="${isCompleted ? 'color: var(--muted);' : ''}">${sub.name}</div>
         <div class="subject-count">${sub.count} ข้อ ${isCompleted ? '<span class="badge-done-text">✅ ผ่านแล้ว</span>' : ''}</div>
@@ -375,11 +376,8 @@ function renderSubjectPicker(subjects) {
     `;
     
     card.onclick = () => {
-      if(isCompleted) {
-        alert('✅ คุณได้ทำการสอบวิชานี้และส่งคำตอบไปเรียบร้อยแล้วครับ ไม่สามารถทำซ้ำได้');
-      } else {
-        startExam(sub.name);
-      }
+      if(isCompleted) { alert('✅ คุณได้ทำการสอบวิชานี้และส่งคำตอบไปเรียบร้อยแล้ว ไม่สามารถทำซ้ำได้'); } 
+      else { startExam(sub.name); }
     };
     list.appendChild(card);
   });
@@ -391,33 +389,22 @@ function startExam(subject) {
 
   const savedStateStr = localStorage.getItem(examStateKey);
   let savedState = null;
-  if (savedStateStr) {
-    try { savedState = JSON.parse(savedStateStr); } catch(e) {}
-  }
+  if (savedStateStr) { try { savedState = JSON.parse(savedStateStr); } catch(e) {} }
 
   if (savedState && savedState.subject === subject) {
     if (confirm('พบข้อสอบที่คุณทำค้างไว้ ต้องการทำต่อจากเดิมหรือไม่?')) {
-      questions = savedState.questions;
-      answers = savedState.answers;
-      examEndTime = savedState.endTime;
-      finishStartExam();
-      return; 
-    } else {
-      localStorage.removeItem(examStateKey);
-    }
+      questions = savedState.questions; answers = savedState.answers; examEndTime = savedState.endTime;
+      finishStartExam(); return; 
+    } else { localStorage.removeItem(examStateKey); }
   }
 
   let filteredQs = allQuestions.filter(q => (q.category || 'ทั่วไป') === subject);
-
   questions = filteredQs.map(q => {
     q.shuffledKeys = ['A', 'B', 'C', 'D'].filter(k => q.choices[k]);
     return q;
   });
 
-  if (questions.length === 0) {
-    alert('ไม่พบข้อสอบในวิชานี้');
-    return;
-  }
+  if (questions.length === 0) { alert('ไม่พบข้อสอบในวิชานี้'); return; }
   
   answers = {};
   examEndTime = Date.now() + (originalExamTime * 1000);
@@ -431,18 +418,12 @@ function finishStartExam() {
   buildDots();
   renderQuestion(0);
   startTimer();
-
   document.getElementById('subject-ov').classList.add('hidden');
   document.getElementById('exam-ui').classList.remove('hidden');
 }
 
 function saveExamState() {
-  const state = {
-    subject: selectedSubject,
-    questions: questions,
-    answers: answers,
-    endTime: examEndTime
-  };
+  const state = { subject: selectedSubject, questions: questions, answers: answers, endTime: examEndTime };
   localStorage.setItem(examStateKey, JSON.stringify(state));
 }
 
@@ -457,14 +438,10 @@ function startTimer() {
   timerInterval = setInterval(() => {
     timeLeft = Math.floor((examEndTime - Date.now()) / 1000);
     if(timeLeft < 0) timeLeft = 0;
-    
     updateTimerDisplay();
-
     if (timeLeft <= 600 && timeLeft > 0 && !tenMinWarningShown && originalExamTime > 600) {
-      tenMinWarningShown = true;
-      document.getElementById('ov-warning').classList.remove('hidden');
+      tenMinWarningShown = true; document.getElementById('ov-warning').classList.remove('hidden');
     }
-
     if (timeLeft <= 0) { clearInterval(timerInterval); submitExam(true); }
   }, 1000);
 }
@@ -478,18 +455,13 @@ function updateTimerDisplay() {
 }
 
 // ==============================================
-// RENDER
+// RENDER & NAVIGATION
 // ==============================================
 function buildDots() {
-  const nav = document.getElementById('dot-nav');
-  nav.innerHTML = '';
+  const nav = document.getElementById('dot-nav'); nav.innerHTML = '';
   questions.forEach((_, i) => {
-    const d = document.createElement('div');
-    d.className = 'dot' + (i === 0 ? ' current' : '');
-    d.id = 'dot-' + i;
-    d.textContent = i + 1;
-    d.onclick = () => goToQ(i);
-    nav.appendChild(d);
+    const d = document.createElement('div'); d.className = 'dot' + (i === 0 ? ' current' : '');
+    d.id = 'dot-' + i; d.textContent = i + 1; d.onclick = () => goToQ(i); nav.appendChild(d);
   });
 }
 
@@ -502,25 +474,18 @@ function updateDots() {
 }
 
 function renderQuestion(idx) {
-  currentQ = idx;
-  const q = questions[idx];
-  if (!q) return;
+  currentQ = idx; const q = questions[idx]; if (!q) return;
 
   document.getElementById('q-num').textContent   = idx + 1;
   document.getElementById('q-cat').textContent   = q.category || 'ทั่วไป';
   document.getElementById('q-count').textContent = `ข้อ ${idx+1} จาก ${questions.length}`;
   document.getElementById('q-text').textContent  = q.questionText;
 
-  const pct = ((idx + 1) / questions.length) * 100;
-  document.getElementById('prog-bar').style.width = pct + '%';
+  document.getElementById('prog-bar').style.width = (((idx + 1) / questions.length) * 100) + '%';
 
-  const container = document.getElementById('choices');
-  container.innerHTML = '';
-
+  const container = document.getElementById('choices'); container.innerHTML = '';
   q.shuffledKeys.forEach((key) => {
-    const text = q.choices[key];
-    if (!text) return;
-    
+    const text = q.choices[key]; if (!text) return;
     const div = document.createElement('div');
     div.className = 'choice' + (answers[idx] === key ? ' selected' : '');
     div.setAttribute('data-key', key); 
@@ -530,29 +495,19 @@ function renderQuestion(idx) {
   });
 
   document.getElementById('btn-prev').style.display = idx === 0 ? 'none' : 'flex';
-  const isLast = idx === questions.length - 1;
   const btnNext = document.getElementById('btn-next');
-  if (isLast) {
-    btnNext.className = 'btn btn-submit';
-    btnNext.textContent = '📤 ส่งข้อสอบ';
-    btnNext.onclick = () => confirmSubmit();
+  if (idx === questions.length - 1) {
+    btnNext.className = 'btn btn-submit'; btnNext.textContent = '📤 ส่งข้อสอบ'; btnNext.onclick = () => confirmSubmit();
   } else {
-    btnNext.className = 'btn btn-next';
-    btnNext.textContent = 'ถัดไป →';
-    btnNext.onclick = nextQ;
+    btnNext.className = 'btn btn-next'; btnNext.textContent = 'ถัดไป →'; btnNext.onclick = nextQ;
   }
-
   updateDots();
 }
 
 function selectAnswer(key) {
   answers[currentQ] = key;
-  document.querySelectorAll('.choice').forEach(c => {
-    const k = c.getAttribute('data-key');
-    c.classList.toggle('selected', k === key);
-  });
-  updateDots();
-  saveExamState(); 
+  document.querySelectorAll('.choice').forEach(c => { c.classList.toggle('selected', c.getAttribute('data-key') === key); });
+  updateDots(); saveExamState(); 
 }
 
 function nextQ() { if (currentQ < questions.length - 1) renderQuestion(currentQ + 1); }
@@ -564,18 +519,14 @@ function goToQ(i) { renderQuestion(i); }
 // ==============================================
 function confirmSubmit() {
   const unanswered = questions.length - Object.keys(answers).length;
-  if (unanswered > 0) {
-    if (!confirm(`ยังมี ${unanswered} ข้อที่ยังไม่ได้ตอบ\nต้องการส่งข้อสอบเลยไหม?`)) return;
-  } else {
-    if (!confirm('ยืนยันส่งข้อสอบ?')) return;
-  }
+  if (unanswered > 0) { if (!confirm(`ยังมี ${unanswered} ข้อที่ยังไม่ได้ตอบ\nต้องการส่งข้อสอบเลยไหม?`)) return; } 
+  else { if (!confirm('ยืนยันส่งข้อสอบ?')) return; }
   submitExam(false);
 }
 
 async function submitExam(timeout) {
   if (submitted) return;
-  submitted = true;
-  clearInterval(timerInterval);
+  submitted = true; clearInterval(timerInterval);
 
   document.getElementById('exam-ui').classList.add('hidden');
   document.getElementById('ov-load').classList.remove('hidden');
@@ -587,24 +538,17 @@ async function submitExam(timeout) {
   try {
     const res = await callAPI('POST', { action:'submit_exam', userId, answers: answerMap, subject: selectedSubject });
     if (!res || res.status === 'error') throw new Error(res ? res.message : 'ส่งข้อสอบล้มเหลว');
-    
     localStorage.removeItem(examStateKey);
-    
     showResult(res);
-  } catch(e) {
-    document.getElementById('load-txt').textContent = '❌ ' + e.message;
-    submitted = false;
-  }
+  } catch(e) { document.getElementById('load-txt').textContent = '❌ ' + e.message; submitted = false; }
 }
 
 function showResult(res) {
   document.getElementById('ov-load').classList.add('hidden');
   document.getElementById('result-ov').classList.remove('hidden');
 
-  const pct   = res.percentage;
-  const grade = pct >= 80 ? { text:'🌟 ดีเยี่ยม', cls:'grade-great' }
-              : pct >= 60 ? { text:'✅ ผ่าน', cls:'grade-pass' }
-                           : { text:'❌ ยังไม่ผ่าน', cls:'grade-fail' };
+  const pct = res.percentage;
+  const grade = pct >= 80 ? { text:'🌟 ดีเยี่ยม', cls:'grade-great' } : pct >= 60 ? { text:'✅ ผ่าน', cls:'grade-pass' } : { text:'❌ ยังไม่ผ่าน', cls:'grade-fail' };
 
   document.getElementById('r-score').textContent   = res.totalScore;
   document.getElementById('r-max').textContent     = '/ ' + res.maxScore;
@@ -617,60 +561,39 @@ function showResult(res) {
   document.getElementById('r-pos').textContent     = member.position + (selectedSubject ? ` · ${selectedSubject}` : '');
 
   const gradeEl = document.getElementById('r-grade');
-  gradeEl.textContent = grade.text;
-  gradeEl.className   = 'grade-badge ' + grade.cls;
+  gradeEl.textContent = grade.text; gradeEl.className = 'grade-badge ' + grade.cls;
 
-  const list = document.getElementById('review-list');
-  list.innerHTML = '';
+  const list = document.getElementById('review-list'); list.innerHTML = '';
   (res.results || []).forEach((r, i) => {
-    const q    = questions.find(qq => String(qq.questionId) === String(r.qid));
+    const q = questions.find(qq => String(qq.questionId) === String(r.qid));
     const isOk = r.isCorrect;
-    const card = document.createElement('div');
-    card.className = 'review-card';
+    const card = document.createElement('div'); card.className = 'review-card';
     card.innerHTML = `
       <div class="review-hdr">
         <div class="review-status ${isOk?'ok':'ng'}">${isOk?'✅':'❌'}</div>
         <div class="review-q">ข้อ ${i+1}: ${q ? q.questionText : '—'}</div>
       </div>
       <div class="review-body">
-        <div class="review-row">คุณตอบ: <span class="${isOk?'ok-color':'ng-color'}">${r.userAnswer || '-'} ${r.userAnswer && q ? q.choices[r.userAnswer]||'' : ''}</span></div>
-        ${!isOk ? `<div class="review-row">เฉลย: <span class="ok-color">${r.correct} ${q ? q.choices[r.correct]||'' : ''}</span></div>` : ''}
+        <div class="review-row">คุณตอบ: <span class="${isOk?'ok-color':'ng-color'}">${r.userAnswer || '-'} ${r.userAnswer && q && q.choices ? q.choices[r.userAnswer]||'' : ''}</span></div>
+        ${!isOk ? `<div class="review-row">เฉลย: <span class="ok-color">${r.correct} ${q && q.choices ? q.choices[r.correct]||'' : ''}</span></div>` : ''}
       </div>
     `;
     list.appendChild(card);
   });
-
   window.scrollTo(0,0);
 }
 
-// ==============================================
-// API HELPER
-// ==============================================
 async function callAPI(method, params, timeoutMs=30000) {
-  const ctrl = new AbortController();
-  const tid  = setTimeout(() => ctrl.abort(), timeoutMs);
+  const ctrl = new AbortController(); const tid = setTimeout(() => ctrl.abort(), timeoutMs);
   try {
     let url = GAS_URL, opts = { signal: ctrl.signal, redirect:'follow' };
-    if (method === 'GET') {
-      url += '?' + new URLSearchParams(params).toString();
-      opts.method = 'GET';
-    } else {
-      opts.method  = 'POST';
-      opts.headers = { 'Content-Type':'text/plain' };
-      opts.body    = JSON.stringify(params);
-    }
-    const resp = await fetch(url, opts);
-    clearTimeout(tid);
-    if (!resp.ok) throw new Error('HTTP ' + resp.status);
-    return await resp.json();
-  } catch(e) {
-    clearTimeout(tid);
-    if (e.name === 'AbortError') throw new Error('หมดเวลาเชื่อมต่อ');
-    throw e;
-  }
+    if (method === 'GET') { url += '?' + new URLSearchParams(params).toString(); opts.method = 'GET'; } 
+    else { opts.method = 'POST'; opts.headers = { 'Content-Type':'text/plain' }; opts.body = JSON.stringify(params); }
+    const resp = await fetch(url, opts); clearTimeout(tid);
+    if (!resp.ok) throw new Error('HTTP ' + resp.status); return await resp.json();
+  } catch(e) { clearTimeout(tid); throw e; }
 }
 
-window.onerror = (msg) => { document.getElementById('load-txt').textContent = '❌ ' + msg; };
 init();
 </script>
 </body>
