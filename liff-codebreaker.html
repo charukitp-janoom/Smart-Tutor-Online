@@ -65,6 +65,7 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
 .lb-container { background: var(--panel); border: 1px solid #333; border-radius: 12px; padding: 16px; width: 100%; max-height: 60vh; overflow-y: auto; margin-bottom: 20px; text-align: left; }
 .lb-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 8px; border-bottom: 1px solid #222; }
 .lb-item:last-child { border-bottom: none; }
+.lb-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; margin: 0 12px 0 6px; border: 2px solid var(--green); flex-shrink: 0; background: #fff;}
 </style>
 </head>
 <body>
@@ -151,7 +152,7 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
 // CONFIG
 // ==============================================
 const LIFF_ID = '2009896605-dsIhqbET'; // << [เปลี่ยนเป็น LIFF ID ของคุณ]
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbwo_kB4DZSVmYqkztnf8n_-sjVvAFUxIH9dZAqby_SUvV5H8gH5hXhILHkzZJ59S2j6/exec'; // << [เปลี่ยนเป็น GAS_URL ของคุณ]
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwo_kB4DZSVmYqkztnf8n_-sjVvAFUxIH9dZAqby_SUvV5H8gH5hXhILHkzZJ59S2j6/exec'; // << [เปลี่ยนเป็น GAS_URL ของคุณ] 
 
 let allQs = [];
 let gamePool = [];
@@ -162,7 +163,6 @@ let isLocked = false;
 let currentCorrectAnswer = '';
 let userId = '';
 
-// Timer Logic อิงเวลาจากระบบเพื่อความเสถียร
 const TIME_LIMIT = 30;
 let timeLeft = 30.0;
 let timerInterval = null;
@@ -233,11 +233,9 @@ function loadNextBomb() {
   const q = gamePool[currentQIndex];
   document.getElementById('q-text').textContent = q.questionText;
   
-  // จำตัวอักษรของคำตอบที่ถูกต้อง
   currentCorrectAnswer = (q.correctAnswer || '').toUpperCase();
 
   const displayLetters = ['A', 'B', 'C', 'D'];
-  // ดึงเฉพาะช้อยส์ที่มีข้อความ และสุ่มตำแหน่งสายไฟ
   const shuffledKeys = displayLetters.filter(k => q.choices && q.choices[k]).sort(() => Math.random() - 0.5);
 
   for(let i=0; i<4; i++) {
@@ -251,14 +249,13 @@ function loadNextBomb() {
       btn.textContent = q.choices[key];
       btn.setAttribute('data-real-key', key);
     } else {
-      row.style.display = 'none'; // ซ่อนสายชนวนที่ไม่มีข้อมูล
+      row.style.display = 'none';
     }
   }
 
   startTimer();
 }
 
-// ⏱️ ระบบจับเวลาแบบใหม่ เสถียร 100%
 function startTimer() {
   clearInterval(timerInterval);
   startTimestamp = Date.now();
@@ -269,53 +266,45 @@ function startTimer() {
   timerEl.textContent = timeLeft.toFixed(1);
   
   timerInterval = setInterval(() => {
-    // คำนวณจากเวลาจริง หักลบความหน่วงของเครื่อง
     const elapsedSecs = (Date.now() - startTimestamp) / 1000;
     timeLeft = Math.max(0, TIME_LIMIT - elapsedSecs);
-    
     timerEl.textContent = timeLeft.toFixed(1);
     
     if (timeLeft <= 0) {
       clearInterval(timerInterval);
       explodeBomb("เวลาหมด! ระเบิดทำงาน");
     }
-  }, 50); // อัปเดตทุก 50ms ให้ดูลื่นไหล
+  }, 50);
 }
 
 function cutWire(index) {
   if (isLocked) return;
   
   const row = document.getElementById(`row-${index}`);
-  if (row.classList.contains('cut')) return; // ป้องกันการกดซ้ำ
+  if (row.classList.contains('cut')) return;
 
   const btn = document.getElementById(`btn-${index}`);
   const realKey = btn.getAttribute('data-real-key');
   
   if (realKey === currentCorrectAnswer) {
-    // 💥 ตัดโดนสายที่ถูก (ระเบิดทำงาน)
     row.classList.add('cut');
     explodeBomb("คุณเผลอตัดสายที่ถูกต้องไป!");
   } else {
-    // ✅ ตัดสายลวงสำเร็จ
     row.classList.add('cut');
     wiresCutCount++;
     
-    // เขย่าหน้าจอเบาๆ เพื่อให้มี Feedback (UX)
     document.getElementById('wires-wrap').classList.add('shake');
     setTimeout(() => { document.getElementById('wires-wrap').classList.remove('shake'); }, 500);
     
-    // เช็กว่าตัดสายลวงครบทุกเส้นที่ผิดหรือยัง
     const totalWrongWires = Array.from(document.querySelectorAll('.wire-row')).filter(r => r.style.display !== 'none').length - 1;
     
     if (wiresCutCount >= totalWrongWires) {
-      // กู้ระเบิดสำเร็จ! 🎉
       isLocked = true;
       clearInterval(timerInterval);
       document.getElementById('timer').style.color = 'var(--green)';
       score++;
       document.getElementById('score').textContent = score;
       
-      // หน่วงเวลาเล็กน้อยเพื่อให้ผู้เล่นรับรู้ชัยชนะก่อนขึ้นข้อใหม่
       setTimeout(() => {
         currentQIndex++;
         loadNextBomb();
@@ -328,7 +317,6 @@ function explodeBomb(reason) {
   isLocked = true;
   clearInterval(timerInterval);
   
-  // Flash Effect แจ้งเตือนการระเบิด
   const flash = document.createElement('div');
   flash.className = 'flash';
   document.body.appendChild(flash);
@@ -336,13 +324,11 @@ function explodeBomb(reason) {
 
   document.getElementById('fail-reason').textContent = reason;
   
-  // รอ 1.5 วิ แล้วโชว์คะแนน
   setTimeout(() => {
     document.getElementById('game-ui').classList.add('hidden');
     document.getElementById('end-ui').classList.remove('hidden');
     document.getElementById('end-score').textContent = score;
     
-    // ส่งคะแนนขึ้นเซิร์ฟเวอร์
     if (score > 0) {
       callAPI('POST', { action: 'submit_codebreaker_score', userId: userId, defusedCount: score })
         .catch(e => console.error(e));
@@ -350,7 +336,6 @@ function explodeBomb(reason) {
   }, 1500);
 }
 
-// --- Leaderboard Functions ---
 async function showLeaderboard() {
   document.getElementById('start-ui').classList.add('hidden');
   document.getElementById('lb-ui').classList.remove('hidden');
@@ -385,10 +370,12 @@ async function loadLeaderboardData() {
       res.leaderboard.forEach((e, i) => {
         const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i+1}.`;
         const isMe = e.userId === userId ? 'color:var(--red); font-weight:800;' : '';
+        const pic = e.pictureUrl || 'https://cdn-icons-png.flaticon.com/512/847/847969.png';
         
         list.innerHTML += `
           <div class="lb-item">
             <div style="font-size:16px; font-weight:800; width:30px; color:#aaa;">${medal}</div>
+            <img src="${pic}" class="lb-avatar">
             <div style="flex:1; ${isMe}">
               <div>${e.fullName}</div>
               <div style="font-size:11px; color:#666;">${e.rank} ${e.position}</div>
@@ -405,7 +392,6 @@ async function loadLeaderboardData() {
   }
 }
 
-// --- Backend API Function ---
 async function callAPI(method, params, timeoutMs=20000) {
   const ctrl = new AbortController();
   const tid  = setTimeout(() => ctrl.abort(), timeoutMs);
