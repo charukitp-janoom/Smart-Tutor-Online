@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Flashcard</title>
+<title>Unit School — Flashcard</title>
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;800&family=IBM+Plex+Mono:wght@700&display=swap" rel="stylesheet">
 <style>
@@ -35,7 +35,8 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
 .game-header { width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 10px;}
 .stat-box { display: flex; align-items: center; gap: 8px; font-size: 20px; font-weight: 800; font-family: 'IBM Plex Mono', monospace; }
 .score-text { color: var(--success); text-shadow: 0 0 10px rgba(0,230,118,0.5); }
-.timer-text { color: var(--primary); background: rgba(0,210,255,0.1); padding: 4px 12px; border-radius: 20px; border: 1px solid var(--primary); }
+.timer-text { color: var(--primary); background: rgba(0,210,255,0.1); padding: 4px 12px; border-radius: 20px; border: 1px solid var(--primary); transition: color 0.3s; }
+.timer-text.warning { color: var(--danger); border-color: var(--danger); background: rgba(255,61,0,0.1); }
 
 /* Swipe Area */
 .card-container { position: relative; width: 100%; height: 350px; margin-bottom: 30px; perspective: 1000px; display: flex; align-items: center; justify-content: center;}
@@ -43,7 +44,7 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
 .swipe-card:active { cursor: grabbing; }
 .card-q { font-size: 18px; font-weight: 600; color: #fff; margin-bottom: 20px; line-height: 1.5; }
 .card-divider { width: 40px; height: 3px; background: var(--primary); margin-bottom: 20px; border-radius: 2px; }
-.card-ans { font-size: 20px; font-weight: 800; color: var(--gold); line-height: 1.4; }
+.card-ans { font-size: 20px; font-weight: 800; color: var(--primary); line-height: 1.4; }
 
 /* Swipe Labels Overlay */
 .stamp { position: absolute; top: 30px; font-size: 32px; font-weight: 900; border: 4px solid; padding: 5px 15px; border-radius: 10px; opacity: 0; text-transform: uppercase; transform: rotate(-15deg); z-index: 10; pointer-events: none;}
@@ -77,7 +78,7 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
 <div id="start-ui" class="screen hidden">
   <div style="font-size: 80px; margin-bottom: 10px; filter: drop-shadow(0 0 20px var(--primary-glow));">🃏</div>
   <div class="title">Flashcard</div>
-  <div class="subtitle">โหมดประจัญบาน<br>อ่านโจทย์และคำตอบบนการ์ด<br><b>ปัดขวาถ้าถูก (✅) / ปัดซ้ายถ้าผิด (❌)</b><br>ทำคะแนนให้มากที่สุดใน 60 วินาที!</div>
+  <div class="subtitle"><span class="dynamic-app-name">System</span><br>โหมดประจัญบาน อ่านโจทย์และคำตอบ<br><b>ปัดขวาถ้าถูก (✅) / ปัดซ้ายถ้าผิด (❌)</b><br>ทำคะแนนให้มากที่สุดใน 60 วินาที!</div>
   
   <button class="btn" onclick="startGame()">🚀 เริ่มประจัญบาน</button>
   <button class="btn btn-outline" onclick="showLeaderboard()">🏆 ทำเนียบคะแนนสูงสุด</button>
@@ -88,12 +89,10 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
 <div id="game-ui" class="screen hidden" style="justify-content: flex-start; padding-top: 30px;">
   <div class="game-header">
     <div class="stat-box">⭐ <span class="score-text" id="score-count">0</span></div>
-    <div class="stat-box timer-text">⏱️ <span id="timer-count">60</span></div>
+    <div class="stat-box timer-text" id="timer-box">⏱️ <span id="timer-count">60</span></div>
   </div>
 
-  <div class="card-container" id="card-container">
-    <!-- Card injected via JS -->
-  </div>
+  <div class="card-container" id="card-container"></div>
 
   <div class="controls">
     <button class="ctrl-btn btn-nope" onclick="handleButtonClick(false)">❌</button>
@@ -107,7 +106,6 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
   <div style="font-size: 60px; margin-bottom: 10px;">⏱️</div>
   <div class="title" style="color:#fff;">หมดเวลา!</div>
   <div style="color:var(--muted); margin-bottom:10px;">คุณเคลียร์การ์ดได้สำเร็จ</div>
-  
   <div class="end-score" id="end-score">0</div>
   <div style="font-size: 14px; color:var(--muted); margin-bottom: 30px;">ใบ</div>
   
@@ -132,22 +130,19 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
 // ==============================================
 const LIFF_ID = '2009896605-1SYoKWK7'; // << [ใส่ LIFF ID ของหน้า Flashcard]
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbwo_kB4DZSVmYqkztnf8n_-sjVvAFUxIH9dZAqby_SUvV5H8gH5hXhILHkzZJ59S2j6/exec';
+  
+let allQs = [], flashcards = [], currentIndex = 0, score = 0, userId = '';
+let appConfig = null;
 
-let allQs = [];
-let flashcards = [];
-let currentIndex = 0;
-let score = 0;
-let userId = '';
-
-// Timer (60s)
+// ⏱️ Timer Logic
 const TIME_LIMIT = 60;
 let timeLeft = 60;
 let timerInterval = null;
+let startTimestamp = 0;
 
 // Swipe Logic
-let startX = 0;
-let currentX = 0;
-let isDragging = false;
+let startX = 0, currentX = 0;
+let isDragging = false, isSwiping = false; // Add isSwiping lock
 let currentCardEl = null;
 
 async function init() {
@@ -155,13 +150,15 @@ async function init() {
     await liff.init({ liffId: LIFF_ID });
     if (!liff.isLoggedIn()) { liff.login(); return; }
     
+    const configRes = await callAPI('GET', { action: 'get_config' });
+    if(configRes.status === 'ok') { appConfig = configRes.config; applyTemplate(appConfig); }
+
     userId = (await liff.getProfile()).userId;
     const data = await callAPI('GET', { action:'get_questions', userId: userId });
     if (data.status === 'error') throw new Error(data.message);
 
     allQs = data.questions || [];
     if (allQs.length === 0) throw new Error(`ไม่พบข้อสอบในระบบ`);
-    if (!allQs[0].correctAnswer) throw new Error("ไม่พบเฉลย! กรุณาอัปเดต Code.gs เป็นเวอร์ชันล่าสุด");
 
     generateFlashcards();
 
@@ -172,18 +169,22 @@ async function init() {
   }
 }
 
-// สร้างกองการ์ด (แปลง 4 ตัวเลือก เป็น ถูก/ผิด)
+function applyTemplate(c) {
+  if(!c) return;
+  document.title = "แฟลชการ์ด - " + c.appName;
+  document.querySelectorAll('.dynamic-app-name').forEach(el => el.textContent = c.appName);
+}
+
 function generateFlashcards() {
   flashcards = [];
-  let tempArr = [...allQs].sort(() => Math.random() - 0.5); // Shuffle questions
+  let tempArr = [...allQs].sort(() => Math.random() - 0.5); 
   
   tempArr.forEach(q => {
     const isTrueStatement = Math.random() > 0.5;
     const correctKey = (q.correctAnswer || '').toUpperCase();
-    let displayChoice = q.choices[correctKey];
+    let displayChoice = q.choices[correctKey] || '';
 
     if (!isTrueStatement) {
-      // เอาคำตอบที่ผิดมาหลอก
       const wrongKeys = ['A','B','C','D'].filter(k => k !== correctKey && q.choices[k]);
       if (wrongKeys.length > 0) {
         const rKey = wrongKeys[Math.floor(Math.random() * wrongKeys.length)];
@@ -191,11 +192,7 @@ function generateFlashcards() {
       }
     }
 
-    flashcards.push({
-      qText: q.questionText,
-      ansText: displayChoice,
-      isTrue: isTrueStatement
-    });
+    flashcards.push({ qText: q.questionText, ansText: displayChoice, isTrue: isTrueStatement });
   });
 }
 
@@ -204,41 +201,47 @@ function startGame() {
   document.getElementById('end-ui').classList.add('hidden');
   document.getElementById('game-ui').classList.remove('hidden');
   
-  score = 0;
-  currentIndex = 0;
+  score = 0; currentIndex = 0;
   document.getElementById('score-count').textContent = '0';
-  generateFlashcards(); // Reshuffle
+  document.getElementById('timer-box').classList.remove('warning');
   
+  generateFlashcards(); 
   startTimer();
   renderCard();
 }
 
 function startTimer() {
   clearInterval(timerInterval);
+  startTimestamp = Date.now();
   timeLeft = TIME_LIMIT;
   document.getElementById('timer-count').textContent = timeLeft;
   
   timerInterval = setInterval(() => {
-    timeLeft--;
+    const elapsedSecs = Math.floor((Date.now() - startTimestamp) / 1000);
+    timeLeft = Math.max(0, TIME_LIMIT - elapsedSecs);
+    
     document.getElementById('timer-count').textContent = timeLeft;
+    
+    if (timeLeft <= 10) document.getElementById('timer-box').classList.add('warning');
+    
     if (timeLeft <= 0) {
       clearInterval(timerInterval);
       endGame();
     }
-  }, 1000);
+  }, 200); 
 }
 
 function renderCard() {
+  isSwiping = false; // ปลดล็อกให้ปัดได้
   const container = document.getElementById('card-container');
   container.innerHTML = '';
   
   if (currentIndex >= flashcards.length) {
-    generateFlashcards(); // ถ้าเล่นหมดกอง ให้สร้างกองใหม่แล้ววนซ้ำ
+    generateFlashcards(); 
     currentIndex = 0;
   }
 
   const cardData = flashcards[currentIndex];
-  
   const card = document.createElement('div');
   card.className = 'swipe-card';
   card.innerHTML = `
@@ -252,7 +255,6 @@ function renderCard() {
   container.appendChild(card);
   currentCardEl = card;
   
-  // Attach Touch/Mouse Events for Dragging
   card.addEventListener('touchstart', handleDragStart, {passive: true});
   card.addEventListener('touchmove', handleDragMove, {passive: false});
   card.addEventListener('touchend', handleDragEnd);
@@ -262,41 +264,35 @@ function renderCard() {
   window.addEventListener('mouseup', handleDragEnd);
 }
 
-// --- Drag & Swipe Logic ---
 function handleDragStart(e) {
-  if (!currentCardEl) return;
+  if (!currentCardEl || isSwiping || timeLeft <= 0) return;
   isDragging = true;
   startX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
   currentCardEl.style.transition = 'none';
 }
 
 function handleDragMove(e) {
-  if (!isDragging || !currentCardEl) return;
-  e.preventDefault(); // Prevent scrolling
+  if (!isDragging || !currentCardEl || isSwiping) return;
+  e.preventDefault(); 
   currentX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
   const diff = currentX - startX;
   const rotate = diff * 0.05;
   
   currentCardEl.style.transform = `translateX(${diff}px) rotate(${rotate}deg)`;
-  
-  // Show Stamps
   document.getElementById('stamp-yep').style.opacity = diff > 50 ? diff/100 : 0;
   document.getElementById('stamp-nope').style.opacity = diff < -50 ? Math.abs(diff)/100 : 0;
 }
 
 function handleDragEnd(e) {
-  if (!isDragging || !currentCardEl) return;
+  if (!isDragging || !currentCardEl || isSwiping) return;
   isDragging = false;
   
   const diff = currentX - startX;
   currentCardEl.style.transition = 'transform 0.3s ease-out';
   
-  if (diff > 100) {
-    swipeAction(true); // ปัดขวา (ตอบว่าโจทย์นี้เป็น "ความจริง")
-  } else if (diff < -100) {
-    swipeAction(false); // ปัดซ้าย (ตอบว่าโจทย์นี้เป็น "ความเท็จ")
-  } else {
-    // Reset to center
+  if (diff > 100) swipeAction(true);
+  else if (diff < -100) swipeAction(false); 
+  else {
     currentCardEl.style.transform = `translateX(0px) rotate(0deg)`;
     document.getElementById('stamp-yep').style.opacity = 0;
     document.getElementById('stamp-nope').style.opacity = 0;
@@ -304,71 +300,52 @@ function handleDragEnd(e) {
 }
 
 function handleButtonClick(isRight) {
-  if(!currentCardEl) return;
+  if(!currentCardEl || isSwiping || timeLeft <= 0) return;
   currentCardEl.style.transition = 'transform 0.3s ease-out';
   swipeAction(isRight);
 }
 
 function swipeAction(swipedTrue) {
+  isSwiping = true; // ล็อกไม่ให้ปัดใบอื่นซ้อน
   const isActualTrue = flashcards[currentIndex].isTrue;
   
-  // Animate Card Out
   currentCardEl.style.transform = `translateX(${swipedTrue ? 500 : -500}px) rotate(${swipedTrue ? 30 : -30}deg)`;
   
   if (swipedTrue === isActualTrue) {
-    // ตอบถูก
     score++;
     document.getElementById('score-count').textContent = score;
   }
   
-  currentCardEl = null; // Disable dragging
+  currentCardEl = null; 
   
-  // Load next card quickly
   setTimeout(() => {
     currentIndex++;
     if(timeLeft > 0) renderCard();
-  }, 300);
+  }, 250); // เพิ่มความเร็วในการเปลี่ยนใบ
 }
 
 function endGame() {
+  clearInterval(timerInterval);
+  isSwiping = true;
   document.getElementById('game-ui').classList.add('hidden');
   document.getElementById('end-ui').classList.remove('hidden');
   document.getElementById('end-score').textContent = score;
   
   if (score > 0) {
-    callAPI('POST', { action: 'submit_flashcard_score', userId: userId, score: score })
-      .catch(e => console.error(e));
+    callAPI('POST', { action: 'submit_flashcard_score', userId: userId, score: score }).catch(e => console.error(e));
   }
 }
 
-// --- Leaderboard ---
-async function showLeaderboard() {
-  document.getElementById('start-ui').classList.add('hidden');
-  document.getElementById('lb-ui').classList.remove('hidden');
-  loadLeaderboardData();
-}
-
-function showLeaderboardFromEnd() {
-  document.getElementById('end-ui').classList.add('hidden');
-  document.getElementById('lb-ui').classList.remove('hidden');
-  loadLeaderboardData();
-}
-
-function closeLeaderboard() {
-  document.getElementById('lb-ui').classList.add('hidden');
-  document.getElementById('start-ui').classList.remove('hidden');
-}
+async function showLeaderboard() { document.getElementById('start-ui').classList.add('hidden'); document.getElementById('lb-ui').classList.remove('hidden'); loadLeaderboardData(); }
+function showLeaderboardFromEnd() { document.getElementById('end-ui').classList.add('hidden'); document.getElementById('lb-ui').classList.remove('hidden'); loadLeaderboardData(); }
+function closeLeaderboard() { document.getElementById('lb-ui').classList.add('hidden'); document.getElementById('start-ui').classList.remove('hidden'); }
 
 async function loadLeaderboardData() {
-  document.getElementById('lb-loading').style.display = 'block';
-  document.getElementById('lb-list').style.display = 'none';
-
+  document.getElementById('lb-loading').style.display = 'block'; document.getElementById('lb-list').style.display = 'none';
   try {
     const res = await callAPI('GET', { action:'get_flashcard_leaderboard' });
     if (res.status === 'error') throw new Error(res.message);
-
-    const list = document.getElementById('lb-list');
-    list.innerHTML = '';
+    const list = document.getElementById('lb-list'); list.innerHTML = '';
     
     if (res.leaderboard.length === 0) {
       list.innerHTML = '<div style="text-align:center; padding:20px; color:var(--muted);">ยังไม่มีสถิติในระบบ</div>';
@@ -376,47 +353,22 @@ async function loadLeaderboardData() {
       res.leaderboard.forEach((e, i) => {
         const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i+1}.`;
         const isMe = e.userId === userId ? 'color:var(--primary); font-weight:800;' : '';
-        
-        list.innerHTML += `
-          <div class="lb-item">
-            <div style="font-size:16px; font-weight:800; width:30px; color:var(--muted);">${medal}</div>
-            <div style="flex:1; ${isMe}">
-              <div>${e.fullName}</div>
-              <div style="font-size:11px; color:#555;">${e.rank} ${e.position}</div>
-            </div>
-            <div style="font-size:18px; font-weight:800; color:var(--success); font-family:monospace;">${e.score}</div>
-          </div>
-        `;
+        list.innerHTML += `<div class="lb-item"><div style="font-size:16px; font-weight:800; width:30px; color:var(--muted);">${medal}</div><div style="flex:1; ${isMe}"><div>${e.fullName}</div><div style="font-size:11px; color:#555;">${e.rank} ${e.position}</div></div><div style="font-size:18px; font-weight:800; color:var(--success); font-family:monospace;">${e.score}</div></div>`;
       });
     }
-    document.getElementById('lb-loading').style.display = 'none';
-    list.style.display = 'block';
-  } catch(e) {
-    document.getElementById('lb-loading').textContent = '❌ โหลดข้อมูลล้มเหลว';
-  }
+    document.getElementById('lb-loading').style.display = 'none'; list.style.display = 'block';
+  } catch(e) { document.getElementById('lb-loading').textContent = '❌ โหลดข้อมูลล้มเหลว'; }
 }
 
 async function callAPI(method, params, timeoutMs=20000) {
-  const ctrl = new AbortController();
-  const tid  = setTimeout(() => ctrl.abort(), timeoutMs);
+  const ctrl = new AbortController(); const tid  = setTimeout(() => ctrl.abort(), timeoutMs);
   try {
     let url = GAS_URL, opts = { signal:ctrl.signal, redirect:'follow' };
-    if (method === 'GET') {
-      url += '?' + new URLSearchParams(params).toString();
-      opts.method = 'GET';
-    } else {
-      opts.method  = 'POST';
-      opts.headers = { 'Content-Type':'text/plain' };
-      opts.body    = JSON.stringify(params);
-    }
-    const resp = await fetch(url, opts);
-    clearTimeout(tid);
-    if (!resp.ok) throw new Error('HTTP ' + resp.status);
-    return await resp.json();
-  } catch(e) {
-    clearTimeout(tid);
-    throw e;
-  }
+    if (method === 'GET') { url += '?' + new URLSearchParams(params).toString(); opts.method = 'GET'; } 
+    else { opts.method  = 'POST'; opts.headers = { 'Content-Type':'text/plain' }; opts.body = JSON.stringify(params); }
+    const resp = await fetch(url, opts); clearTimeout(tid);
+    if (!resp.ok) throw new Error('HTTP ' + resp.status); return await resp.json();
+  } catch(e) { clearTimeout(tid); throw e; }
 }
 
 init();
