@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Unit School — Admin Dashboard</title>
+<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:   #1a237e; --navy2:  #283593;
+  --gold:   #ffd700; --gold2:  #ffb300;
+  --bg:     #0f1322; --surface:#161c36; --surf2:  #1e2647;
+  --border: #2a3558; --text:   #e8ecf8; --muted:  #6e7aa0;
+  --green:  #00c853; --red:    #ff5252; --blue:   #4fc3f7; --purple: #ce93d8;
+  --shadow: 0 4px 24px rgba(0,0,0,0.5);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+/* OVERLAYS */
+.ov{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;z-index:9999;padding:32px;text-align:center}
+.ov.hidden{display:none!important}
+.ov-spinner{width:64px;height:64px;border:3px solid var(--surf2);border-top:3px solid var(--gold);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* LOGIN SCREEN */
+.login-box{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:32px 28px;width:100%;max-width:340px;text-align:center}
+.pin-input{width:100%;background:var(--surf2);border:2px solid var(--border);border-radius:12px;padding:15px;font-size:20px;font-family:'IBM Plex Mono',monospace;color:var(--text);outline:none;text-align:center;letter-spacing:4px;margin:16px 0}
+.pin-input:focus{border-color:var(--gold);}
+.err-msg{font-size:13px;color:var(--red);margin-bottom:12px;min-height:20px}
+
+/* HEADER */
+.hdr{background:linear-gradient(135deg,var(--navy),var(--navy2));padding:14px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:var(--shadow)}
+
+/* TABS */
+.tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto}
+.tabs::-webkit-scrollbar { display:none; }
+.tab{flex:none;padding:12px 20px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;transition:all .2s}
+.tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+
+/* CONTENT */
+.tab-content{display:none;padding:16px 16px 80px;max-width:600px;margin:0 auto}
+.tab-content.active{display:block}
+
+/* Q-TABS (เพิ่มสไตล์สำหรับแท็บย่อยข้อสอบ) */
+.q-tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 12px; }
+.q-tabs::-webkit-scrollbar { display: none; }
+.q-tab { flex: none; padding: 6px 12px; background: var(--surf2); border: 1px solid var(--border); border-radius: 14px; font-size: 12px; font-weight: 700; color: var(--muted); cursor: pointer; transition: 0.2s; }
+.q-tab.active { background: rgba(255,215,0,0.15); border-color: var(--gold); color: var(--gold); }
+.q-content { display: none; flex-direction: column; gap: 10px; }
+.q-content.active { display: flex; }
+
+/* GRIDS & CARDS */
+.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:20px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center}
+.stat-val{font-size:28px;font-weight:800;font-family:'IBM Plex Mono',monospace;color:var(--gold)}
+.stat-label{font-size:12px;color:var(--muted);margin-top:4px}
+
+.data-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px; margin-bottom:12px; animation:fadeUp .3s ease; display: flex; flex-direction: column; gap: 10px;}
+.data-hdr { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+.badge { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; font-family:'IBM Plex Mono',monospace;}
+.badge.pdf { background: rgba(248,81,73,0.15); color: #f85149; }
+.badge.video { background: rgba(255,152,0,0.15); color: #ff9800; }
+.badge.link { background: rgba(46,160,67,0.15); color: #2ea043; }
+.badge.active { background: rgba(0,200,83,0.15); color: var(--green); border: 1px solid var(--green);}
+.badge.inactive { background: rgba(255,82,82,0.15); color: var(--red); border: 1px solid var(--red);}
+
+/* FORM & MODAL */
+.form-group{margin-bottom:16px}
+.form-label{font-size:12px;font-weight:700;color:var(--muted);margin-bottom:8px;display:block}
+input[type=text],input[type=number],textarea,select{width:100%;background:var(--surf2);border:1.5px solid var(--border);border-radius:10px;padding:12px 16px;font-family:'Sarabun',sans-serif;font-size:15px;color:var(--text);outline:none;transition:border-color .2s;-webkit-appearance:none;appearance:none}
+input:focus,textarea:focus,select:focus{border-color:var(--gold);}
+textarea{resize:vertical;min-height:80px}
+select option{background:var(--surf2);color:var(--text)}
+
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:500;display:flex;align-items:flex-end}
+.modal-backdrop.hidden{display:none!important}
+.modal{background:var(--surface);border-top-left-radius:20px;border-top-right-radius:20px;padding:24px 20px;width:100%;max-height:90vh;overflow-y:auto;border:1px solid var(--border)}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 16px;border:none;border-radius:10px;font-family:'Sarabun',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:linear-gradient(135deg,var(--navy),var(--navy2));color:var(--gold)}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#1a1a1a}
+.btn-red{background:rgba(255,82,82,0.15);color:var(--red);border:1px solid rgba(255,82,82,0.3)}
+.btn-secondary{background:var(--surf2);color:var(--text);border:1px solid var(--border)}
+.btn-sm{padding:8px 14px;font-size:13px}
+.btn-full{width:100%}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+
+<div id="ov-load" class="ov">
+  <div class="ov-spinner"></div>
+  <div style="font-size:18px;font-weight:800;color:var(--gold)">Admin Dashboard</div>
+  <div style="font-size:13px;color:var(--muted)" id="load-txt">กำลังเชื่อมต่อ...</div>
+</div>
+
+<div id="ov-login" class="ov hidden">
+  <div class="login-box">
+    <div style="font-size:56px;margin-bottom:12px">🔐</div>
+    <div style="font-size:20px;font-weight:800;color:var(--gold);">Admin Dashboard</div>
+    <div style="font-size:13px;color:var(--muted);">กรอกรหัสผ่านผู้ดูแลระบบ</div>
+    <input type="password" class="pin-input" id="pin-input" placeholder="••••••" maxlength="20">
+    <div class="err-msg" id="err-msg"></div>
+    <button class="btn btn-gold btn-full" onclick="doLogin()">🔓 เข้าสู่ระบบ</button>
+  </div>
+</div>
+
+<div id="app" class="hidden">
+  <div class="hdr">
+    <div style="display:flex; align-items:center; gap:12px;">
+      <div style="width:36px;height:36px;background:var(--gold);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;">🎖️</div>
+      <div>
+        <div style="font-size:15px;font-weight:800;color:var(--gold)">Admin Dashboard</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.55)">Unit School</div>
+      </div>
+    </div>
+    <button class="btn btn-secondary btn-sm" onclick="loadData()">🔄</button>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('overview')">📊 ภาพรวม</div>
+    <div class="tab" onclick="showTab('leaderboard')">🏆 อันดับ</div>
+    <div class="tab" onclick="showTab('members')">👤 กำลังพล</div>
+    <div class="tab" onclick="showTab('questions')">📝 ข้อสอบ</div>
+    <div class="tab" onclick="showTab('library')">📚 คลังความรู้</div>
+    <div class="tab" onclick="showTab('store')">🛒 ร้านค้า PX</div>
+  </div>
+
+  <!-- TAB OVERVIEW -->
+  <div id="tab-overview" class="tab-content active">
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-val" id="s-members">—</div><div class="stat-label">กำลังพลลงทะเบียน</div></div>
+      <div class="stat-card" style="color:var(--green)"><div class="stat-val" id="s-examed" style="color:var(--green)">—</div><div class="stat-label" style="color:var(--green)">ทำข้อสอบแล้ว</div></div>
+      <div class="stat-card" style="color:var(--red)"><div class="stat-val" id="s-not" style="color:var(--red)">—</div><div class="stat-label" style="color:var(--red)">ยังไม่ได้สอบ</div></div>
+      <div class="stat-card"><div class="stat-val" id="s-avg" style="color:var(--blue)">—%</div><div class="stat-label">คะแนนเฉลี่ย</div></div>
+    </div>
+
+    <div style="font-weight:700; color:var(--muted); margin:20px 0 10px;">⚙️ ตั้งค่าระบบ</div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;">
+      <div class="form-group">
+        <label class="form-label">เวลาในการทำข้อสอบ (นาที)</label>
+        <input type="number" id="inp-exam-time" placeholder="เช่น 20">
+      </div>
+      <button class="btn btn-gold btn-full" onclick="saveSettings()">💾 บันทึกการตั้งค่า</button>
+    </div>
+  </div>
+
+  <!-- TAB LEADERBOARD -->
+  <div id="tab-leaderboard" class="tab-content">
+    <div style="font-weight:700; color:var(--muted); margin-bottom:12px;">🏆 ตารางอันดับคะแนนรวม</div>
+    <div id="lb-container" style="display:flex; flex-direction:column; gap:10px;"></div>
+  </div>
+
+  <!-- TAB MEMBERS -->
+  <div id="tab-members" class="tab-content">
+    <div style="font-weight:700; color:var(--muted); margin-bottom:12px;">👤 รายชื่อกำลังพลทั้งหมด</div>
+    <div id="members-container" style="display:flex; flex-direction:column; gap:10px;"></div>
+  </div>
+
+  <!-- TAB QUESTIONS -->
+  <div id="tab-questions" class="tab-content">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+      <div style="font-weight:700; color:var(--muted);">📝 คลังข้อสอบ</div>
+      <div style="display:flex; gap:8px;">
+        <button class="btn btn-secondary btn-sm" onclick="openImportModal()">📥 นำเข้าข้อสอบ</button>
+        <button class="btn btn-gold btn-sm" onclick="openAddQuestion()">+ เพิ่มข้อสอบ</button>
+      </div>
+    </div>
+    <div id="q-container"></div>
+  </div>
+
+  <!-- TAB LIBRARY -->
+  <div id="tab-library" class="tab-content">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+      <div style="font-weight:700; color:var(--muted);">📚 จัดการคลังความรู้</div>
+      <button class="btn btn-gold btn-sm" onclick="openAddLibrary()">+ เพิ่มสื่อการสอน</button>
+    </div>
+    <div id="lib-container"></div>
+  </div>
+
+  <!-- TAB STORE -->
+  <div id="tab-store" class="tab-content">
+    <div class="q-tabs" style="margin-bottom: 20px;">
+      <div class="q-tab active" onclick="showStoreSubTab('rewards')" id="s-tab-btn-rewards">🎁 จัดการของรางวัล</div>
+      <div class="q-tab" onclick="showStoreSubTab('requests')" id="s-tab-btn-requests">🔔 รายการขอแลกรางวัล</div>
+    </div>
+
+    <!-- Sub-tab: Rewards -->
+    <div class="q-content active" id="s-content-rewards">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <div style="font-size:12px; color:var(--muted);">แคตตาล็อกรางวัลที่เปิดให้แลก</div>
+        <button class="btn btn-gold btn-sm" onclick="openAddReward()">+ เพิ่มของรางวัล</button>
+      </div>
+      <div id="reward-container"></div>
+    </div>
+
+    <!-- Sub-tab: Requests -->
+    <div class="q-content" id="s-content-requests">
+      <div style="font-size:12px; color:var(--muted); margin-bottom:16px;">กำลังพลที่กดขอแลกรางวัล รอการอนุมัติ</div>
+      <div id="request-container"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: QUESTION -->
+<div id="modal-q" class="modal-backdrop hidden" onclick="closeModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div style="font-size:18px; font-weight:800; color:var(--gold); margin-bottom:20px;" id="mq-title">เพิ่มข้อสอบ</div>
+    <input type="hidden" id="mq-id">
+    <div class="form-group"><label class="form-label">คำถาม</label><textarea id="mq-text"></textarea></div>
+    <div class="form-group"><label class="form-label">ตัวเลือก A</label><input type="text" id="mq-a"></div>
+    <div class="form-group"><label class="form-label">ตัวเลือก B</label><input type="text" id="mq-b"></div>
+    <div class="form-group"><label class="form-label">ตัวเลือก C</label><input type="text" id="mq-c"></div>
+    <div class="form-group"><label class="form-label">ตัวเลือก D</label><input type="text" id="mq-d"></div>
+    <div class="form-group"><label class="form-label">เฉลย</label>
+      <select id="mq-ans"><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option></select>
+    </div>
+    <div class="form-group"><label class="form-label">หมวดหมู่/รายวิชา</label><input type="text" id="mq-cat"></div>
+    <div style="display:flex; gap:10px; margin-top:20px;">
+      <button class="btn btn-secondary" style="flex:1" onclick="closeAllModal()">ยกเลิก</button>
+      <button class="btn btn-gold" style="flex:2" onclick="saveQuestion()">💾 บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: IMPORT QUESTIONS -->
+<div id="modal-import" class="modal-backdrop hidden" onclick="closeModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div style="font-size:18px; font-weight:800; color:var(--gold); margin-bottom:10px;">📥 นำเข้าข้อสอบจาก Excel</div>
+    <div style="font-size:12px; color:var(--muted); margin-bottom:15px; line-height:1.5;">
+      ให้ Copy ข้อมูลจากตาราง Excel มาวางในกล่องด้านล่างนี้ โดยเรียงคอลัมน์ดังนี้:<br>
+      <b style="color:var(--text)">คำถาม | ตัวเลือก A | B | C | D | เฉลย | รายวิชา</b>
+    </div>
+    <div class="form-group">
+      <textarea id="mi-text" placeholder="วางข้อมูลจาก Excel ลงที่นี่..." style="min-height: 150px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; white-space: pre; overflow-x: auto;"></textarea>
+    </div>
+    <div style="display:flex; gap:10px; margin-top:20px;">
+      <button class="btn btn-secondary" style="flex:1" onclick="closeAllModal()">ยกเลิก</button>
+      <button class="btn btn-gold" style="flex:2" onclick="processImport()" id="btn-import-submit">🚀 นำเข้าข้อมูล</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: LIBRARY -->
+<div id="modal-lib" class="modal-backdrop hidden" onclick="closeModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div style="font-size:18px; font-weight:800; color:var(--gold); margin-bottom:20px;" id="ml-title">เพิ่มสื่อการสอน</div>
+    <input type="hidden" id="ml-id">
+    
+    <div class="form-group">
+      <label class="form-label">ชื่อสื่อการสอน / บทเรียน</label>
+      <input type="text" id="ml-title-inp" placeholder="เช่น คู่มือการปฐมพยาบาล">
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label">ประเภท (Type)</label>
+      <select id="ml-type">
+        <option value="PDF">📄 เอกสาร (PDF)</option>
+        <option value="VIDEO">🎥 วิดีโอ (YouTube/MP4)</option>
+        <option value="LINK">🔗 เว็บไซต์ (Link)</option>
+      </select>
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label">URL (ลิงก์ไปยังไฟล์หรือเว็บ)</label>
+      <textarea id="ml-url" placeholder="https://..." style="min-height: 60px;"></textarea>
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label">หมวดหมู่รายวิชา</label>
+      <input type="text" id="ml-cat" placeholder="เช่น วิชาอาวุธ">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">สถานะการแสดงผล</label>
+      <select id="ml-active">
+        <option value="YES">เปิดให้กำลังพลเข้าดูได้ (Active)</option>
+        <option value="NO">ซ่อนไว้ก่อน (Inactive)</option>
+      </select>
+    </div>
+    
+    <div style="display:flex; gap:10px; margin-top:20px;">
+      <button class="btn btn-secondary" style="flex:1" onclick="closeAllModal()">ยกเลิก</button>
+      <button class="btn btn-gold" style="flex:2" onclick="saveLibrary()">💾 บันทึกข้อมูล</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: STORE REWARD -->
+<div id="modal-reward" class="modal-backdrop hidden" onclick="closeModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div style="font-size:18px; font-weight:800; color:var(--gold); margin-bottom:20px;" id="mr-title">เพิ่มของรางวัล</div>
+    <input type="hidden" id="mr-id">
+    
+    <div class="form-group">
+      <label class="form-label">ชื่อของรางวัล</label>
+      <input type="text" id="mr-name" placeholder="เช่น บัตรพัก 1 วัน">
+    </div>
+    <div class="form-group">
+      <label class="form-label">คำอธิบาย</label>
+      <input type="text" id="mr-desc" placeholder="เช่น ขออนุมัติผ่าน ผบ.ร้อย ได้ทันที">
+    </div>
+    <div style="display:flex; gap:10px;">
+      <div class="form-group" style="flex:1">
+        <label class="form-label">ราคา (เหรียญ)</label>
+        <input type="number" id="mr-price" placeholder="500">
+      </div>
+      <div class="form-group" style="flex:1">
+        <label class="form-label">จำนวน (สิทธิ์)</label>
+        <input type="number" id="mr-stock" placeholder="10">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">ลิงก์รูปภาพ (Image URL)</label>
+      <input type="text" id="mr-image" placeholder="https://...">
+    </div>
+    <div class="form-group">
+      <label class="form-label">สถานะ (เปิด/ปิดให้แลก)</label>
+      <select id="mr-active"><option value="YES">เปิด (YES)</option><option value="NO">ปิด (NO)</option></select>
+    </div>
+    
+    <div style="display:flex; gap:10px; margin-top:20px;">
+      <button class="btn btn-secondary" style="flex:1" onclick="closeAllModal()">ยกเลิก</button>
+      <button class="btn btn-gold" style="flex:2" onclick="saveReward()">💾 บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const LIFF_ID  = '2009717287-baGusOWI'; // LIFF ID Admin
+const GAS_URL  = 'https://script.google.com/macros/s/AKfycbyRhVNOnNIAkwZxrTcJOzI2nh_fmSIzI8tgbVurJoUJlDaZrR2Kovo0AydC3Qs0PNyU/exec';
+
+let adminSecret = '', adminData = null, userId = '';
+
+async function init() {
+  try {
+    await liff.init({ liffId: LIFF_ID });
+    if (!liff.isLoggedIn()) { liff.login(); return; }
+    userId = (await liff.getProfile()).userId;
+    document.getElementById('ov-load').classList.add('hidden');
+    document.getElementById('ov-login').classList.remove('hidden');
+  } catch(e) { document.getElementById('load-txt').textContent = '❌ ' + e.message; }
+}
+
+async function doLogin() {
+  const secret = document.getElementById('pin-input').value.trim();
+  if (!secret) return;
+  document.getElementById('ov-login').classList.add('hidden');
+  document.getElementById('ov-load').classList.remove('hidden');
+
+  try {
+    const res = await callAPI('POST', { action:'admin_login', userId, secret });
+    if (res.status !== 'ok') throw new Error(res.message);
+    adminSecret = secret;
+    await loadData();
+    document.getElementById('ov-load').classList.add('hidden');
+    document.getElementById('app').classList.remove('hidden');
+  } catch(e) {
+    document.getElementById('ov-load').classList.add('hidden');
+    document.getElementById('ov-login').classList.remove('hidden');
+    document.getElementById('err-msg').textContent = '❌ ' + e.message;
+  }
+}
+
+async function loadData() {
+  try {
+    const res = await callAPI('GET', { action:'admin_data', secret: adminSecret });
+    if (res.status !== 'ok') throw new Error(res.message);
+    adminData = res;
+    renderAll();
+  } catch(e) { alert('โหลดข้อมูลล้มเหลว: ' + e.message); }
+}
+
+function renderAll() {
+  // Overview
+  const s = adminData.stats;
+  document.getElementById('s-members').textContent = s.totalMembers;
+  document.getElementById('s-examed').textContent = s.totalExamed;
+  document.getElementById('s-not').textContent = s.notExamed;
+  document.getElementById('s-avg').textContent = s.avgScore + '%';
+  if(adminData.settings) document.getElementById('inp-exam-time').value = adminData.settings.examTimeMinutes;
+
+  // Leaderboard
+  const lbHtml = (adminData.leaderboard || []).map((e, i) => `
+    <div class="data-card" style="flex-direction:row; align-items:center;">
+      <div style="font-size:24px; font-weight:800; color:var(--gold); width:30px;">${i+1}</div>
+      <div style="flex:1;">
+        <div style="font-weight:700;">${e.fullName}</div>
+        <div style="font-size:11px; color:var(--muted);">${e.position || '-'}</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-weight:800; color:var(--gold); font-family:monospace;">${e.totalScore}/${e.maxScore}</div>
+        <div style="font-size:11px;">${Math.round(e.percentage)}%</div>
+      </div>
+      <button class="btn btn-red btn-sm" style="margin-left:10px;" onclick="resetUser('${e.userId}')">รีเซ็ต</button>
+    </div>
+  `).join('');
+  document.getElementById('lb-container').innerHTML = lbHtml || '<div style="text-align:center; color:var(--muted);">ไม่มีข้อมูล</div>';
+
+  // Members
+  const mHtml = (adminData.members || []).map(m => `
+    <div class="data-card">
+      <div style="font-weight:700;">${m.fullName} <span style="font-size:11px; color:var(--muted); font-weight:normal;">(${m.rank})</span></div>
+      <div style="font-size:12px; color:var(--muted);">ตำแหน่ง: ${m.position}</div>
+    </div>
+  `).join('');
+  document.getElementById('members-container').innerHTML = mHtml;
+
+  // Questions (ปรับปรุงให้รองรับแท็บรายวิชา)
+  window._qMap = {};
+  const qGroups = {};
+  (adminData.questions || []).forEach(q => {
+    window._qMap[q.questionId] = q;
+    const cat = q.category || 'ทั่วไป';
+    if (!qGroups[cat]) qGroups[cat] = [];
+    qGroups[cat].push(q);
+  });
+
+  const cats = Object.keys(qGroups).sort();
+  if (cats.length === 0) {
+    document.getElementById('q-container').innerHTML = '<div style="text-align:center; color:var(--muted);">ยังไม่มีข้อสอบ</div>';
+  } else {
+    if (!window._activeQTab || !cats.includes(window._activeQTab)) window._activeQTab = cats[0];
+    
+    let tabsHtml = '<div class="q-tabs">';
+    let contentsHtml = '';
+    
+    cats.forEach(cat => {
+      const isActive = cat === window._activeQTab ? 'active' : '';
+      tabsHtml += `<div class="q-tab ${isActive}" onclick="showQTab('${cat}')" id="q-tab-btn-${cat}">${cat} (${qGroups[cat].length})</div>`;
+      
+      contentsHtml += `<div class="q-content ${isActive}" id="q-content-${cat}">`;
+      contentsHtml += qGroups[cat].map(q => `
+        <div class="data-card" style="margin-bottom:0;">
+          <div class="data-hdr">
+            <span class="badge" style="background:var(--surf2); color:var(--text);">${q.category}</span>
+            <div style="font-size:11px; font-family:monospace; color:var(--muted);">${q.questionId}</div>
+          </div>
+          <div style="font-size:14px; font-weight:600; margin:10px 0;">${q.questionText}</div>
+          <div style="font-size:12px; color:var(--muted);">
+            A: ${q.choiceA} ${q.correctAnswer==='A'?'✅':''}<br>
+            B: ${q.choiceB} ${q.correctAnswer==='B'?'✅':''}<br>
+            C: ${q.choiceC} ${q.correctAnswer==='C'?'✅':''}<br>
+            D: ${q.choiceD} ${q.correctAnswer==='D'?'✅':''}
+          </div>
+          <div style="display:flex; gap:10px; margin-top:10px;">
+            <button class="btn btn-secondary btn-sm" style="flex:1" onclick="openEditQuestion('${q.questionId}')">✏️ แก้ไข</button>
+            <button class="btn btn-red btn-sm" style="flex:1" onclick="deleteQuestion('${q.questionId}')">🗑️ ลบ</button>
+          </div>
+        </div>`).join('');
+      contentsHtml += `</div>`;
+    });
+    tabsHtml += '</div>';
+    document.getElementById('q-container').innerHTML = tabsHtml + contentsHtml;
+  }
+
+  // Library
+  window._libMap = {};
+  const libHtml = (adminData.library || []).map(l => {
+    window._libMap[l.id] = l;
+    const tClass = l.type === 'PDF' ? 'pdf' : l.type === 'VIDEO' ? 'video' : 'link';
+    const activeClass = l.active === 'YES' ? 'active' : 'inactive';
+    const activeText = l.active === 'YES' ? 'ออนไลน์' : 'ซ่อน';
+    return `
+    <div class="data-card">
+      <div class="data-hdr">
+        <div style="display:flex; gap:6px;">
+          <span class="badge ${tClass}">${l.type}</span>
+          <span class="badge" style="background:var(--surf2); color:var(--text);">${l.category}</span>
+        </div>
+        <span class="badge ${activeClass}">${activeText}</span>
+      </div>
+      <div style="font-size:15px; font-weight:700; margin:10px 0;">${l.title}</div>
+      <div style="font-size:11px; color:var(--primary); word-break:break-all; margin-bottom:10px;">${l.url}</div>
+      <div style="display:flex; gap:10px;">
+        <button class="btn btn-secondary btn-sm" style="flex:1" onclick="openEditLibrary('${l.id}')">✏️ แก้ไข</button>
+        <button class="btn btn-red btn-sm" style="flex:1" onclick="deleteLibrary('${l.id}')">🗑️ ลบ</button>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('lib-container').innerHTML = libHtml || '<div style="text-align:center; color:var(--muted);">ยังไม่มีสื่อการสอน</div>';
+
+  // Store - Rewards
+  window._rewMap = {};
+  const rewHtml = (adminData.rewards || []).map(r => {
+    window._rewMap[r.id] = r;
+    const activeBadge = r.active === 'YES' ? '<span class="badge active">เปิดแลก</span>' : '<span class="badge inactive">ซ่อน</span>';
+    return `
+    <div class="data-card" style="flex-direction:row; align-items:center; gap:16px;">
+      <img src="${r.image || 'https://cdn-icons-png.flaticon.com/512/10398/10398492.png'}" style="width:60px; height:60px; object-fit:contain; border-radius:8px; background:#fff; padding:4px;" onerror="this.style.display='none'">
+      <div style="flex:1; overflow:hidden;">
+        <div style="display:flex; gap:8px; align-items:center; margin-bottom:4px;">
+          <div style="font-weight:800; font-size:15px; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;">${r.name}</div>
+          ${activeBadge}
+        </div>
+        <div style="font-size:12px; color:var(--muted); margin-bottom:4px;">${r.desc || '-'}</div>
+        <div style="font-size:12px; font-weight:700;">
+          <span style="color:var(--gold)">${r.price} 🪙</span> | <span style="color:var(--blue)">สต็อก: ${r.stock}</span>
+        </div>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:6px;">
+        <button class="btn btn-secondary btn-sm" onclick="openEditReward('${r.id}')">✏️</button>
+        <button class="btn btn-red btn-sm" onclick="deleteReward('${r.id}')">🗑️</button>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('reward-container').innerHTML = rewHtml || '<div style="text-align:center; color:var(--muted); padding:20px;">ยังไม่มีของรางวัล</div>';
+
+  // Store - Redemptions (Requests)
+  const reqHtml = (adminData.redemptions || []).filter(req => req.status === 'PENDING').map(req => `
+    <div class="data-card">
+      <div class="data-hdr" style="border-bottom:none; padding-bottom:0;">
+        <div style="font-weight:700; color:var(--blue);">${req.userName}</div>
+        <div style="font-size:11px; color:var(--muted);">${new Date(req.timestamp).toLocaleString()}</div>
+      </div>
+      <div style="font-size:14px; font-weight:600; margin:8px 0;">ขอแลก: ${req.rewardName} <span style="color:var(--gold)">(${req.price} 🪙)</span></div>
+      <div style="display:flex; gap:10px; margin-top:10px;">
+        <button class="btn btn-secondary btn-sm" style="flex:1; color:var(--red); border-color:var(--red);" onclick="updateRedemption('${req.id}', 'REJECTED')">❌ ปฏิเสธ (คืนเหรียญ)</button>
+        <button class="btn btn-gold btn-sm" style="flex:1; background:var(--green); color:#fff;" onclick="updateRedemption('${req.id}', 'APPROVED')">✅ อนุมัติให้รางวัล</button>
+      </div>
+    </div>
+  `).join('');
+  document.getElementById('request-container').innerHTML = reqHtml || '<div style="text-align:center; color:var(--muted); padding:20px;">ไม่มีคำขอแลกรางวัลที่ค้างอยู่</div>';
+}
+
+function showTab(name) {
+  document.querySelectorAll('.tab').forEach((t, i) => {
+    const names = ['overview','leaderboard','members','questions', 'library', 'store'];
+    t.classList.toggle('active', names[i] === name);
+  });
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+}
+
+function showQTab(cat) {
+  window._activeQTab = cat;
+  document.querySelectorAll('.q-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.q-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('q-tab-btn-' + cat).classList.add('active');
+  document.getElementById('q-content-' + cat).classList.add('active');
+}
+
+function showStoreSubTab(sub) {
+  document.querySelectorAll('#tab-store .q-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('#tab-store .q-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('s-tab-btn-' + sub).classList.add('active');
+  document.getElementById('s-content-' + sub).classList.add('active');
+}
+
+// --- QUESTIONS ---
+function openAddQuestion() {
+  document.getElementById('mq-title').textContent = '➕ เพิ่มข้อสอบ';
+  document.getElementById('mq-id').value = '';
+  ['text','a','b','c','d','cat'].forEach(k => document.getElementById('mq-'+k).value = '');
+  document.getElementById('mq-ans').value = 'A';
+  document.getElementById('modal-q').classList.remove('hidden');
+}
+function openEditQuestion(id) {
+  const q = window._qMap[id];
+  document.getElementById('mq-title').textContent = '✏️ แก้ไขข้อสอบ';
+  document.getElementById('mq-id').value = q.questionId;
+  document.getElementById('mq-text').value = q.questionText;
+  document.getElementById('mq-a').value = q.choiceA;
+  document.getElementById('mq-b').value = q.choiceB;
+  document.getElementById('mq-c').value = q.choiceC;
+  document.getElementById('mq-d').value = q.choiceD;
+  document.getElementById('mq-ans').value = q.correctAnswer;
+  document.getElementById('mq-cat').value = q.category;
+  document.getElementById('modal-q').classList.remove('hidden');
+}
+async function saveQuestion() {
+  const data = {
+    action: 'save_question', secret: adminSecret,
+    questionId: document.getElementById('mq-id').value || undefined,
+    questionText: document.getElementById('mq-text').value,
+    choiceA: document.getElementById('mq-a').value, choiceB: document.getElementById('mq-b').value,
+    choiceC: document.getElementById('mq-c').value, choiceD: document.getElementById('mq-d').value,
+    correctAnswer: document.getElementById('mq-ans').value, category: document.getElementById('mq-cat').value
+  };
+  try {
+    await callAPI('POST', data);
+    closeAllModal(); await loadData(); alert('✅ บันทึกข้อสอบสำเร็จ');
+  } catch(e) { alert(e.message); }
+}
+async function deleteQuestion(id) {
+  if(!confirm('ยืนยันลบข้อสอบ?')) return;
+  try { await callAPI('POST', {action:'delete_question', secret:adminSecret, questionId:id}); await loadData(); } catch(e) { alert(e.message); }
+}
+
+// --- IMPORT QUESTIONS ---
+function openImportModal() {
+  document.getElementById('mi-text').value = '';
+  document.getElementById('modal-import').classList.remove('hidden');
+}
+async function processImport() {
+  const text = document.getElementById('mi-text').value.trim();
+  if (!text) return alert('กรุณาวางข้อมูลก่อน');
+  
+  const lines = text.split('\n');
+  const qList = [];
+  
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) continue;
+    
+    const cols = line.split('\t');
+    if (cols.length >= 6) {
+      qList.push({
+        q: cols[0].trim(),
+        a: cols[1].trim(),
+        b: cols[2].trim(),
+        c: cols[3].trim(),
+        d: cols[4].trim(),
+        ans: cols[5].trim().toUpperCase(),
+        cat: cols[6] ? cols[6].trim() : 'ทั่วไป'
+      });
+    }
+  }
+
+  if (qList.length === 0) return alert('ไม่พบข้อมูลที่ถูกต้อง กรุณาตรวจสอบการเรียงคอลัมน์ (ต้องมีอย่างน้อย 6 คอลัมน์)');
+  if (!confirm(`ตรวจสอบพบข้อสอบ ${qList.length} ข้อ ยืนยันการนำเข้าหรือไม่?`)) return;
+
+  const btn = document.getElementById('btn-import-submit');
+  btn.disabled = true;
+  btn.textContent = '⏳ กำลังนำเข้า...';
+
+  try {
+    const res = await callAPI('POST', { action: 'import_questions', secret: adminSecret, questions: qList });
+    closeAllModal();
+    await loadData();
+    alert('✅ ' + res.message);
+  } catch(e) {
+    alert('เกิดข้อผิดพลาด: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🚀 นำเข้าข้อมูล';
+  }
+}
+
+// --- LIBRARY ---
+function openAddLibrary() {
+  document.getElementById('ml-title').textContent = '➕ เพิ่มสื่อการสอน';
+  document.getElementById('ml-id').value = '';
+  document.getElementById('ml-title-inp').value = '';
+  document.getElementById('ml-url').value = '';
+  document.getElementById('ml-cat').value = 'ทั่วไป';
+  document.getElementById('ml-type').value = 'PDF';
+  document.getElementById('ml-active').value = 'YES';
+  document.getElementById('modal-lib').classList.remove('hidden');
+}
+function openEditLibrary(id) {
+  const l = window._libMap[id];
+  document.getElementById('ml-title').textContent = '✏️ แก้ไขสื่อการสอน';
+  document.getElementById('ml-id').value = l.id;
+  document.getElementById('ml-title-inp').value = l.title;
+  document.getElementById('ml-url').value = l.url;
+  document.getElementById('ml-cat').value = l.category;
+  document.getElementById('ml-type').value = l.type;
+  document.getElementById('ml-active').value = l.active;
+  document.getElementById('modal-lib').classList.remove('hidden');
+}
+async function saveLibrary() {
+  const data = {
+    action: 'save_library', secret: adminSecret,
+    id: document.getElementById('ml-id').value || undefined,
+    title: document.getElementById('ml-title-inp').value,
+    type: document.getElementById('ml-type').value,
+    url: document.getElementById('ml-url').value,
+    category: document.getElementById('ml-cat').value,
+    active: document.getElementById('ml-active').value
+  };
+  try {
+    await callAPI('POST', data);
+    closeAllModal(); await loadData(); alert('✅ บันทึกสื่อการสอนสำเร็จ');
+  } catch(e) { alert(e.message); }
+}
+async function deleteLibrary(id) {
+  if(!confirm('ยืนยันลบสื่อการสอน?')) return;
+  try { await callAPI('POST', {action:'delete_library', secret:adminSecret, id:id}); await loadData(); } catch(e) { alert(e.message); }
+}
+
+// --- STORE FUNCTIONS ---
+function openAddReward() {
+  document.getElementById('mr-title').textContent = '➕ เพิ่มของรางวัล';
+  document.getElementById('mr-id').value = '';
+  ['name','desc','image'].forEach(k => document.getElementById('mr-'+k).value = '');
+  document.getElementById('mr-price').value = '500';
+  document.getElementById('mr-stock').value = '10';
+  document.getElementById('mr-active').value = 'YES';
+  document.getElementById('modal-reward').classList.remove('hidden');
+}
+function openEditReward(id) {
+  const r = window._rewMap[id];
+  document.getElementById('mr-title').textContent = '✏️ แก้ไขของรางวัล';
+  document.getElementById('mr-id').value = r.id;
+  document.getElementById('mr-name').value = r.name;
+  document.getElementById('mr-desc').value = r.desc;
+  document.getElementById('mr-price').value = r.price;
+  document.getElementById('mr-stock').value = r.stock;
+  document.getElementById('mr-image').value = r.image;
+  document.getElementById('mr-active').value = r.active;
+  document.getElementById('modal-reward').classList.remove('hidden');
+}
+async function saveReward() {
+  const data = {
+    action: 'save_reward', secret: adminSecret,
+    id: document.getElementById('mr-id').value || undefined,
+    name: document.getElementById('mr-name').value,
+    desc: document.getElementById('mr-desc').value,
+    price: Number(document.getElementById('mr-price').value),
+    stock: Number(document.getElementById('mr-stock').value),
+    image: document.getElementById('mr-image').value,
+    active: document.getElementById('mr-active').value
+  };
+  try {
+    await callAPI('POST', data);
+    closeAllModal(); await loadData(); alert('✅ บันทึกของรางวัลสำเร็จ');
+  } catch(e) { alert(e.message); }
+}
+async function deleteReward(id) {
+  if(!confirm('ยืนยันลบของรางวัลชิ้นนี้?')) return;
+  try { await callAPI('POST', {action:'delete_reward', secret:adminSecret, id:id}); await loadData(); } catch(e) { alert(e.message); }
+}
+async function updateRedemption(id, status) {
+  const actionText = status === 'APPROVED' ? 'อนุมัติให้รางวัล' : 'ปฏิเสธและคืนเหรียญ';
+  if(!confirm(`ยืนยัน "${actionText}" รายการนี้?`)) return;
+  try { await callAPI('POST', {action:'update_redemption', secret:adminSecret, id:id, status:status}); await loadData(); } catch(e) { alert(e.message); }
+}
+
+async function saveSettings() {
+  const t = document.getElementById('inp-exam-time').value;
+  try { await callAPI('POST', {action:'save_settings', secret:adminSecret, examTimeMinutes:Number(t)}); alert('✅ บันทึกเวลาแล้ว'); } catch(e) { alert(e.message); }
+}
+async function resetUser(uid) {
+  if(!confirm('รีเซ็ตผลสอบของคนนี้?')) return;
+  try { await callAPI('POST', {action:'reset_exam', secret:adminSecret, userId:uid}); await loadData(); } catch(e) { alert(e.message); }
+}
+
+function closeModal(e) { if(e.target.classList.contains('modal-backdrop')) closeAllModal(); }
+function closeAllModal() { document.querySelectorAll('.modal-backdrop').forEach(m => m.classList.add('hidden')); }
+
+async function callAPI(method, params, timeoutMs=30000) {
+  const ctrl = new AbortController(); const tid = setTimeout(()=>ctrl.abort(), timeoutMs);
+  try {
+    let url = GAS_URL, opts = { signal:ctrl.signal, redirect:'follow' };
+    if (method === 'GET') { url += '?' + new URLSearchParams(params).toString(); opts.method = 'GET'; }
+    else { opts.method = 'POST'; opts.headers = {'Content-Type':'text/plain'}; opts.body = JSON.stringify(params); }
+    const resp = await fetch(url, opts); clearTimeout(tid);
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const data = await resp.json();
+    if(data.status === 'error') throw new Error(data.message);
+    return data;
+  } catch(e) { clearTimeout(tid); throw e; }
+}
+
+init();
+</script>
+</body>
+</html>
