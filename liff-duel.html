@@ -111,6 +111,8 @@ const GAS_URL = 'https://script.google.com/macros/s/AKfycbwo_kB4DZSVmYqkztnf8n_-
 
 let userId = '', inboxDuels = [], challengeMembers = [], appConfig = null;
 let currentDuel = null, targetUserId = null, questions = [], qIndex = 0, myScore = 0;
+
+// ⏱️ Timer Logic อิงเวลาจากระบบเพื่อความเสถียร
 let qStartTime = 0, totalTimeMs = 0, isAnswerLocked = false, gameTimerInterval = null;
 
 async function init() {
@@ -198,7 +200,7 @@ async function initChallenge(tId, tName) {
   try {
     const data = await callAPI('GET', { action:'get_questions', userId: userId });
     if (data.status === 'error') throw new Error(data.message);
-    const allQs = data.questions || []; if(allQs.length < 5) throw new Error('ข้อสอบไม่พอสำหรับการประลอง');
+    const allQs = data.questions || []; if(allQs.length < 5) throw new Error('ข้อสอบไม่พอสำหรับการประลอง (ต้องมีอย่างน้อย 5 ข้อ)');
     questions = allQs.sort(()=>Math.random()-0.5).slice(0,5); targetUserId = tId; currentDuel = null;
     startQuizFlow();
   } catch(e) { showError(e.message); }
@@ -210,32 +212,64 @@ function renderQuestion() {
   if (qIndex >= 5) { submitDuelResult(); return; }
   isAnswerLocked = false; const q = questions[qIndex];
   document.getElementById('q-current').textContent = qIndex + 1; document.getElementById('q-text').textContent = q.questionText;
-  const displayLetters = ['A', 'B', 'C', 'D']; const shuffledKeys = displayLetters.filter(k => q.choices && q.choices[k]).sort(() => Math.random() - 0.5);
+  
+  const displayLetters = ['A', 'B', 'C', 'D']; 
+  const shuffledKeys = displayLetters.filter(k => q.choices && q.choices[k]).sort(() => Math.random() - 0.5);
+  
   displayLetters.forEach(l => { const btn = document.getElementById(`btn-${l}`); btn.className = 'choice-btn'; btn.style.display = 'none'; });
-  shuffledKeys.forEach((key, index) => { const letter = displayLetters[index]; const btn = document.getElementById(`btn-${letter}`); btn.style.display = 'block'; btn.textContent = q.choices[key]; btn.setAttribute('data-real-key', key); });
-  qStartTime = Date.now(); startTimerUI();
+  shuffledKeys.forEach((key, index) => { 
+    const letter = displayLetters[index]; 
+    const btn = document.getElementById(`btn-${letter}`); 
+    btn.style.display = 'block'; 
+    btn.textContent = q.choices[key]; 
+    btn.setAttribute('data-real-key', key); 
+  });
+  
+  startTimerUI();
 }
 
 function startTimerUI() {
-  clearInterval(gameTimerInterval); const el = document.getElementById('game-timer');
-  gameTimerInterval = setInterval(() => { el.textContent = ((Date.now() - qStartTime) / 1000).toFixed(1) + 's'; }, 100);
+  clearInterval(gameTimerInterval);
+  qStartTime = Date.now(); // บันทึกเวลาที่แท้จริง
+  const el = document.getElementById('game-timer');
+  
+  gameTimerInterval = setInterval(() => { 
+    // แสดงเวลาแบบเรียลไทม์ และไม่เพี้ยนแม้เครื่องหน่วง
+    el.textContent = ((Date.now() - qStartTime) / 1000).toFixed(1) + 's'; 
+  }, 100);
 }
 
 function selectAnswer(displayLetter) {
-  if(isAnswerLocked) return; isAnswerLocked = true; clearInterval(gameTimerInterval);
+  if(isAnswerLocked) return; 
+  isAnswerLocked = true; 
+  clearInterval(gameTimerInterval);
+  
+  // นำเวลาจริงที่ใช้ไปรวมกับเวลาสะสม
   totalTimeMs += Date.now() - qStartTime;
+  
   const btn = document.getElementById(`btn-${displayLetter}`);
   const realKey = btn.getAttribute('data-real-key');
   const correctKey = (questions[qIndex].correctAnswer || '').toUpperCase();
+  
   btn.classList.add('selected');
-  setTimeout(() => { if (realKey === correctKey) myScore++; qIndex++; renderQuestion(); }, 300);
+  
+  setTimeout(() => { 
+    if (realKey === correctKey) myScore++; 
+    qIndex++; 
+    renderQuestion(); 
+  }, 300); // ดีเลย์เล็กน้อยเพื่อความสวยงาม
 }
 
 async function submitDuelResult() {
   showLoading('กำลังส่งผลการประลอง...');
   try {
-    if (currentDuel) { await callAPI('POST', { action: 'submit_duel', userId: userId, duelId: currentDuel.duelId, score: myScore, timeMs: totalTimeMs }); await loadDuelData(currentDuel.duelId); } 
-    else { await callAPI('POST', { action: 'create_duel', userId: userId, targetId: targetUserId, score: myScore, timeMs: totalTimeMs, qIds: questions.map(q => q.questionId) }); showResultWaiting(); }
+    if (currentDuel) { 
+      await callAPI('POST', { action: 'submit_duel', userId: userId, duelId: currentDuel.duelId, score: myScore, timeMs: totalTimeMs }); 
+      await loadDuelData(currentDuel.duelId); 
+    } else { 
+      await callAPI('POST', { action: 'create_duel', userId: userId, targetId: targetUserId, score: myScore, timeMs: totalTimeMs, qIds: questions.map(q => q.questionId) }); 
+      showResultWaiting(); 
+    }
   } catch(e) { showError(e.message); }
 }
 
