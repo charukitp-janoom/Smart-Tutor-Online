@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>คลังความรู้</title>
+<title>Unit School — คลังความรู้</title>
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -53,6 +53,13 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
 .badge { padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 800; background: var(--bg); border: 1px solid var(--border); }
 
 .empty-state { text-align: center; padding: 40px 20px; color: var(--muted); }
+
+/* Video Modal */
+.modal-video-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.modal-video-container { width: 100%; max-width: 600px; display: flex; flex-direction: column; gap: 10px; }
+.close-btn { align-self: flex-end; background: transparent; border: none; color: #fff; font-size: 36px; cursor: pointer; line-height: 1; }
+.video-wrapper { position: relative; width: 100%; padding-bottom: 56.25%; height: 0; border-radius: 12px; overflow: hidden; background: #000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+.video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
 </style>
 </head>
 <body>
@@ -76,6 +83,16 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
 
 <div class="content-area" id="material-list">
   <!-- Items inserted here -->
+</div>
+
+<!-- Video Player Modal -->
+<div id="modal-video" class="modal-video-bg hidden" onclick="closeVideoModal(event)">
+  <div class="modal-video-container" onclick="event.stopPropagation()">
+    <button class="close-btn" onclick="closeVideoModal()">&times;</button>
+    <div class="video-wrapper">
+      <iframe id="video-frame" allowfullscreen allow="autoplay; encrypted-media"></iframe>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -152,8 +169,9 @@ function filterData() {
     const typeClass = m.type.toUpperCase() === 'PDF' ? 't-pdf' : m.type.toUpperCase() === 'VIDEO' ? 't-video' : 't-link';
     const icon = m.type.toUpperCase() === 'PDF' ? '📄' : m.type.toUpperCase() === 'VIDEO' ? '🎥' : '🔗';
     
+    // สังเกตว่ามีการส่ง m.type ไปด้วยเพื่อเช็กว่าเป็นวิดีโอหรือไม่
     return `
-      <div class="card ${typeClass}" onclick="openMaterial(_mMap[${idx}].url)">
+      <div class="card ${typeClass}" onclick="openMaterial(_mMap[${idx}].url, '${m.type.toUpperCase()}')">
         <div class="card-icon">${icon}</div>
         <div class="card-info">
           <div class="card-title">${escapeHtml(m.title)}</div>
@@ -175,11 +193,35 @@ function escapeHtml(str) {
   }[c]));
 }
 
-function openMaterial(url) {
-  liff.openWindow({
-    url: url,
-    external: true
-  });
+function openMaterial(url, type) {
+  if (type === 'VIDEO') {
+    // ถ้าระบุว่าเป็นวิดีโอ ให้แปลงลิงก์เพื่อฝังลงใน iframe
+    let embedUrl = url;
+    
+    // แปลงลิงก์ YouTube ให้เป็นแบบ Embed อัตโนมัติ
+    const ytMatch = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i);
+    if (ytMatch && ytMatch[1]) {
+      embedUrl = `https://www.youtube.com/embed/${ytMatch[1]}?autoplay=1`;
+    }
+    
+    document.getElementById('video-frame').src = embedUrl;
+    document.getElementById('modal-video').classList.remove('hidden');
+  } else {
+    // ถ้าเป็น PDF หรือ Link ให้เปิดเบราว์เซอร์ใหม่ตามปกติ
+    liff.openWindow({
+      url: url,
+      external: true
+    });
+  }
+}
+
+function closeVideoModal(e) {
+  // เช็กว่าถ้ามี event (คลิกที่พื้นที่ดำๆ นอกวิดีโอ) ให้ปิดด้วย
+  if (e && e.target.id !== 'modal-video' && e.target.className !== 'close-btn') return;
+  
+  // ล้าง src ของ iframe ทิ้ง เพื่อให้วิดีโอหยุดเล่นทันที
+  document.getElementById('video-frame').src = ''; 
+  document.getElementById('modal-video').classList.add('hidden');
 }
 
 function showError(msg) {
@@ -193,7 +235,6 @@ async function callAPI(method, params, timeoutMs=20000) {
   try {
     let url = GAS_URL, opts = { signal:ctrl.signal, redirect:'follow' };
     
-    // แก้ไขคำสั่งนี้ให้เป็น new URLSearchParams แล้วครับ
     if (method === 'GET') {
       url += '?' + new URLSearchParams(params).toString();
       opts.method = 'GET';
