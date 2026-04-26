@@ -3,19 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>ข้อสอบออนไลน์</title>
+<title>ข้อสอบ</title>
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  /* Dynamic Variables */
-  --config-primary: #1a237e;
-  --config-secondary: #ffd700;
-  
-  --navy:   var(--config-primary);
-  --navy2:  var(--config-primary);
-  --gold:   var(--config-secondary);
-  --gold2:  var(--config-secondary);
+  --navy:   #1a237e;
+  --navy2:  #283593;
+  --gold:   #ffd700;
+  --gold2:  #ffb300;
   --bg:     #0f1322;
   --surface:#161c36;
   --surf2:  #1e2647;
@@ -89,12 +85,8 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
 .choice{display:flex;align-items:flex-start;gap:12px;background:var(--surf2);border:2px solid var(--border);border-radius:14px;padding:14px 16px;cursor:pointer;transition:all .2s;-webkit-tap-highlight-color:transparent}
 .choice:active{transform:scale(.98)}
 .choice.selected{border-color:var(--gold);background:rgba(255,215,0,0.06);box-shadow:0 0 0 1px rgba(255,215,0,0.3)}
-.choice.correct-show{border-color:var(--correct);background:rgba(0,200,83,0.08)!important}
-.choice.wrong-show{border-color:var(--wrong);background:rgba(255,82,82,0.08)!important;opacity:.7}
 .choice-key{width:32px;height:32px;border-radius:8px;background:var(--surface);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;font-family:'IBM Plex Mono',monospace;color:var(--muted);flex-shrink:0;transition:all .2s}
 .choice.selected .choice-key{background:var(--gold);color:#1a1a1a;border-color:var(--gold)}
-.choice.correct-show .choice-key{background:var(--correct);color:#fff;border-color:var(--correct)}
-.choice.wrong-show .choice-key{background:var(--wrong);color:#fff;border-color:var(--wrong)}
 .choice-text{font-size:15px;line-height:1.6;padding-top:3px}
 
 /* NAV */
@@ -102,7 +94,6 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
 .nav-inner{max-width:480px;margin:0 auto;display:flex;gap:10px}
 .btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border:none;border-radius:12px;font-family:'Sarabun',sans-serif;font-size:16px;font-weight:700;cursor:pointer;transition:all .2s;-webkit-appearance:none;width:100%}
 .btn:active{transform:scale(.97)}
-.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
 .btn-prev{background:var(--surf2);color:var(--text);border:1px solid var(--border);flex:0 0 auto;width:auto;padding:14px 20px}
 .btn-next{background:linear-gradient(135deg,var(--navy),var(--navy2));color:var(--gold)}
 .btn-submit{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#1a1a1a}
@@ -151,6 +142,7 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
 .subject-name{font-size:16px;font-weight:700;color:var(--text);margin-bottom:3px}
 .subject-count{font-size:12px;color:var(--muted);display:flex;align-items:center;}
 .subject-arrow{font-size:18px;color:var(--muted)}
+
 .badge-done-text { font-size: 11px; color: var(--green); font-weight: 800; background: rgba(0,200,83,0.15); padding: 2px 6px; border-radius: 4px; margin-left: 8px; }
 .subject-section-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;padding:0 16px;margin-bottom:4px;max-width:480px;margin-left:auto;margin-right:auto}
 </style>
@@ -159,21 +151,21 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
 
 <div id="ov-load" class="ov">
   <div class="ov-spinner"></div>
-  <div class="ov-title dynamic-app-name">📋 Unit School</div>
-  <div class="ov-sub" id="load-txt">กำลังโหลดข้อสอบ...</div>
+  <div class="ov-title dynamic-app-name">กำลังโหลดข้อมูล...</div>
+  <div class="ov-sub" id="load-txt">เตรียมข้อสอบและดึงข้อมูล</div>
 </div>
 
 <div id="ov-noreg" class="ov hidden">
   <div style="font-size:60px">⚠️</div>
   <div class="ov-title" style="color:var(--red)">ยังไม่ได้ลงทะเบียน</div>
-  <div class="ov-sub">กรุณาลงทะเบียนก่อนทำข้อสอบ<br>กลับไปแชทกับระบบ</div>
+  <div class="ov-sub">กรุณาลงทะเบียนก่อนเข้าทำข้อสอบ</div>
   <button class="btn" style="background:var(--navy);color:var(--gold);max-width:200px" onclick="liff.closeWindow()">← กลับ</button>
 </div>
 
 <div id="ov-warning" class="ov hidden" style="background:rgba(15,19,34,0.95); z-index:9999;">
   <div style="font-size:60px">⏰</div>
   <div class="ov-title" style="color:var(--gold)">แจ้งเตือนเวลา</div>
-  <div class="ov-sub" style="font-size:16px; color:#fff; max-width: 300px;">เหลือเวลาทำข้อสอบอีก 10 นาทีครับ<br>รีบทำข้อที่เหลือให้เสร็จนะครับ</div>
+  <div class="ov-sub" style="font-size:16px; color:#fff; max-width: 300px;">เหลือเวลาทำข้อสอบอีก 10 นาที<br>รีบทำข้อที่เหลือให้เสร็จนะครับ</div>
   <button class="btn" style="background:var(--gold);color:#000;max-width:200px;margin-top:20px" onclick="document.getElementById('ov-warning').classList.add('hidden')">รับทราบ</button>
 </div>
 
@@ -205,25 +197,25 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
 
   <div class="rank-box">
     <div class="rank-num" id="r-rank">—</div>
-    <div class="rank-label">อันดับปัจจุบัน จาก <span class="dynamic-term-user">กำลังพล</span> <span id="r-total">—</span> คน</div>
+    <div class="rank-label">อันดับปัจจุบัน จาก <span class="dynamic-term-user">สมาชิก</span> <span id="r-total">—</span> คน</div>
   </div>
 
   <div style="font-size:14px;font-weight:700;color:var(--muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px">📝 เฉลยข้อสอบ</div>
   <div id="review-list"></div>
 
   <div style="margin-top:16px">
-    <button class="btn btn-close" onclick="liff.closeWindow()">✅ กลับหน้าหลัก LINE</button>
+    <button class="btn btn-close" onclick="liff.closeWindow()">✅ กลับสู่ระบบ LINE</button>
   </div>
 </div>
 
 <div id="subject-ov" class="subject-ov hidden">
   <div class="subject-hdr">
     <div class="subject-hdr-title">📚 เลือกวิชาที่ต้องการสอบ</div>
-    <div class="subject-hdr-sub"><span class="dynamic-app-name">Unit School</span> — ห้องเรียนอัจฉริยะ</div>
+    <div class="subject-hdr-sub"><span class="dynamic-app-name">System</span> — <span class="dynamic-org-name">Organization</span></div>
     <div class="subject-greeting" id="subject-greeting"></div>
   </div>
   <div style="padding:20px 16px 8px;max-width:480px;margin:0 auto">
-    <div class="subject-section-label" style="padding:0;margin-bottom:8px">📋 วิชาที่เปิดสอบ</div>
+    <div class="subject-section-label" style="padding:0;margin-bottom:8px">📋 หมวดวิชาที่เปิดสอบ</div>
   </div>
   <div class="subject-list" id="subject-list"></div>
 </div>
@@ -231,7 +223,7 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
 <div id="exam-ui" class="hidden">
   <div class="hdr">
     <div class="hdr-info">
-      <div class="hdr-title">📋 <span class="dynamic-app-name">Unit School</span></div>
+      <div class="hdr-title">📋 <span class="dynamic-app-name">System</span></div>
       <div class="hdr-sub" id="hdr-sub">ข้อสอบวัดผล</div>
     </div>
     <div class="hdr-timer" id="timer">--:--</div>
@@ -269,7 +261,7 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
 // CONFIG
 // ==============================================
 const LIFF_ID = '2009896605-Wd1uqyvU';   
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbwo_kB4DZSVmYqkztnf8n_-sjVvAFUxIH9dZAqby_SUvV5H8gH5hXhILHkzZJ59S2j6/exec'; 
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwo_kB4DZSVmYqkztnf8n_-sjVvAFUxIH9dZAqby_SUvV5H8gH5hXhILHkzZJ59S2j6/exec';  
 
 let appConfig = null;
 let allQuestions = []; 
@@ -290,18 +282,12 @@ async function init() {
   try {
     await liff.init({ liffId: LIFF_ID });
     if (!liff.isLoggedIn()) { liff.login(); return; }
-    
-    // โหลด Config ก่อนเพื่อให้สีและข้อความเปลี่ยนทันที
-    const configRes = await callAPI('GET', { action: 'get_config' });
-    if(configRes.status === 'ok') {
-      appConfig = configRes.config;
-      applyTemplate(appConfig);
-    }
-    
-    userId = (await liff.getProfile()).userId;
+    const profile = await liff.getProfile();
+    userId = profile.userId;
     examStateKey = 'examState_' + userId;
 
     document.getElementById('load-txt').textContent = 'กำลังโหลดข้อมูลข้อสอบ...';
+
     const res = await callAPI('GET', { action:'get_questions', userId });
 
     if (!res || res.status === 'error') {
@@ -311,6 +297,12 @@ async function init() {
         return;
       }
       throw new Error(res ? res.message : 'โหลดข้อมูลล้มเหลว');
+    }
+    
+    // โหลด Config 
+    if (res.config) {
+      appConfig = res.config;
+      applyTemplate(appConfig);
     }
 
     member    = res.member;
@@ -341,22 +333,22 @@ async function init() {
 
 function applyTemplate(c) {
   if(!c) return;
-  document.documentElement.style.setProperty('--config-primary', c.colorPrimary);
-  document.documentElement.style.setProperty('--config-secondary', c.colorSecondary);
-  document.title = c.appName;
+  document.documentElement.style.setProperty('--navy', c.colorPrimary);
+  document.documentElement.style.setProperty('--navy2', c.colorPrimary);
+  document.documentElement.style.setProperty('--gold', c.colorSecondary);
+  document.documentElement.style.setProperty('--gold2', c.colorSecondary);
+  document.title = c.appName + " - แบบทดสอบ";
   
   document.querySelectorAll('.dynamic-app-name').forEach(el => el.textContent = c.appName);
   document.querySelectorAll('.dynamic-org-name').forEach(el => el.textContent = c.orgName);
   document.querySelectorAll('.dynamic-term-user').forEach(el => el.textContent = c.termUser);
-  document.querySelectorAll('.dynamic-term-coin').forEach(el => el.textContent = c.termCoin);
 }
 
 // ==============================================
 // SUBJECT PICKER
 // ==============================================
 function renderSubjectPicker(subjects) {
-  const levelTerm = appConfig ? appConfig.termLevel : 'ระดับ';
-  document.getElementById('subject-greeting').textContent = `สวัสดีครับ ${member.rank} ${member.fullName}`;
+  document.getElementById('subject-greeting').textContent = `สวัสดี ${member.rank} ${member.fullName}`;
 
   const list = document.getElementById('subject-list');
   list.innerHTML = '';
@@ -400,7 +392,7 @@ function startExam(subject) {
 
   let filteredQs = allQuestions.filter(q => (q.category || 'ทั่วไป') === subject);
   questions = filteredQs.map(q => {
-    q.shuffledKeys = ['A', 'B', 'C', 'D'].filter(k => q.choices[k]);
+    q.shuffledKeys = ['A', 'B', 'C', 'D'].filter(k => q.choices && q.choices[k]);
     return q;
   });
 
@@ -428,7 +420,7 @@ function saveExamState() {
 }
 
 // ==============================================
-// TIMER
+// TIMER (Date.now)
 // ==============================================
 function startTimer() {
   timeLeft = Math.floor((examEndTime - Date.now()) / 1000);
@@ -439,9 +431,11 @@ function startTimer() {
     timeLeft = Math.floor((examEndTime - Date.now()) / 1000);
     if(timeLeft < 0) timeLeft = 0;
     updateTimerDisplay();
+    
     if (timeLeft <= 600 && timeLeft > 0 && !tenMinWarningShown && originalExamTime > 600) {
       tenMinWarningShown = true; document.getElementById('ov-warning').classList.remove('hidden');
     }
+    
     if (timeLeft <= 0) { clearInterval(timerInterval); submitExam(true); }
   }, 1000);
 }
@@ -530,14 +524,14 @@ async function submitExam(timeout) {
 
   document.getElementById('exam-ui').classList.add('hidden');
   document.getElementById('ov-load').classList.remove('hidden');
-  document.getElementById('load-txt').textContent = '⏳ กำลังตรวจข้อสอบ...';
+  document.getElementById('load-txt').textContent = '⏳ กำลังตรวจคะแนน...';
 
   const answerMap = {};
   questions.forEach((q, i) => { answerMap[q.questionId] = answers[i] || ''; });
 
   try {
     const res = await callAPI('POST', { action:'submit_exam', userId, answers: answerMap, subject: selectedSubject });
-    if (!res || res.status === 'error') throw new Error(res ? res.message : 'ส่งข้อสอบล้มเหลว');
+    if (!res || res.status === 'error') throw new Error(res ? res.message : 'ส่งข้อมูลล้มเหลว');
     localStorage.removeItem(examStateKey);
     showResult(res);
   } catch(e) { document.getElementById('load-txt').textContent = '❌ ' + e.message; submitted = false; }
@@ -548,7 +542,7 @@ function showResult(res) {
   document.getElementById('result-ov').classList.remove('hidden');
 
   const pct = res.percentage;
-  const grade = pct >= 80 ? { text:'🌟 ดีเยี่ยม', cls:'grade-great' } : pct >= 60 ? { text:'✅ ผ่าน', cls:'grade-pass' } : { text:'❌ ยังไม่ผ่าน', cls:'grade-fail' };
+  const grade = pct >= 80 ? { text:'🌟 ดีเยี่ยม', cls:'grade-great' } : pct >= 60 ? { text:'✅ ผ่าน', cls:'grade-pass' } : { text:'❌ ต้องปรับปรุง', cls:'grade-fail' };
 
   document.getElementById('r-score').textContent   = res.totalScore;
   document.getElementById('r-max').textContent     = '/ ' + res.maxScore;
