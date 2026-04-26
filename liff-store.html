@@ -3,32 +3,30 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Unit School — ร้านค้า PX</title>
+<title>Reward Store</title>
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700;800&family=IBM+Plex+Mono:wght@700&display=swap" rel="stylesheet">
 <style>
 :root {
+  --config-secondary: #ffd700;
   --bg: #0b0c10; --surface: #1f2833; --border: #30363d;
-  --primary: #ffd700; --primary-dark: #ffb300;
+  --primary: var(--config-secondary); 
   --text: #e6edf3; --muted: #8b949e;
   --success: #00e676; --danger: #ff5252;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
 
-/* Overlays */
 .ov { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; padding: 20px; text-align: center; }
 .hidden { display: none !important; }
-.spinner { width: 50px; height: 50px; border: 3px solid rgba(255,215,0,0.1); border-top: 3px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
+.spinner { width: 50px; height: 50px; border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* Header & Wallet */
 .wallet-card { background: linear-gradient(135deg, #1f2833, #161c24); padding: 24px 20px; text-align: center; border-bottom: 1px solid var(--border); box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
 .wallet-title { font-size: 14px; color: var(--muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1px; }
 .wallet-balance { font-size: 48px; font-weight: 800; color: var(--primary); font-family: 'IBM Plex Mono', monospace; line-height: 1; text-shadow: 0 0 20px rgba(255,215,0,0.3); }
 .wallet-currency { font-size: 16px; color: var(--muted); margin-left: 4px; }
 
-/* Tabs */
 .tabs { display: flex; background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10; }
 .tab { flex: 1; padding: 14px 10px; font-size: 14px; font-weight: 700; color: var(--muted); text-align: center; cursor: pointer; border-bottom: 3px solid transparent; transition: 0.2s; }
 .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
@@ -36,7 +34,6 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
 .tab-content { display: none; padding: 16px; flex: 1; flex-direction: column; gap: 12px; }
 .tab-content.active { display: flex; }
 
-/* Products Grid */
 .store-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
 .product-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; transition: 0.2s; }
 .product-card:active { transform: scale(0.96); }
@@ -46,10 +43,9 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
 .p-title { font-size: 14px; font-weight: 700; color: var(--text); line-height: 1.4; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .p-desc { font-size: 11px; color: var(--muted); margin-bottom: auto; }
 .p-stock { font-size: 11px; color: var(--primary); margin-top: 8px; margin-bottom: 8px; }
-.btn-redeem { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #000; border: none; padding: 8px; border-radius: 8px; font-size: 13px; font-weight: 800; font-family: 'Sarabun', sans-serif; cursor: pointer; width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.btn-redeem { background: var(--primary); color: #000; border: none; padding: 8px; border-radius: 8px; font-size: 13px; font-weight: 800; font-family: 'Sarabun', sans-serif; cursor: pointer; width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px; }
 .btn-redeem:disabled { background: #333; color: #888; cursor: not-allowed; }
 
-/* History List */
 .history-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px; display: flex; justify-content: space-between; align-items: center; }
 .h-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
 .h-date { font-size: 11px; color: var(--muted); }
@@ -58,7 +54,6 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
 .s-APPROVED { background: rgba(0,230,118,0.1); color: var(--success); }
 .s-REJECTED { background: rgba(255,82,82,0.1); color: var(--danger); }
 
-/* Modal */
 .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:500;display:flex;align-items:center;justify-content:center; padding: 20px;}
 .modal{background:var(--surface); border-radius:20px; padding:24px 20px; width:100%; max-width: 320px; text-align:center; border:1px solid var(--border); animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);}
 @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
@@ -66,7 +61,6 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
 .btn-m { flex: 1; padding: 12px; border-radius: 10px; border: none; font-size: 15px; font-weight: 700; cursor: pointer; font-family: 'Sarabun'; }
 .btn-cancel { background: var(--bg); color: var(--text); border: 1px solid var(--border); }
 .btn-confirm { background: var(--primary); color: #000; }
-
 .empty-state { text-align: center; padding: 40px 20px; color: var(--muted); width: 100%; grid-column: 1 / -1;}
 </style>
 </head>
@@ -78,9 +72,9 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
 </div>
 
 <div class="wallet-card">
-  <div class="wallet-title">เหรียญสะสมของท่าน</div>
-  <div><span class="wallet-balance" id="ui-balance">0</span><span class="wallet-currency">🪙</span></div>
-  <div style="font-size:11px; color:var(--muted); margin-top:8px;">ได้เหรียญจากการทำข้อสอบและเล่นเกม</div>
+  <div class="wallet-title">ยอดสะสมของท่าน</div>
+  <div><span class="wallet-balance" id="ui-balance">0</span><span class="wallet-currency dynamic-term-coin">Point</span></div>
+  <div style="font-size:11px; color:var(--muted); margin-top:8px;">ได้จากการทำข้อสอบและเล่นเกมใน <span class="dynamic-app-name">System</span></div>
 </div>
 
 <div class="tabs">
@@ -88,29 +82,17 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
   <div class="tab" onclick="showTab('history')" id="tab-btn-history">📜 ประวัติการแลก</div>
 </div>
 
-<div class="tab-content active" id="tab-store">
-  <div class="store-grid" id="store-list">
-    <!-- Products inserted here -->
-  </div>
-</div>
+<div class="tab-content active" id="tab-store"><div class="store-grid" id="store-list"></div></div>
+<div class="tab-content" id="tab-history"><div id="history-list" style="display: flex; flex-direction: column; gap: 10px;"></div></div>
 
-<div class="tab-content" id="tab-history">
-  <div id="history-list" style="display: flex; flex-direction: column; gap: 10px;">
-    <!-- History inserted here -->
-  </div>
-</div>
-
-<!-- Modal Confirm -->
 <div id="modal-confirm" class="modal-backdrop hidden" onclick="closeModal(event)">
   <div class="modal" onclick="event.stopPropagation()">
     <div style="font-size:40px; margin-bottom:10px;">🛒</div>
     <div style="font-size:18px; font-weight:800; color:var(--text); margin-bottom:5px;">ยืนยันการแลกรางวัล?</div>
     <div style="font-size:14px; color:var(--muted); margin-bottom:15px;" id="m-product-name">—</div>
-    <div style="font-size:24px; font-weight:800; color:var(--primary); font-family:monospace; margin-bottom:5px;" id="m-product-price">— 🪙</div>
+    <div style="font-size:24px; font-weight:800; color:var(--primary); font-family:monospace; margin-bottom:5px;" id="m-product-price">— <span class="dynamic-term-coin"></span></div>
     <div style="font-size:12px; color:var(--danger);" id="m-warning"></div>
-    
     <input type="hidden" id="m-product-id">
-    
     <div class="btn-row">
       <button class="btn-m btn-cancel" onclick="closeAllModal()">ยกเลิก</button>
       <button class="btn-m btn-confirm" id="btn-submit-redeem" onclick="submitRedeem()">แลกเลย!</button>
@@ -119,23 +101,32 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
 </div>
 
 <script>
-const LIFF_ID = '2009717287-rli41ASz'; // << [ใส่ LIFF ID ของหน้าร้านค้า PX]
+const LIFF_ID = 'YOUR-LIFF-STORE-ID'; 
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbyRhVNOnNIAkwZxrTcJOzI2nh_fmSIzI8tgbVurJoUJlDaZrR2Kovo0AydC3Qs0PNyU/exec';
 
 let userId = '';
 let currentBalance = 0;
-let isSubmitting = false; // [FIX] ป้องกัน double-submit ในการแลกเหรียญ
+let appConfig = null;
 
 async function init() {
   try {
     await liff.init({ liffId: LIFF_ID });
     if (!liff.isLoggedIn()) { liff.login(); return; }
     
+    const configRes = await callAPI('GET', { action: 'get_config' });
+    if(configRes.status === 'ok') { appConfig = configRes.config; applyTemplate(appConfig); }
+
     userId = (await liff.getProfile()).userId;
     await fetchStoreData();
-  } catch(e) {
-    showError(e.message);
-  }
+  } catch(e) { showError(e.message); }
+}
+
+function applyTemplate(c) {
+  if(!c) return;
+  document.documentElement.style.setProperty('--config-secondary', c.colorSecondary);
+  document.title = "ร้านค้า - " + c.appName;
+  document.querySelectorAll('.dynamic-app-name').forEach(el => el.textContent = c.appName);
+  document.querySelectorAll('.dynamic-term-coin').forEach(el => el.textContent = c.termCoin);
 }
 
 async function fetchStoreData() {
@@ -145,93 +136,47 @@ async function fetchStoreData() {
     
     currentBalance = data.balance || 0;
     document.getElementById('ui-balance').textContent = currentBalance;
-    
-    renderStore(data.rewards || []);
-    renderHistory(data.history || []);
-    
+    renderStore(data.rewards || []); renderHistory(data.history || []);
     document.getElementById('ov-load').classList.add('hidden');
-  } catch(e) {
-    showError('โหลดข้อมูลล้มเหลว: ' + e.message);
-  }
+  } catch(e) { showError('โหลดข้อมูลล้มเหลว: ' + e.message); }
 }
 
 function renderStore(rewards) {
   const container = document.getElementById('store-list');
-  if (rewards.length === 0) {
-    container.innerHTML = '<div class="empty-state">ไม่มีของรางวัลในขณะนี้</div>';
-    return;
-  }
+  const cTerm = appConfig ? appConfig.termCoin : '';
+  if (rewards.length === 0) { container.innerHTML = '<div class="empty-state">ไม่มีของรางวัลในขณะนี้</div>'; return; }
 
   container.innerHTML = rewards.map(r => {
     const canAfford = currentBalance >= r.price;
-    const btnHtml = canAfford 
-      ? `<button class="btn-redeem" onclick="openConfirm('${r.id}', '${r.name}', ${r.price})">แลก ${r.price} 🪙</button>`
-      : `<button class="btn-redeem" disabled>เหรียญไม่พอ (${r.price} 🪙)</button>`;
-
-    return `
-      <div class="product-card">
-        <div class="product-img"><img src="${r.image || 'https://cdn-icons-png.flaticon.com/512/10398/10398492.png'}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/10398/10398492.png'"></div>
-        <div class="product-info">
-          <div class="p-title">${r.name}</div>
-          <div class="p-desc">${r.desc || '-'}</div>
-          <div class="p-stock">เหลือ: ${r.stock} สิทธิ์</div>
-          ${btnHtml}
-        </div>
-      </div>
-    `;
+    const btnHtml = canAfford ? `<button class="btn-redeem" onclick="openConfirm('${r.id}', '${r.name}', ${r.price})">แลก ${r.price} ${cTerm}</button>` : `<button class="btn-redeem" disabled>ยอดไม่พอ (${r.price} ${cTerm})</button>`;
+    return `<div class="product-card"><div class="product-img"><img src="${r.image || 'https://cdn-icons-png.flaticon.com/512/10398/10398492.png'}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/10398/10398492.png'"></div><div class="product-info"><div class="p-title">${r.name}</div><div class="p-desc">${r.desc || '-'}</div><div class="p-stock">เหลือ: ${r.stock} สิทธิ์</div>${btnHtml}</div></div>`;
   }).join('');
 }
 
 function renderHistory(history) {
   const container = document.getElementById('history-list');
-  if (history.length === 0) {
-    container.innerHTML = '<div class="empty-state">ยังไม่มีประวัติการแลกของรางวัล</div>';
-    return;
-  }
+  const cTerm = appConfig ? appConfig.termCoin : '';
+  if (history.length === 0) { container.innerHTML = '<div class="empty-state">ยังไม่มีประวัติการแลกของรางวัล</div>'; return; }
 
-  const statusMap = {
-    'PENDING': { t: 'รออนุมัติ', c: 's-PENDING' },
-    'APPROVED': { t: 'อนุมัติแล้ว', c: 's-APPROVED' },
-    'REJECTED': { t: 'ถูกปฏิเสธ', c: 's-REJECTED' }
-  };
-
+  const statusMap = { 'PENDING': { t: 'รออนุมัติ', c: 's-PENDING' }, 'APPROVED': { t: 'อนุมัติแล้ว', c: 's-APPROVED' }, 'REJECTED': { t: 'ถูกปฏิเสธ', c: 's-REJECTED' } };
   container.innerHTML = history.map(h => {
     const st = statusMap[h.status] || { t: h.status, c: '' };
-    // Format date string to brief format if possible
     let dateStr = h.timestamp;
-    try {
-      const d = new Date(h.timestamp);
-      if(!isNaN(d)) dateStr = `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
-    } catch(e) {}
-
-    return `
-      <div class="history-card">
-        <div>
-          <div class="h-title">${h.rewardName}</div>
-          <div class="h-date">${dateStr} · หัก ${h.price} 🪙</div>
-        </div>
-        <div class="h-status ${st.c}">${st.t}</div>
-      </div>
-    `;
+    try { const d = new Date(h.timestamp); if(!isNaN(d)) dateStr = `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`; } catch(e) {}
+    return `<div class="history-card"><div><div class="h-title">${h.rewardName}</div><div class="h-date">${dateStr} · หัก ${h.price} ${cTerm}</div></div><div class="h-status ${st.c}">${st.t}</div></div>`;
   }).join('');
 }
 
 function showTab(tabName) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-  
-  document.getElementById(`tab-btn-${tabName}`).classList.add('active');
-  document.getElementById(`tab-${tabName}`).classList.add('active');
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active')); document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById(`tab-btn-${tabName}`).classList.add('active'); document.getElementById(`tab-${tabName}`).classList.add('active');
 }
 
 function openConfirm(id, name, price) {
   document.getElementById('m-product-id').value = id;
   document.getElementById('m-product-name').textContent = name;
-  document.getElementById('m-product-price').textContent = price;
-  
-  const remaining = currentBalance - price;
-  document.getElementById('m-warning').textContent = `เหรียญจะเหลือ: ${remaining} 🪙`;
-  
+  document.getElementById('m-product-price').textContent = `${price} ${appConfig?appConfig.termCoin:''}`;
+  document.getElementById('m-warning').textContent = `ยอดจะเหลือ: ${currentBalance - price} ${appConfig?appConfig.termCoin:''}`;
   document.getElementById('modal-confirm').classList.remove('hidden');
 }
 
@@ -239,39 +184,16 @@ function closeModal(e) { if(e.target.classList.contains('modal-backdrop')) close
 function closeAllModal() { document.querySelectorAll('.modal-backdrop').forEach(m => m.classList.add('hidden')); }
 
 async function submitRedeem() {
-  // [FIX] ป้องกันกดซ้ำก่อน response แรกกลับมา
-  if (isSubmitting) return;
-  const rId = document.getElementById('m-product-id').value;
-  if(!rId) return;
-  isSubmitting = true;
-
-  const btn = document.getElementById('btn-submit-redeem');
-  btn.disabled = true;
-  btn.textContent = 'กำลังดำเนินการ...';
-
+  const rId = document.getElementById('m-product-id').value; if(!rId) return;
+  const btn = document.getElementById('btn-submit-redeem'); btn.disabled = true; btn.textContent = 'กำลังดำเนินการ...';
   try {
-    const res = await callAPI('POST', {
-      action: 'redeem_reward',
-      userId: userId,
-      rewardId: rId
-    });
-    
+    const res = await callAPI('POST', { action: 'redeem_reward', userId: userId, rewardId: rId });
     if (res.status === 'error') throw new Error(res.message);
-    
-    closeAllModal();
-    alert('✅ ' + res.message);
-    
-    // Refresh
+    closeAllModal(); alert('✅ ' + res.message);
     document.getElementById('ov-load').classList.remove('hidden');
-    await fetchStoreData();
-    showTab('history');
-  } catch(e) {
-    alert('❌ ผิดพลาด: ' + e.message);
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'แลกเลย!';
-    isSubmitting = false; // [FIX] reset flag
-  }
+    await fetchStoreData(); showTab('history');
+  } catch(e) { alert('❌ ผิดพลาด: ' + e.message); } 
+  finally { btn.disabled = false; btn.textContent = 'แลกเลย!'; }
 }
 
 function showError(msg) {
@@ -281,26 +203,14 @@ function showError(msg) {
 }
 
 async function callAPI(method, params, timeoutMs=20000) {
-  const ctrl = new AbortController();
-  const tid  = setTimeout(() => ctrl.abort(), timeoutMs);
+  const ctrl = new AbortController(); const tid = setTimeout(() => ctrl.abort(), timeoutMs);
   try {
     let url = GAS_URL, opts = { signal:ctrl.signal, redirect:'follow' };
-    if (method === 'GET') {
-      url += '?' + new URLSearchParams(params).toString();
-      opts.method = 'GET';
-    } else {
-      opts.method  = 'POST';
-      opts.headers = { 'Content-Type':'text/plain' };
-      opts.body    = JSON.stringify(params);
-    }
-    const resp = await fetch(url, opts);
-    clearTimeout(tid);
-    if (!resp.ok) throw new Error('HTTP ' + resp.status);
-    return await resp.json();
-  } catch(e) {
-    clearTimeout(tid);
-    throw e;
-  }
+    if (method === 'GET') { url += '?' + new URLSearchParams(params).toString(); opts.method = 'GET'; } 
+    else { opts.method = 'POST'; opts.headers = { 'Content-Type':'text/plain' }; opts.body = JSON.stringify(params); }
+    const resp = await fetch(url, opts); clearTimeout(tid);
+    if (!resp.ok) throw new Error('HTTP ' + resp.status); return await resp.json();
+  } catch(e) { clearTimeout(tid); throw e; }
 }
 
 init();
