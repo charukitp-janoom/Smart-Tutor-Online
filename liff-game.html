@@ -45,6 +45,7 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg-color); color: v
 .lb-rank { font-size: 18px; font-weight: 800; color: var(--gold); width: 40px; text-align: left; }
 .lb-name { flex: 1; text-align: left; font-size: 15px; color: var(--text); }
 .lb-prize { font-size: 17px; font-weight: 800; color: var(--green); font-family: 'IBM Plex Mono', monospace; text-align: right; }
+.lb-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; margin: 0 12px 0 6px; border: 2px solid var(--gold); flex-shrink: 0; background: #fff;}
 
 .game-container { max-width: 600px; margin: 0 auto; width: 100%; padding: 20px 16px; flex: 1; display: flex; flex-direction: column; }
 .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
@@ -161,11 +162,7 @@ const PRIZES = ['1,000', '2,000', '3,000', '5,000', '10,000', '20,000', '40,000'
 let allQs = [], questions = [], currentLevel = 0, isAnswerLocked = false, currentCorrectAnswer = '', userId = '';
 let appConfig = null;
 
-// ⏱️ ระบบเวลาแบบใหม่
-let qTimerInterval = null;
-let qTimeLeft = 60;
-const MAX_Q_TIME = 60;
-let startTimestamp = 0;
+let qTimerInterval = null, qTimeLeft = 60, MAX_Q_TIME = 60, startTimestamp = 0;
 
 async function init() {
   try {
@@ -232,7 +229,6 @@ function updateLadder() {
   });
 }
 
-// ⏱️ ระบบเวลาแบบ Real-time
 function startQTimer() {
   clearInterval(qTimerInterval);
   startTimestamp = Date.now();
@@ -407,7 +403,21 @@ async function showLeaderboard() {
       res.leaderboard.forEach((e, i) => {
         const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i+1}.`;
         const isMe = e.userId === userId ? 'font-weight:800; color:var(--gold);' : 'font-weight:700;';
-        list.innerHTML += `<div class="lb-item"><div class="lb-rank">${medal}</div><div class="lb-name"><div style="${isMe}">${e.fullName} ${e.userId === userId ? '(คุณ)' : ''}</div><div style="font-size:11px; color:#888;">${e.rank} ${e.position}</div></div><div class="lb-prize">฿${e.prizeText}</div></div>`;
+        
+        // แทรกรูปภาพโปรไฟล์เข้ามาในการ์ด
+        const pic = e.pictureUrl || 'https://cdn-icons-png.flaticon.com/512/847/847969.png';
+        
+        list.innerHTML += `
+          <div class="lb-item">
+            <div class="lb-rank">${medal}</div>
+            <img src="${pic}" class="lb-avatar">
+            <div class="lb-name">
+              <div style="${isMe}">${e.fullName} ${e.userId === userId ? '(คุณ)' : ''}</div>
+              <div style="font-size:11px; color:#888;">${e.rank} ${e.position}</div>
+            </div>
+            <div class="lb-prize">฿${e.prizeText}</div>
+          </div>
+        `;
       });
     }
     document.getElementById('lb-loading').style.display = 'none'; list.style.display = 'block';
