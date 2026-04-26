@@ -91,7 +91,7 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg-color); color: v
     <div class="streak-box">🔥 <span id="streak-count">0</span></div>
     <div class="life-box" id="life-icon">❤️</div>
   </div>
-  <div class="timer-container"><div class="timer-bar" id="timer-bar"></div></div>
+  <div class="timer-container"><div class="timer-bar" id="timer-bar" style="width:100%"></div></div>
   <div class="q-card" id="q-text">คำถาม?</div>
   <div class="choices">
     <button class="choice-btn" id="btn-A" onclick="selectAnswer('A')">-</button>
@@ -123,6 +123,7 @@ let allQs = [], gamePool = [], currentQIndex = 0, currentStreak = 0;
 let isLocked = false, currentCorrectAnswer = '', userId = '';
 const TIME_LIMIT_MS = 10000;
 let timerTimeout = null;
+let startTimestamp = 0;
 let appConfig = null;
 
 async function init() {
@@ -192,24 +193,34 @@ function loadNextQuestion() {
     const btn = document.getElementById(`btn-${letter}`);
     btn.style.display = 'block'; btn.textContent = q.choices[key]; btn.setAttribute('data-real-key', key);
   });
+  
   startTimerBar();
 }
 
+// ⏱️ ระบบหลอดเวลาใหม่ อิงตามเวลาจริง ไม่กระตุก
 function startTimerBar() {
-  clearTimeout(timerTimeout);
+  clearInterval(timerTimeout);
+  startTimestamp = Date.now();
   const bar = document.getElementById('timer-bar');
-  bar.style.transition = 'none'; bar.style.width = '100%';
-  requestAnimationFrame(() => { requestAnimationFrame(() => {
-      bar.style.transition = `width ${TIME_LIMIT_MS}ms linear`; bar.style.width = '0%';
-  });});
-  timerTimeout = setTimeout(() => { if (!isLocked) handleWrongAnswer(null, true); }, TIME_LIMIT_MS);
+  bar.style.width = '100%';
+  
+  timerTimeout = setInterval(() => {
+    const elapsed = Date.now() - startTimestamp;
+    const remaining = Math.max(0, TIME_LIMIT_MS - elapsed);
+    const pct = (remaining / TIME_LIMIT_MS) * 100;
+    
+    bar.style.width = pct + '%';
+    
+    if (remaining <= 0) {
+      clearInterval(timerTimeout);
+      if (!isLocked) handleWrongAnswer(null, true);
+    }
+  }, 50); // วาดภาพเฟรมทุกๆ 50ms ให้ดูลื่น
 }
 
 function selectAnswer(displayLetter) {
   if (isLocked) return; isLocked = true;
-  clearTimeout(timerTimeout);
-  const bar = document.getElementById('timer-bar');
-  bar.style.width = bar.offsetWidth + 'px'; bar.style.transition = 'none';
+  clearInterval(timerTimeout);
 
   const btn = document.getElementById(`btn-${displayLetter}`);
   if (btn.getAttribute('data-real-key') === currentCorrectAnswer) {
@@ -253,7 +264,7 @@ async function loadLeaderboardData() {
     else {
       res.leaderboard.forEach((e, i) => {
         const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i+1}.`;
-        list.innerHTML += `<div class="lb-item"><div class="lb-rank">${medal}</div><div class="lb-name" style="${e.userId === userId ? 'color:var(--orange);' : ''}"><div style="font-weight:700">${e.fullName}</div><div style="font-size:11px; color:#888;">${e.rank}</div></div><div class="lb-score">${e.streak} 🔥</div></div>`;
+        list.innerHTML += `<div class="lb-item"><div class="lb-rank">${medal}</div><div class="lb-name" style="${e.userId === userId ? 'color:var(--orange);' : ''}"><div style="font-weight:700">${e.fullName}</div><div style="font-size:11px; color:#888;">${e.rank} ${e.position}</div></div><div class="lb-score">${e.streak} 🔥</div></div>`;
       });
     }
     document.getElementById('lb-loading').style.display = 'none'; list.style.display = 'block';
