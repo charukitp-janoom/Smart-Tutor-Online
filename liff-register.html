@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Register</title>
+<title>ลงทะเบียน</title>
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
@@ -56,20 +56,17 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
 </head>
 <body>
 
-<!-- หน้าจอโหลด -->
 <div id="loading-screen">
   <div class="loader"></div>
   <div style="font-weight: 600; color: var(--text);" id="load-text">กำลังตรวจสอบข้อมูล...</div>
 </div>
 
-<!-- ส่วนหัว และ รูปโปรไฟล์ LINE -->
 <div class="header hidden" id="ui-header">
   <img src="" id="ui-profile-img" class="profile-img hidden" alt="LINE Profile">
   <div class="org-name" id="ui-org-name">Organization</div>
   <div class="app-name" id="ui-app-name">App Name</div>
 </div>
 
-<!-- การ์ดแจ้งเตือนกรณีลงทะเบียนแล้ว -->
 <div class="registered-card hidden" id="ui-already-registered">
   <div style="font-size: 50px; margin-bottom: 10px;">✅</div>
   <h2 style="font-size: 20px; margin-bottom: 5px; color: var(--green);">ท่านลงทะเบียนเรียบร้อยแล้ว</h2>
@@ -94,7 +91,6 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
   <button class="btn btn-outline" onclick="showEditForm()">✏️ แก้ไขข้อมูลใหม่</button>
 </div>
 
-<!-- การ์ดฟอร์มลงทะเบียน (และแก้ไข) -->
 <div class="form-card hidden" id="ui-form">
   <h2 id="form-title" style="font-size: 20px; margin-bottom: 20px; text-align: center; border-bottom: 1px solid #eee; padding-bottom: 15px;">ลงทะเบียนเข้าสู่ระบบ</h2>
   
@@ -129,7 +125,7 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
 </div>
 
 <script>
-const LIFF_ID = '2009896605-DDyxB4Wy'; // << [ใส่ LIFF ID ของหน้าลงทะเบียน]
+const LIFF_ID = '2009896605-DDyxB4Wy'; 
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbwo_kB4DZSVmYqkztnf8n_-sjVvAFUxIH9dZAqby_SUvV5H8gH5hXhILHkzZJ59S2j6/exec';
 
 let profile = null;
@@ -141,17 +137,14 @@ async function init() {
     await liff.init({ liffId: LIFF_ID });
     if (!liff.isLoggedIn()) { liff.login(); return; }
     
-    // ดึงโปรไฟล์ LINE ของผู้ใช้งาน
     profile = await liff.getProfile();
     
-    // แสดงรูปโปรไฟล์ LINE ทันที
     if (profile.pictureUrl) {
       const img = document.getElementById('ui-profile-img');
       img.src = profile.pictureUrl;
       img.classList.remove('hidden');
     }
 
-    // เรียก API 2 ตัวพร้อมกัน: 1. ดึง Config (เทมเพลต) 2. ดึงข้อมูลสมาชิก (เช็กว่าลงทะเบียนหรือยัง)
     const [configRes, memberRes] = await Promise.all([
       callAPI('GET', { action: 'get_config' }),
       callAPI('GET', { action: 'get_member', userId: profile.userId })
@@ -165,7 +158,6 @@ async function init() {
     document.getElementById('loading-screen').classList.add('hidden');
     document.getElementById('ui-header').classList.remove('hidden');
 
-    // ตรวจสอบว่าเคยลงทะเบียนไว้หรือไม่
     if (memberRes.status === 'ok' && memberRes.member) {
       existingMember = memberRes.member;
       showRegisteredInfo();
@@ -179,7 +171,6 @@ async function init() {
   }
 }
 
-// ฟังก์ชันแปลงร่างหน้าเว็บตาม Config ลูกค้า
 function applyTemplate(config) {
   document.documentElement.style.setProperty('--primary', config.colorPrimary || '#4a5568');
   document.documentElement.style.setProperty('--secondary', config.colorSecondary || '#a0aec0');
@@ -188,18 +179,15 @@ function applyTemplate(config) {
   document.getElementById('ui-app-name').textContent = config.appName;
   document.getElementById('ui-org-name').textContent = config.orgName;
   
-  // เปลี่ยน Label ในฟอร์ม
   document.getElementById('lbl-level').textContent = `ระบุ${config.termLevel}ปัจจุบัน`;
   document.getElementById('lbl-fullname').textContent = `ชื่อ-นามสกุล${config.termUser}`;
   document.getElementById('lbl-position').textContent = `ระบุ${config.termPosition}`;
 
-  // เปลี่ยน Label ในการ์ดข้อมูล
   document.getElementById('lbl-info-level').textContent = config.termLevel;
   document.getElementById('lbl-info-fullname').textContent = `ชื่อ-นามสกุล${config.termUser}`;
   document.getElementById('lbl-info-pos').textContent = config.termPosition;
 }
 
-// แสดงการ์ดข้อมูลเดิม
 function showRegisteredInfo() {
   document.getElementById('ui-form').classList.add('hidden');
   document.getElementById('ui-already-registered').classList.remove('hidden');
@@ -209,7 +197,6 @@ function showRegisteredInfo() {
   document.getElementById('info-pos').textContent = existingMember.position || '-';
 }
 
-// แสดงฟอร์มกรณีต้องการแก้ไข
 function showEditForm() {
   document.getElementById('ui-already-registered').classList.add('hidden');
   document.getElementById('ui-form').classList.remove('hidden');
@@ -218,7 +205,6 @@ function showEditForm() {
   document.getElementById('btn-submit').textContent = "อัปเดตข้อมูล";
   document.getElementById('btn-cancel-edit').classList.remove('hidden');
   
-  // นำข้อมูลเดิมมาใส่ในช่องกรอก
   if (existingMember) {
     document.getElementById('inp-level').value = existingMember.rank;
     document.getElementById('inp-fullname').value = existingMember.fullName;
@@ -226,10 +212,7 @@ function showEditForm() {
   }
 }
 
-// ยกเลิกการแก้ไข
-function cancelEdit() {
-  showRegisteredInfo();
-}
+function cancelEdit() { showRegisteredInfo(); }
 
 async function submitData() {
   const level = document.getElementById('inp-level').value;
@@ -246,7 +229,8 @@ async function submitData() {
     const res = await callAPI('POST', {
       action: 'liff_register',
       userId: profile.userId,
-      displayName: profile.displayName, // เก็บ Display Name เผื่อไว้ตรวจสอบ
+      displayName: profile.displayName, 
+      pictureUrl: profile.pictureUrl, // ⚠️ เพิ่มการส่งรูปโปรไฟล์
       rank: level,
       fullName: fullname,
       position: position
@@ -255,9 +239,7 @@ async function submitData() {
     if(res.status === 'ok') {
       alert(isEditing ? 'อัปเดตข้อมูลสำเร็จ!' : 'ลงทะเบียนสำเร็จ!');
       liff.closeWindow();
-    } else {
-      throw new Error(res.message);
-    }
+    } else { throw new Error(res.message); }
   } catch(e) {
     alert(e.message);
     btn.textContent = isEditing ? 'อัปเดตข้อมูล' : 'บันทึกข้อมูล'; 
