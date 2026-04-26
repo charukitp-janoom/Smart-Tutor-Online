@@ -3,13 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Unit School — ภารกิจประจำวัน</title>
+<title>ภารกิจประจำวัน</title>
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700;800&family=IBM+Plex+Mono:wght@700&display=swap" rel="stylesheet">
 <style>
 :root {
+  --config-secondary: #ffd700;
   --bg: #0b0c10; --surface: #1f2833; --border: #30363d;
-  --primary: #ffd700; --primary-dark: #ffb300;
+  --primary: var(--config-secondary); 
   --text: #e6edf3; --muted: #8b949e;
   --success: #00e676; --danger: #ff5252;
 }
@@ -48,9 +49,8 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
 .q-progress-text { font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 700; color: var(--muted); width: 40px; text-align: right; }
 
 .btn-claim { background: var(--surface); color: var(--muted); border: 1px solid var(--border); padding: 12px; border-radius: 10px; font-size: 15px; font-weight: 800; font-family: 'Sarabun', sans-serif; cursor: not-allowed; transition: 0.2s; text-align: center; }
-.btn-claim.ready { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #000; border: none; cursor: pointer; box-shadow: 0 4px 15px rgba(255,215,0,0.3); animation: pulse 1.5s infinite alternate; }
+.btn-claim.ready { background: var(--primary); color: #000; border: none; cursor: pointer; box-shadow: 0 4px 15px rgba(255,215,0,0.3); animation: pulse 1.5s infinite alternate; }
 .btn-claim.claimed { background: rgba(0,230,118,0.1); color: var(--success); border: 1px solid rgba(0,230,118,0.3); cursor: not-allowed; }
-
 @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.02); } }
 </style>
 </head>
@@ -63,76 +63,69 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
 
 <div class="header-card">
   <div class="wallet-box">
-    <span class="wallet-title">เหรียญสะสม:</span>
-    <span class="wallet-balance" id="ui-balance">0</span><span style="font-size: 14px;">🪙</span>
+    <span class="wallet-title">คะแนนสะสม:</span>
+    <span class="wallet-balance" id="ui-balance">0</span><span style="font-size: 14px;" class="dynamic-term-coin">Point</span>
   </div>
   <div class="main-title">🎯 ภารกิจประจำวัน</div>
-  <div class="main-sub">ทำภารกิจให้สำเร็จเพื่อรับเหรียญ PX ฟรีทุกวัน<br>ระบบจะรีเซ็ตภารกิจใหม่เวลาเที่ยงคืน</div>
+  <div class="main-sub">ทำภารกิจ <span class="dynamic-app-name">App</span> ให้สำเร็จเพื่อรับคะแนนฟรี<br>ระบบจะรีเซ็ตภารกิจใหม่เวลาเที่ยงคืน</div>
 </div>
 
-<div class="quest-container" id="quest-list">
-  <!-- Quests injected here -->
-</div>
+<div class="quest-container" id="quest-list"></div>
 
 <script>
-const LIFF_ID = '2009717287-htEMqY79'; // << [ใส่ LIFF ID ของหน้าภารกิจ]
+const LIFF_ID = 'YOUR-LIFF-QUESTS-ID'; 
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbyRhVNOnNIAkwZxrTcJOzI2nh_fmSIzI8tgbVurJoUJlDaZrR2Kovo0AydC3Qs0PNyU/exec';
 
 let userId = '';
-let isClaiming = false; // [FIX] ป้องกัน double-claim quest reward
+let appConfig = null;
+let isClaiming = false;
 
 async function init() {
   try {
     await liff.init({ liffId: LIFF_ID });
     if (!liff.isLoggedIn()) { liff.login(); return; }
     
+    const configRes = await callAPI('GET', { action: 'get_config' });
+    if(configRes.status === 'ok') { appConfig = configRes.config; applyTemplate(appConfig); }
+    
     userId = (await liff.getProfile()).userId;
     await fetchQuests();
-  } catch(e) {
-    showError(e.message);
-  }
+  } catch(e) { showError(e.message); }
+}
+
+function applyTemplate(c) {
+  if(!c) return;
+  document.documentElement.style.setProperty('--config-secondary', c.colorSecondary);
+  document.title = "ภารกิจ - " + c.appName;
+  document.querySelectorAll('.dynamic-app-name').forEach(el => el.textContent = c.appName);
+  document.querySelectorAll('.dynamic-term-coin').forEach(el => el.textContent = c.termCoin);
 }
 
 async function fetchQuests() {
   try {
     const data = await callAPI('GET', { action: 'get_quests', userId: userId });
     if (data.status === 'error') throw new Error(data.message);
-    
     document.getElementById('ui-balance').textContent = data.balance || 0;
     renderQuests(data.quests || []);
-    
     document.getElementById('ov-load').classList.add('hidden');
-  } catch(e) {
-    showError('โหลดข้อมูลล้มเหลว: ' + e.message);
-  }
+  } catch(e) { showError('โหลดข้อมูลล้มเหลว: ' + e.message); }
 }
 
 function renderQuests(quests) {
   const container = document.getElementById('quest-list');
-  if (quests.length === 0) {
-    container.innerHTML = '<div style="text-align:center; color:var(--muted); margin-top: 40px;">ไม่มีภารกิจในขณะนี้</div>';
-    return;
-  }
+  if (quests.length === 0) { container.innerHTML = '<div style="text-align:center; color:var(--muted); margin-top: 40px;">ไม่มีภารกิจในขณะนี้</div>'; return; }
+  const coinTerm = appConfig ? appConfig.termCoin : '';
 
   container.innerHTML = quests.map(q => {
-    let cardClass = 'quest-card';
-    if (q.isClaimed) cardClass += ' claimed';
-    else if (q.isCompleted) cardClass += ' completed';
-
-    let btnHtml = `<div class="btn-claim">ยังไม่สำเร็จ</div>`;
-    if (q.isClaimed) {
-      btnHtml = `<div class="btn-claim claimed">✅ รับรางวัลแล้ว</div>`;
-    } else if (q.isCompleted) {
-      btnHtml = `<button class="btn-claim ready" onclick="claimReward('${q.id}')">🎁 กดรับรางวัล</button>`;
-    }
-
+    let cardClass = 'quest-card' + (q.isClaimed ? ' claimed' : q.isCompleted ? ' completed' : '');
+    let btnHtml = q.isClaimed ? `<div class="btn-claim claimed">✅ รับรางวัลแล้ว</div>` : q.isCompleted ? `<button class="btn-claim ready" onclick="claimReward('${q.id}')">🎁 กดรับรางวัล</button>` : `<div class="btn-claim">ยังไม่สำเร็จ</div>`;
     const pct = Math.min((q.current / q.target) * 100, 100);
 
     return `
       <div class="${cardClass}">
         <div class="q-header">
           <div class="q-title">${q.title}</div>
-          <div class="q-reward">+${q.reward} 🪙</div>
+          <div class="q-reward">+${q.reward} ${coinTerm}</div>
         </div>
         <div class="q-progress-wrap">
           <div class="q-bar-bg">
@@ -147,29 +140,14 @@ function renderQuests(quests) {
 }
 
 async function claimReward(questId) {
-  // [FIX] ป้องกันกดซ้ำก่อน response แรกกลับมา
-  if (isClaiming) return;
-  isClaiming = true;
-  
+  if (isClaiming) return; isClaiming = true;
   document.getElementById('ov-load').classList.remove('hidden');
   try {
-    const res = await callAPI('POST', {
-      action: 'claim_quest',
-      userId: userId,
-      questId: questId
-    });
-    
+    const res = await callAPI('POST', { action: 'claim_quest', userId: userId, questId: questId });
     if (res.status === 'error') throw new Error(res.message);
-    
-    // Refresh list and balance
-    await fetchQuests();
-    alert('✅ ' + res.message);
-  } catch(e) {
-    document.getElementById('ov-load').classList.add('hidden');
-    alert('❌ ผิดพลาด: ' + e.message);
-  } finally {
-    isClaiming = false; // [FIX] reset flag
-  }
+    await fetchQuests(); alert('✅ ' + res.message);
+  } catch(e) { document.getElementById('ov-load').classList.add('hidden'); alert('❌ ผิดพลาด: ' + e.message);
+  } finally { isClaiming = false; }
 }
 
 function showError(msg) {
@@ -178,29 +156,11 @@ function showError(msg) {
   el.classList.remove('hidden');
 }
 
-async function callAPI(method, params, timeoutMs=20000) {
-  const ctrl = new AbortController();
-  const tid  = setTimeout(() => ctrl.abort(), timeoutMs);
-  try {
-    let url = GAS_URL, opts = { signal:ctrl.signal, redirect:'follow' };
-    if (method === 'GET') {
-      url += '?' + new URLSearchParams(params).toString();
-      opts.method = 'GET';
-    } else {
-      opts.method  = 'POST';
-      opts.headers = { 'Content-Type':'text/plain' };
-      opts.body    = JSON.stringify(params);
-    }
-    const resp = await fetch(url, opts);
-    clearTimeout(tid);
-    if (!resp.ok) throw new Error('HTTP ' + resp.status);
-    return await resp.json();
-  } catch(e) {
-    clearTimeout(tid);
-    throw e;
-  }
+async function callAPI(method, params) {
+  let url = GAS_URL, opts = { method: 'POST', headers: {'Content-Type':'text/plain'}, body: JSON.stringify(params) };
+  if (method === 'GET') { url += '?' + new URLSearchParams(params).toString(); opts = { method: 'GET' }; }
+  const resp = await fetch(url, opts); return await resp.json();
 }
-
 init();
 </script>
 </body>
