@@ -34,6 +34,10 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
 .tab { flex: 1; padding: 10px; font-size: 14px; font-weight: 700; color: var(--muted); cursor: pointer; border-radius: 6px; transition: 0.2s; }
 .tab.active { background: var(--primary); color: #fff; }
 
+/* Subject Selector */
+.subject-select { width: 100%; padding: 14px 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; color: #fff; font-family: 'Sarabun', sans-serif; font-size: 14px; font-weight: 700; margin-bottom: 16px; outline: none; appearance: none; cursor: pointer; }
+.subject-select option { background: var(--panel); color: #fff; }
+
 .list-container { width: 100%; display: flex; flex-direction: column; gap: 10px; flex: 1; overflow-y: auto; padding-bottom: 20px; }
 .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px; text-align: left; display: flex; flex-direction: column; gap: 10px; }
 .card-header { display: flex; justify-content: space-between; align-items: center; }
@@ -79,7 +83,15 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
   </div>
 
   <div class="list-container" id="list-inbox"></div>
-  <div class="list-container hidden" id="list-challenge"></div>
+  
+  <div class="list-container hidden" id="list-challenge">
+    <div style="text-align: left; margin-bottom: 5px; font-size: 14px; color: var(--muted); font-weight: 600;">เลือกวิชาที่ต้องการท้าดวล:</div>
+    <select id="sel-subject" class="subject-select">
+      <option value="ALL">🌟 สุ่มรวมทุกวิชา</option>
+    </select>
+    <div id="challenge-members-wrap" style="display:flex; flex-direction:column; gap:10px; margin-top: 10px;"></div>
+  </div>
+
   <button class="btn btn-outline" style="margin-top:auto;" onclick="liff.closeWindow()">← ปิดหน้าต่าง</button>
 </div>
 
@@ -109,10 +121,9 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
 const LIFF_ID = '2009896605-GH2nKTgJ'; 
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbwo_kB4DZSVmYqkztnf8n_-sjVvAFUxIH9dZAqby_SUvV5H8gH5hXhILHkzZJ59S2j6/exec';
 
-let userId = '', inboxDuels = [], challengeMembers = [], appConfig = null;
+let userId = '', inboxDuels = [], challengeMembers = [], allQs = [], appConfig = null;
 let currentDuel = null, targetUserId = null, questions = [], qIndex = 0, myScore = 0;
 
-// ⏱️ Timer Logic อิงเวลาจากระบบเพื่อความเสถียร
 let qStartTime = 0, totalTimeMs = 0, isAnswerLocked = false, gameTimerInterval = null;
 
 async function init() {
@@ -124,6 +135,14 @@ async function init() {
     if(configRes.status === 'ok') { appConfig = configRes.config; applyTemplate(appConfig); }
 
     userId = (await liff.getProfile()).userId;
+    
+    // โหลดคำถามทั้งหมดมาเก็บไว้ก่อน เพื่อสกัดหาหมวดหมู่
+    const qData = await callAPI('GET', { action:'get_questions', userId: userId });
+    if (qData.status === 'ok') {
+      allQs = qData.questions || [];
+      populateSubjectSelect(allQs, 'sel-subject');
+    }
+
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('duelId')) await loadDuelData(urlParams.get('duelId'));
     else await loadLobby();
@@ -135,6 +154,17 @@ function applyTemplate(c) {
   document.documentElement.style.setProperty('--config-primary', c.colorPrimary);
   document.title = "ลานประลอง - " + c.appName;
   document.querySelectorAll('.dynamic-app-name').forEach(el => el.textContent = c.appName);
+}
+
+function populateSubjectSelect(qs, selectId) {
+  const select = document.getElementById(selectId);
+  const categories = [...new Set(qs.map(q => q.category || 'ทั่วไป'))];
+  let html = '<option value="ALL">🌟 สุ่มรวมทุกวิชา</option>';
+  categories.forEach(c => {
+    const count = qs.filter(q => (q.category||'ทั่วไป') === c).length;
+    html += `<option value="${c}">${c} (${count} ข้อ)</option>`;
+  });
+  select.innerHTML = html;
 }
 
 async function loadLobby() {
@@ -169,10 +199,11 @@ function renderLobby() {
     });
   }
 
-  const chEl = document.getElementById('list-challenge'); chEl.innerHTML = '<div style="font-size: 12px; color:var(--muted); margin-bottom: 10px;">เลือกรายชื่อที่ต้องการท้าประลอง</div>';
-  if (challengeMembers.length === 0) chEl.innerHTML += '<div style="color:var(--muted); padding: 40px 0;">ไม่มีรายชื่อในระบบ</div>';
+  const chWrap = document.getElementById('challenge-members-wrap');
+  chWrap.innerHTML = '';
+  if (challengeMembers.length === 0) chWrap.innerHTML = '<div style="color:var(--muted); padding: 40px 0;">ไม่มีรายชื่อในระบบ</div>';
   else {
-    challengeMembers.forEach(m => { chEl.innerHTML += `<div class="card" style="flex-direction:row; align-items:center; justify-content:space-between; padding: 12px 16px;"><div><div class="card-name">${m.fullName}</div><div class="card-pos">${m.rank} ${m.position}</div></div><button class="btn btn-outline" style="width:auto; padding: 6px 16px; margin:0;" onclick="initChallenge('${m.userId}', '${m.fullName}')">ท้าดวล</button></div>`; });
+    challengeMembers.forEach(m => { chWrap.innerHTML += `<div class="card" style="flex-direction:row; align-items:center; justify-content:space-between; padding: 12px 16px;"><div><div class="card-name">${m.fullName}</div><div class="card-pos">${m.rank} ${m.position}</div></div><button class="btn btn-outline" style="width:auto; padding: 6px 16px; margin:0;" onclick="initChallenge('${m.userId}', '${m.fullName}')">ท้าดวล</button></div>`; });
   }
 }
 
@@ -195,13 +226,18 @@ async function loadDuelData(duelId) {
 }
 
 async function initChallenge(tId, tName) {
-  if(!confirm(`ต้องการท้าประลอง ${tName} หรือไม่?`)) return;
+  const subj = document.getElementById('sel-subject').value;
+  let targetQs = subj === 'ALL' ? allQs : allQs.filter(q => (q.category||'ทั่วไป') === subj);
+  
+  if (targetQs.length < 5) {
+     return alert('วิชานี้มีข้อสอบไม่ถึง 5 ข้อ ไม่สามารถใช้ท้าประลองได้ครับ');
+  }
+
+  if(!confirm(`ต้องการส่งคำท้าประลอง ${tName} หรือไม่?`)) return;
   showLoading('กำลังดึงชุดคำถาม...');
   try {
-    const data = await callAPI('GET', { action:'get_questions', userId: userId });
-    if (data.status === 'error') throw new Error(data.message);
-    const allQs = data.questions || []; if(allQs.length < 5) throw new Error('ข้อสอบไม่พอสำหรับการประลอง (ต้องมีอย่างน้อย 5 ข้อ)');
-    questions = allQs.sort(()=>Math.random()-0.5).slice(0,5); targetUserId = tId; currentDuel = null;
+    questions = targetQs.sort(()=>Math.random()-0.5).slice(0,5); 
+    targetUserId = tId; currentDuel = null;
     startQuizFlow();
   } catch(e) { showError(e.message); }
 }
@@ -230,11 +266,10 @@ function renderQuestion() {
 
 function startTimerUI() {
   clearInterval(gameTimerInterval);
-  qStartTime = Date.now(); // บันทึกเวลาที่แท้จริง
+  qStartTime = Date.now(); 
   const el = document.getElementById('game-timer');
   
   gameTimerInterval = setInterval(() => { 
-    // แสดงเวลาแบบเรียลไทม์ และไม่เพี้ยนแม้เครื่องหน่วง
     el.textContent = ((Date.now() - qStartTime) / 1000).toFixed(1) + 's'; 
   }, 100);
 }
@@ -244,7 +279,6 @@ function selectAnswer(displayLetter) {
   isAnswerLocked = true; 
   clearInterval(gameTimerInterval);
   
-  // นำเวลาจริงที่ใช้ไปรวมกับเวลาสะสม
   totalTimeMs += Date.now() - qStartTime;
   
   const btn = document.getElementById(`btn-${displayLetter}`);
@@ -257,7 +291,7 @@ function selectAnswer(displayLetter) {
     if (realKey === correctKey) myScore++; 
     qIndex++; 
     renderQuestion(); 
-  }, 300); // ดีเลย์เล็กน้อยเพื่อความสวยงาม
+  }, 300); 
 }
 
 async function submitDuelResult() {
