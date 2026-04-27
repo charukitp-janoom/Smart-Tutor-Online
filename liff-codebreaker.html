@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>กู้ระเบิด</title>
+<title>Unit School — กู้ระเบิด</title>
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;800&family=IBM+Plex+Mono:wght@700&display=swap" rel="stylesheet">
 <style>
@@ -28,8 +28,13 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
 
 /* UI Elements */
 .title { font-size: 32px; font-weight: 800; color: #fff; margin-bottom: 5px; text-shadow: 0 0 10px var(--red); }
-.subtitle { font-size: 14px; color: var(--muted); margin-bottom: 30px; line-height: 1.6; }
-.btn { background: #333; color: #fff; border: 2px solid #555; padding: 14px 24px; border-radius: 12px; font-size: 16px; font-weight: 800; cursor: pointer; width: 100%; font-family: 'Sarabun', sans-serif; transition: 0.2s; margin-bottom: 12px; }
+.subtitle { font-size: 14px; color: var(--muted); margin-bottom: 20px; line-height: 1.6; }
+
+/* Subject Selector */
+.subject-select { width: 100%; max-width: 320px; padding: 14px 16px; background: #333; border: 2px solid #555; border-radius: 12px; color: #fff; font-family: 'Sarabun', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 24px; outline: none; appearance: none; text-align: center; cursor: pointer; }
+.subject-select option { background: var(--panel); color: #fff; text-align: left; }
+
+.btn { background: #333; color: #fff; border: 2px solid #555; padding: 14px 24px; border-radius: 12px; font-size: 16px; font-weight: 800; cursor: pointer; width: 100%; max-width: 320px; font-family: 'Sarabun', sans-serif; transition: 0.2s; margin-bottom: 12px; }
 .btn:active { transform: scale(0.96); }
 .btn-red { background: linear-gradient(180deg, var(--red) 0%, #aa0000 100%); border-color: #ff8888; box-shadow: 0 4px 15px rgba(255,0,0,0.4); }
 
@@ -71,24 +76,25 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
 <body>
 <div class="bg-pulse"></div>
 
-<!-- Loading -->
 <div id="ov-load" class="screen">
   <div style="font-size:40px; margin-bottom:10px; animation: tick 0.5s infinite alternate;">💣</div>
   <div style="color:var(--red); font-weight:800;" id="load-text">กำลังเตรียมระบบ...</div>
 </div>
 
-<!-- Start -->
 <div id="start-ui" class="screen hidden">
   <div style="font-size: 80px; margin-bottom: 10px; filter: drop-shadow(0 0 20px red);">💣</div>
   <div class="title">กู้ระเบิด</div>
   <div class="subtitle"><span class="dynamic-app-name">System</span><br>ระวัง! ตัดสายที่ <b>"ผิด"</b> ทิ้ง 3 สายเพื่อกู้ระเบิด<br>หากเผลอตัดสายที่เป็น "คำตอบที่ถูก" ระเบิดจะทำงานทันที!</div>
   
+  <select id="sel-subject" class="subject-select">
+    <option value="ALL">🌟 รวมทุกรายวิชา</option>
+  </select>
+
   <button class="btn btn-red" onclick="startGame()">✂️ เข้าสู่ภารกิจกู้ระเบิด</button>
   <button class="btn" onclick="showLeaderboard()">🏆 ทำเนียบหน่วย EOD</button>
   <button class="btn" style="background:transparent; border:none; font-size:14px; color:#888;" onclick="liff.closeWindow()">ปิดหน้าต่าง</button>
 </div>
 
-<!-- Game -->
 <div id="game-ui" class="screen hidden" style="justify-content: flex-start;">
   <div class="bomb-header">
     <div class="bomb-icon">💣</div>
@@ -122,7 +128,6 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
   </div>
 </div>
 
-<!-- End -->
 <div id="end-ui" class="screen hidden">
   <div style="font-size: 60px; margin-bottom: 10px;">💥</div>
   <div class="title" style="color:var(--red);">ระเบิดทำงาน!</div>
@@ -132,11 +137,10 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
   <div class="end-score" id="end-score">0</div>
   <div style="font-size: 14px; color:var(--muted); margin-bottom: 30px;">ลูก</div>
   
-  <button class="btn btn-red" onclick="startGame()">🔄 ทำภารกิจใหม่</button>
+  <button class="btn btn-red" onclick="resetToStart()">🔄 ทำภารกิจใหม่</button>
   <button class="btn" onclick="showLeaderboardFromEnd()">🏆 ดูทำเนียบ EOD</button>
 </div>
 
-<!-- Leaderboard -->
 <div id="lb-ui" class="screen hidden" style="justify-content: flex-start;">
   <div class="title" style="font-size:24px;">ทำเนียบหน่วย EOD</div>
   <div class="subtitle" style="margin-bottom: 16px;">จัดอันดับจากจำนวนระเบิดที่กู้สำเร็จ</div>
@@ -148,13 +152,10 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
 </div>
 
 <script>
-// ==============================================
-// CONFIG
-// ==============================================
 const LIFF_ID = '2009896605-dsIhqbET'; // << [เปลี่ยนเป็น LIFF ID ของคุณ]
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbwo_kB4DZSVmYqkztnf8n_-sjVvAFUxIH9dZAqby_SUvV5H8gH5hXhILHkzZJ59S2j6/exec'; // << [เปลี่ยนเป็น GAS_URL ของคุณ] 
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwo_kB4DZSVmYqkztnf8n_-sjVvAFUxIH9dZAqby_SUvV5H8gH5hXhILHkzZJ59S2j6/exec'; // << [เปลี่ยนเป็น GAS_URL ของคุณ]  
 
-let allQs = [];
+let allQs = [], currentPlayQs = [];
 let gamePool = [];
 let currentQIndex = 0;
 let score = 0;
@@ -187,6 +188,8 @@ async function init() {
     if (allQs.length === 0) throw new Error(`ไม่พบข้อสอบในระบบ`);
     if (!allQs[0].correctAnswer) throw new Error("ไม่พบเฉลย! คุณอาจยังไม่ได้อัปเดต Code.gs เป็นเวอร์ชันล่าสุด");
 
+    populateSubjectSelect(allQs, 'sel-subject');
+
     document.getElementById('ov-load').classList.add('hidden');
     document.getElementById('start-ui').classList.remove('hidden');
   } catch(e) {
@@ -200,6 +203,17 @@ function applyTemplate(c) {
   document.querySelectorAll('.dynamic-app-name').forEach(el => el.textContent = c.appName);
 }
 
+function populateSubjectSelect(qs, selectId) {
+  const select = document.getElementById(selectId);
+  const categories = [...new Set(qs.map(q => q.category || 'ทั่วไป'))];
+  let html = '<option value="ALL">🌟 รวมทุกรายวิชา</option>';
+  categories.forEach(c => {
+    const count = qs.filter(q => (q.category||'ทั่วไป') === c).length;
+    html += `<option value="${c}">${c} (${count} ข้อ)</option>`;
+  });
+  select.innerHTML = html;
+}
+
 function shuffleArray(array) {
   let arr = [...array];
   for (let i = arr.length - 1; i > 0; i--) {
@@ -210,16 +224,28 @@ function shuffleArray(array) {
 }
 
 function startGame() {
+  const subj = document.getElementById('sel-subject').value;
+  currentPlayQs = subj === 'ALL' ? [...allQs] : allQs.filter(q => (q.category||'ทั่วไป') === subj);
+
+  if(currentPlayQs.length === 0) {
+     alert('ไม่พบข้อสอบในวิชานี้ กรุณาเลือกวิชาอื่น'); return;
+  }
+
   document.getElementById('start-ui').classList.add('hidden');
   document.getElementById('end-ui').classList.add('hidden');
   document.getElementById('game-ui').classList.remove('hidden');
   
   score = 0;
   document.getElementById('score').textContent = '0';
-  gamePool = shuffleArray(allQs);
+  gamePool = shuffleArray(currentPlayQs);
   currentQIndex = 0;
   
   loadNextBomb();
+}
+
+function resetToStart() {
+  document.getElementById('end-ui').classList.add('hidden');
+  document.getElementById('start-ui').classList.remove('hidden');
 }
 
 function loadNextBomb() {
@@ -227,7 +253,7 @@ function loadNextBomb() {
   wiresCutCount = 0;
 
   if (currentQIndex >= gamePool.length) {
-    gamePool = gamePool.concat(shuffleArray(allQs));
+    gamePool = gamePool.concat(shuffleArray(currentPlayQs));
   }
 
   const q = gamePool[currentQIndex];
