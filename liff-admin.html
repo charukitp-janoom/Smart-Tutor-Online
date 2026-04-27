@@ -222,7 +222,19 @@ select.form-control { cursor: pointer; }
 <div id="modal-broadcast" class="modal-ov hidden" onclick="closeModal(event)">
   <div class="modal-box" onclick="event.stopPropagation()">
     <div class="modal-title" style="color:var(--secondary)">📢 แจ้งเตือนบทเรียน / ข่าวสาร</div>
-    <div class="stat-label mb-2" style="color:var(--muted)">ข้อความนี้จะถูกส่งไปยังแชท LINE ของสมาชิก<b>ทุกคน</b>ในระบบทันที</div>
+    <div class="stat-label mb-2" style="color:var(--muted)">ข้อความนี้จะถูกส่งไปยังแชท LINE ของเป้าหมายที่เลือก</div>
+    
+    <label class="stat-label mt-2">กลุ่มเป้าหมาย</label>
+    <select id="inp-broadcast-target-type" class="form-control" onchange="updateBroadcastTargetOptions()">
+      <option value="ALL">สมาชิกทุกคนในระบบ</option>
+      <option value="LEVEL">ระบุตาม ระดับชั้น</option>
+      <option value="POSITION">ระบุตาม สาขาวิชา</option>
+    </select>
+    
+    <div id="wrap-broadcast-target-val" class="hidden">
+      <label class="stat-label">เลือกกลุ่ม</label>
+      <select id="inp-broadcast-target-val" class="form-control"></select>
+    </div>
     
     <label class="stat-label mt-2">พิมพ์ข้อความแจ้งเตือน</label>
     <textarea id="inp-broadcast-msg" class="form-control" rows="5" placeholder="ตัวอย่าง: ประกาศ! มีการอัปเดตเอกสารประกอบการสอนใหม่ในคลังความรู้ กรุณาเข้าไปศึกษาเตรียมความพร้อมก่อนทำข้อสอบครับ..."></textarea>
@@ -717,20 +729,68 @@ async function delLibrary(id) {
 
 // 📢 -- Broadcast (แจ้งเตือน) --
 function openBroadcastModal() {
+  document.getElementById('inp-broadcast-target-type').value = 'ALL';
+  document.getElementById('wrap-broadcast-target-val').classList.add('hidden');
   document.getElementById('inp-broadcast-msg').value = '';
+  updateBroadcastTargetOptions();
   openModal('modal-broadcast');
+}
+
+function updateBroadcastTargetOptions() {
+  const type = document.getElementById('inp-broadcast-target-type').value;
+  const wrap = document.getElementById('wrap-broadcast-target-val');
+  const select = document.getElementById('inp-broadcast-target-val');
+  
+  if (type === 'ALL') {
+    wrap.classList.add('hidden');
+    return;
+  }
+  
+  wrap.classList.remove('hidden');
+  select.innerHTML = '';
+  
+  const members = appData.members || [];
+  let options = new Set();
+  
+  if (type === 'LEVEL') {
+    members.forEach(m => { if(m.rank) options.add(m.rank); });
+  } else if (type === 'POSITION') {
+    members.forEach(m => { if(m.position) options.add(m.position); });
+  }
+  
+  if(options.size === 0) {
+    select.innerHTML = '<option value="">ไม่มีข้อมูล</option>';
+  } else {
+    [...options].sort().forEach(opt => {
+      select.innerHTML += `<option value="${opt}">${opt}</option>`;
+    });
+  }
 }
 
 async function sendBroadcast() {
   const msg = document.getElementById('inp-broadcast-msg').value.trim();
+  const targetType = document.getElementById('inp-broadcast-target-type').value;
+  const targetValue = document.getElementById('inp-broadcast-target-val').value;
+
   if(!msg) return alert('กรุณาพิมพ์ข้อความที่ต้องการแจ้งเตือน');
-  if(!confirm('ยืนยันการส่งข้อความนี้ไปยังสมาชิก "ทุกคน" ในระบบใช่หรือไม่?')) return;
+  
+  let confirmMsg = 'ยืนยันการส่งข้อความนี้ไปยังสมาชิก "ทุกคน" ในระบบใช่หรือไม่?';
+  if(targetType === 'LEVEL') confirmMsg = `ยืนยันส่งข้อความไปยังระดับชั้น "${targetValue}" ใช่หรือไม่?`;
+  if(targetType === 'POSITION') confirmMsg = `ยืนยันส่งข้อความไปยังสาขาวิชา "${targetValue}" ใช่หรือไม่?`;
+
+  if(!confirm(confirmMsg)) return;
   
   const btn = document.getElementById('btn-send-broadcast');
   btn.disabled = true; btn.textContent = 'กำลังส่ง...';
   
   try {
-    const res = await callAPI('POST', { action: 'broadcast_message', secret: adminSecret, textMessage: msg });
+    const res = await callAPI('POST', { 
+      action: 'broadcast_message', 
+      secret: adminSecret, 
+      textMessage: msg,
+      targetType: targetType,
+      targetValue: targetValue
+    });
     if(res.status === 'ok') {
       alert('✅ ' + res.message);
       closeAllModal();
