@@ -39,7 +39,7 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); overflow: hidd
 .btn-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 10px; width: 100%; height: 100%; }
 .btn-shape { border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 0 rgba(0,0,0,0.2); cursor: pointer; transition: 0.1s;}
 .btn-shape:active { transform: translateY(6px); box-shadow: none; }
-.shape-icon { width: 60px; height: 60px; background: #fff; }
+.shape-icon { width: 60px; height: 60px; background: #fff; pointer-events: none;}
 .bg-red { background: var(--shape-red); }
 .bg-blue { background: var(--shape-blue); }
 .bg-yellow { background: var(--shape-yellow); }
@@ -124,17 +124,21 @@ async function init() {
     await liff.init({ liffId: LIFF_ID });
     if (!liff.isLoggedIn()) { liff.login(); return; }
     
-    const configRes = await callAPI('GET', { action: 'get_config' });
-    if(configRes.status === 'ok') { 
-      appConfig = configRes.config; 
-      applyTemplate(appConfig); 
-    }
+    // โหลด Config แค่ครั้งเดียว
+    callAPI('GET', { action: 'get_config' }).then(configRes => {
+      if(configRes.status === 'ok') { 
+        appConfig = configRes.config; 
+        applyTemplate(appConfig); 
+      }
+    }).catch(e => console.log(e));
     
     const profile = await liff.getProfile();
     userId = profile.userId;
     userName = profile.displayName;
     document.getElementById('u-name').textContent = userName;
     
+    // เริ่มดึงข้อมูลทันที ไม่ต้องรอ Config เสร็จ
+    fetchStateOnce(); 
     startPolling();
   } catch(e) {
     document.getElementById('screen-loading').innerHTML = `<h2 style="color:#ff3355">ผิดพลาด</h2><p>${e.message}</p>`;
@@ -153,7 +157,16 @@ function showScreen(id) {
   document.getElementById(id).classList.remove('hidden');
 }
 
+// ดึงครั้งแรกเพื่อความไว
+async function fetchStateOnce() {
+  try {
+    const res = await callAPI('GET', { action:'live_get_state', isHost:'false' });
+    if(res.status === 'ok') handleStateUpdate(res.state);
+  } catch(e) {}
+}
+
 function startPolling() {
+  // ⚡ ลดความถี่จาก 2000ms เป็น 1000ms (1 วินาที) เพื่อให้ตอบสนองอาจารย์ได้ไวขึ้น
   pollInterval = setInterval(async () => {
     try {
       const res = await callAPI('GET', { action:'live_get_state', isHost:'false' });
@@ -164,7 +177,7 @@ function startPolling() {
         showScreen('screen-loading');
       }
     } catch(e) {}
-  }, 2000); 
+  }, 1000); 
 }
 
 function handleStateUpdate(state) {
@@ -219,7 +232,8 @@ function handleStateUpdate(state) {
 async function submitAnswer(colorIndex) {
   if(isAnswered) return;
   isAnswered = true;
-  showScreen('screen-wait');
+  // ⚡ สลับไปหน้า "ส่งคำตอบแล้ว" ทันทีที่นิ้วแตะ เพื่อให้ผู้ใช้รู้สึกว่าระบบตอบสนองทันที
+  showScreen('screen-wait'); 
   
   const timeTaken = Date.now() - questionStartTime;
   const q = currentState.question;
