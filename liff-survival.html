@@ -26,7 +26,11 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg-color); color: v
 .start-logo { font-size: 80px; margin-bottom: 10px; filter: drop-shadow(0 0 20px rgba(255,61,0,0.6)); animation: float 3s ease-in-out infinite; }
 @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
 .title { font-size: 36px; font-weight: 800; color: var(--fire); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 2px;}
-.subtitle { font-size: 14px; color: #ffab91; margin-bottom: 40px; line-height: 1.6; }
+.subtitle { font-size: 14px; color: #ffab91; margin-bottom: 20px; line-height: 1.6; }
+
+/* Subject Selector */
+.subject-select { width: 100%; max-width: 320px; padding: 14px 16px; background: rgba(255,255,255,0.05); border: 2px solid var(--orange); border-radius: 12px; color: #fff; font-family: 'Sarabun', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 24px; outline: none; appearance: none; text-align: center; cursor: pointer; }
+.subject-select option { background: var(--panel-bg); color: #fff; text-align: left; }
 
 .btn { background: var(--btn-grad); color: #fff; border: 2px solid #ff8a80; padding: 16px 32px; border-radius: 12px; font-size: 18px; font-weight: 800; cursor: pointer; width: 100%; font-family: 'Sarabun', sans-serif; transition: 0.2s; box-shadow: 0 4px 15px rgba(213,0,0,0.5); margin-bottom: 12px; }
 .btn:active { transform: scale(0.96); }
@@ -73,6 +77,10 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg-color); color: v
   <div class="title">Survival</div>
   <div class="subtitle"><span class="dynamic-app-name">System</span><br>โหมดเอาชีวิตรอด ข้อละ 10 วินาที พลาด 1 ครั้งจบเกม!</div>
   
+  <select id="sel-subject" class="subject-select">
+    <option value="ALL">🌟 รวมทุกรายวิชา</option>
+  </select>
+
   <button class="btn" onclick="startGame()">🔥 เริ่มเอาชีวิตรอด</button>
   <button class="btn btn-outline" onclick="showLeaderboard()">🏆 ทำเนียบผู้รอดชีวิต</button>
   <button class="btn btn-close" onclick="liff.closeWindow()">ปิดหน้าต่าง</button>
@@ -110,7 +118,7 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg-color); color: v
     <div class="end-score" id="end-streak">0</div>
     <div style="font-size: 14px; color:#aaa; margin-bottom: 30px;">ข้อ</div>
     
-    <button class="btn" onclick="startGame()">🔄 ลองใหม่อีกครั้ง</button>
+    <button class="btn" onclick="resetToStart()">🔄 ลองใหม่อีกครั้ง</button>
     <button class="btn btn-outline" onclick="showLeaderboardFromEnd()">🏆 ดูทำเนียบ</button>
     <button class="btn btn-close" onclick="liff.closeWindow()">กลับสู่หน้าหลัก LINE</button>
   </div>
@@ -120,7 +128,7 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg-color); color: v
 const LIFF_ID = '2009896605-Q5vvQ9Fr';   
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbwo_kB4DZSVmYqkztnf8n_-sjVvAFUxIH9dZAqby_SUvV5H8gH5hXhILHkzZJ59S2j6/exec';
 
-let allQs = [], gamePool = [], currentQIndex = 0, currentStreak = 0;
+let allQs = [], currentPlayQs = [], gamePool = [], currentQIndex = 0, currentStreak = 0;
 let isLocked = false, currentCorrectAnswer = '', userId = '';
 const TIME_LIMIT_MS = 10000;
 let timerTimeout = null;
@@ -142,6 +150,8 @@ async function init() {
     allQs = data.questions || [];
     if (allQs.length === 0) throw new Error(`ไม่พบข้อสอบในระบบ`);
 
+    populateSubjectSelect(allQs, 'sel-subject');
+
     document.getElementById('ov-load').classList.add('hidden');
     document.getElementById('start-ui').style.display = 'flex';
   } catch(e) {
@@ -155,6 +165,17 @@ function applyTemplate(c) {
   document.querySelectorAll('.dynamic-app-name').forEach(el => el.textContent = c.appName);
 }
 
+function populateSubjectSelect(qs, selectId) {
+  const select = document.getElementById(selectId);
+  const categories = [...new Set(qs.map(q => q.category || 'ทั่วไป'))];
+  let html = '<option value="ALL">🌟 รวมทุกรายวิชา</option>';
+  categories.forEach(c => {
+    const count = qs.filter(q => (q.category||'ทั่วไป') === c).length;
+    html += `<option value="${c}">${c} (${count} ข้อ)</option>`;
+  });
+  select.innerHTML = html;
+}
+
 function shuffleArray(array) {
   let arr = [...array];
   for (let i = arr.length - 1; i > 0; i--) {
@@ -165,6 +186,13 @@ function shuffleArray(array) {
 }
 
 function startGame() {
+  const subj = document.getElementById('sel-subject').value;
+  currentPlayQs = subj === 'ALL' ? [...allQs] : allQs.filter(q => (q.category||'ทั่วไป') === subj);
+
+  if(currentPlayQs.length === 0) {
+     alert('ไม่พบข้อสอบในวิชานี้ กรุณาเลือกวิชาอื่น'); return;
+  }
+
   document.getElementById('start-ui').style.display = 'none';
   document.getElementById('end-ui').classList.add('hidden');
   document.getElementById('game-ui').style.display = 'flex';
@@ -172,13 +200,18 @@ function startGame() {
   currentStreak = 0;
   document.getElementById('streak-count').textContent = '0';
   document.getElementById('life-icon').textContent = '❤️';
-  gamePool = shuffleArray(allQs); currentQIndex = 0;
+  gamePool = shuffleArray(currentPlayQs); currentQIndex = 0;
   loadNextQuestion();
+}
+
+function resetToStart() {
+  document.getElementById('end-ui').classList.add('hidden');
+  document.getElementById('start-ui').style.display = 'flex';
 }
 
 function loadNextQuestion() {
   isLocked = false;
-  if (currentQIndex >= gamePool.length) gamePool = gamePool.concat(shuffleArray(allQs));
+  if (currentQIndex >= gamePool.length) gamePool = gamePool.concat(shuffleArray(currentPlayQs));
 
   const q = gamePool[currentQIndex];
   document.getElementById('q-text').textContent = q.questionText;
