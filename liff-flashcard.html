@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Flashcard</title>
+<title>Unit School — Flashcard</title>
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;800&family=IBM+Plex+Mono:wght@700&display=swap" rel="stylesheet">
 <style>
@@ -17,7 +17,9 @@
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-.bg-glow { position: fixed; inset: 0; background: radial-gradient(circle at 50% -20%, rgba(255,255,255,0.1) 0%, rgba(9,14,23,0) 70%); z-index: -1; }
+/* Background effect */
+.bg-glow { position: fixed; inset: 0; background: radial-gradient(circle at 50% -20%, rgba(255,255,255,0.1) 0%, rgba(9,14,23,0) 70%); z-index: -1; pointer-events: none;}
+
 .screen { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; max-width: 500px; margin: 0 auto; height: 100%; flex: 1; padding: 20px; text-align: center; }
 .hidden { display: none !important; }
 
@@ -44,8 +46,8 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
 
 /* Swipe Area */
 .card-container { position: relative; width: 100%; height: 350px; margin-bottom: 30px; perspective: 1000px; display: flex; align-items: center; justify-content: center;}
-.swipe-card { position: absolute; width: 100%; height: 100%; background: var(--panel); border: 2px solid #2a3558; border-radius: 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transform-origin: 50% 100%; transition: transform 0.3s ease; cursor: grab; user-select: none; }
-.swipe-card:active { cursor: grabbing; }
+.swipe-card { position: absolute; width: 100%; height: 100%; background: var(--panel); border: 2px solid #2a3558; border-radius: 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transform-origin: 50% 100%; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: grab; user-select: none; }
+.swipe-card:active { cursor: grabbing; transition: none; }
 .card-q { font-size: 18px; font-weight: 600; color: #fff; margin-bottom: 20px; line-height: 1.5; }
 .card-divider { width: 40px; height: 3px; background: var(--primary); margin-bottom: 20px; border-radius: 2px; }
 .card-ans { font-size: 20px; font-weight: 800; color: var(--primary); line-height: 1.4; }
@@ -73,11 +75,13 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
 <body>
 <div class="bg-glow"></div>
 
+<!-- Loading -->
 <div id="ov-load" class="screen">
   <div style="font-size:50px; margin-bottom:10px; animation: spin 2s infinite linear;">🌀</div>
   <div style="color:var(--primary); font-weight:800;">กำลังสร้างแฟลชการ์ด...</div>
 </div>
 
+<!-- Start -->
 <div id="start-ui" class="screen hidden">
   <div style="font-size: 80px; margin-bottom: 10px; filter: drop-shadow(0 0 20px rgba(255,255,255,0.2));">🃏</div>
   <div class="title">Flashcard</div>
@@ -92,6 +96,7 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
   <button class="btn-close" onclick="liff.closeWindow()">ปิดหน้าต่าง</button>
 </div>
 
+<!-- Game -->
 <div id="game-ui" class="screen hidden" style="justify-content: flex-start; padding-top: 30px;">
   <div class="game-header">
     <div class="stat-box">⭐ <span class="score-text" id="score-count">0</span></div>
@@ -107,6 +112,7 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
   <div style="font-size: 12px; color: var(--muted);">สามารถใช้นิ้วปัดซ้าย-ขวาที่การ์ดได้</div>
 </div>
 
+<!-- End -->
 <div id="end-ui" class="screen hidden">
   <div style="font-size: 60px; margin-bottom: 10px;">⏱️</div>
   <div class="title" style="color:#fff;">หมดเวลา!</div>
@@ -118,6 +124,7 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
   <button class="btn btn-outline" onclick="showLeaderboardFromEnd()">🏆 ดูทำเนียบ</button>
 </div>
 
+<!-- Leaderboard -->
 <div id="lb-ui" class="screen hidden" style="justify-content: flex-start; padding-top:40px;">
   <div class="title" style="font-size:24px;">ทำเนียบแฟลชการ์ด</div>
   <div class="subtitle" style="margin-bottom: 16px;">จัดอันดับจากจำนวนการ์ดที่ตอบถูกใน 60 วินาที</div>
@@ -129,6 +136,9 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
 </div>
 
 <script>
+// ==============================================
+// CONFIG
+// ==============================================
 const LIFF_ID = '2009896605-1SYoKWK7'; 
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbwo_kB4DZSVmYqkztnf8n_-sjVvAFUxIH9dZAqby_SUvV5H8gH5hXhILHkzZJ59S2j6/exec';
 
@@ -191,15 +201,21 @@ function generateFlashcards() {
   let tempArr = [...currentPlayQs].sort(() => Math.random() - 0.5); 
   
   tempArr.forEach(q => {
-    const isTrueStatement = Math.random() > 0.5;
+    let isTrueStatement = Math.random() > 0.5;
     const correctKey = (q.correctAnswer || '').toUpperCase();
     let displayChoice = q.choices[correctKey] || '';
 
+    // ถ้าสุ่มได้ประโยคเท็จ ต้องหาช้อยส์หลอกมาแสดง
     if (!isTrueStatement) {
-      const wrongKeys = ['A','B','C','D'].filter(k => k !== correctKey && q.choices[k]);
+      // ดึงช้อยส์ที่ผิดและไม่ว่างเปล่า
+      const wrongKeys = ['A','B','C','D'].filter(k => k !== correctKey && q.choices[k] && q.choices[k].trim() !== '');
       if (wrongKeys.length > 0) {
         const rKey = wrongKeys[Math.floor(Math.random() * wrongKeys.length)];
         displayChoice = q.choices[rKey];
+      } else {
+        // [FIX BUG]: ถ้าข้อนั้นไม่มีช้อยส์หลอกเลย (เช่น มีแค่ถูก-ผิด) บังคับให้เป็นประโยคจริงเสมอ
+        isTrueStatement = true;
+        displayChoice = q.choices[correctKey];
       }
     }
 
@@ -311,7 +327,7 @@ function handleDragEnd(e) {
   isDragging = false;
   
   const diff = currentX - startX;
-  currentCardEl.style.transition = 'transform 0.3s ease-out';
+  currentCardEl.style.transition = 'transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
   
   if (diff > 100) swipeAction(true);
   else if (diff < -100) swipeAction(false); 
@@ -324,7 +340,7 @@ function handleDragEnd(e) {
 
 function handleButtonClick(isRight) {
   if(!currentCardEl || isSwiping || timeLeft <= 0) return;
-  currentCardEl.style.transition = 'transform 0.3s ease-out';
+  currentCardEl.style.transition = 'transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
   swipeAction(isRight);
 }
 
@@ -344,7 +360,7 @@ function swipeAction(swipedTrue) {
   setTimeout(() => {
     currentIndex++;
     if(timeLeft > 0) renderCard();
-  }, 250); 
+  }, 200); // เร่งความเร็วการโชว์การ์ดใบถัดไปให้ลื่นขึ้น
 }
 
 function endGame() {
@@ -399,7 +415,8 @@ async function callAPI(method, params, timeoutMs=20000) {
   const ctrl = new AbortController(); const tid  = setTimeout(() => ctrl.abort(), timeoutMs);
   try {
     let url = GAS_URL, opts = { signal:ctrl.signal, redirect:'follow' };
-    if (method === 'GET') { url += '?' + newSearchParams(params).toString(); opts.method = 'GET'; } 
+    // [FIX BUG]: แก้ไขเป็น new URLSearchParams ให้ถูกต้อง
+    if (method === 'GET') { url += '?' + new URLSearchParams(params).toString(); opts.method = 'GET'; } 
     else { opts.method  = 'POST'; opts.headers = { 'Content-Type':'text/plain' }; opts.body = JSON.stringify(params); }
     const resp = await fetch(url, opts); clearTimeout(tid);
     if (!resp.ok) throw new Error('HTTP ' + resp.status); return await resp.json();
