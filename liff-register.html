@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>ลงทะเบียน</title>
+<title>Register</title>
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
@@ -56,17 +56,20 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
 </head>
 <body>
 
+<!-- หน้าจอโหลด -->
 <div id="loading-screen">
   <div class="loader"></div>
   <div style="font-weight: 600; color: var(--text);" id="load-text">กำลังตรวจสอบข้อมูล...</div>
 </div>
 
+<!-- ส่วนหัว และ รูปโปรไฟล์ LINE -->
 <div class="header hidden" id="ui-header">
   <img src="" id="ui-profile-img" class="profile-img hidden" alt="LINE Profile">
   <div class="org-name" id="ui-org-name">Organization</div>
   <div class="app-name" id="ui-app-name">App Name</div>
 </div>
 
+<!-- การ์ดแจ้งเตือนกรณีลงทะเบียนแล้ว -->
 <div class="registered-card hidden" id="ui-already-registered">
   <div style="font-size: 50px; margin-bottom: 10px;">✅</div>
   <h2 style="font-size: 20px; margin-bottom: 5px; color: var(--green);">ท่านลงทะเบียนเรียบร้อยแล้ว</h2>
@@ -82,6 +85,10 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
       <span class="info-value" id="info-fullname">-</span>
     </div>
     <div class="info-row">
+      <span class="info-label">ชื่อเล่น</span>
+      <span class="info-value" id="info-nickname">-</span>
+    </div>
+    <div class="info-row">
       <span class="info-label" id="lbl-info-pos">สาขา</span>
       <span class="info-value" id="info-pos">-</span>
     </div>
@@ -91,6 +98,7 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
   <button class="btn btn-outline" onclick="showEditForm()">✏️ แก้ไขข้อมูลใหม่</button>
 </div>
 
+<!-- การ์ดฟอร์มลงทะเบียน (และแก้ไข) -->
 <div class="form-card hidden" id="ui-form">
   <h2 id="form-title" style="font-size: 20px; margin-bottom: 20px; text-align: center; border-bottom: 1px solid #eee; padding-bottom: 15px;">ลงทะเบียนเข้าสู่ระบบ</h2>
   
@@ -116,6 +124,11 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
   </div>
 
   <div class="form-group">
+    <label class="form-label">ชื่อเล่น</label>
+    <input type="text" class="form-control" id="inp-nickname" placeholder="กรอกชื่อเล่น">
+  </div>
+
+  <div class="form-group">
     <label class="form-label" id="lbl-position">สาขา / กลุ่มเรียน</label>
     <input type="text" class="form-control" id="inp-position" placeholder="เช่น สาขาพญาไท, ห้อง 1">
   </div>
@@ -137,14 +150,17 @@ async function init() {
     await liff.init({ liffId: LIFF_ID });
     if (!liff.isLoggedIn()) { liff.login(); return; }
     
+    // ดึงโปรไฟล์ LINE ของผู้ใช้งาน
     profile = await liff.getProfile();
     
+    // แสดงรูปโปรไฟล์ LINE ทันที
     if (profile.pictureUrl) {
       const img = document.getElementById('ui-profile-img');
       img.src = profile.pictureUrl;
       img.classList.remove('hidden');
     }
 
+    // เรียก API
     const [configRes, memberRes] = await Promise.all([
       callAPI('GET', { action: 'get_config' }),
       callAPI('GET', { action: 'get_member', userId: profile.userId })
@@ -158,6 +174,7 @@ async function init() {
     document.getElementById('loading-screen').classList.add('hidden');
     document.getElementById('ui-header').classList.remove('hidden');
 
+    // ตรวจสอบว่าเคยลงทะเบียนไว้หรือไม่
     if (memberRes.status === 'ok' && memberRes.member) {
       existingMember = memberRes.member;
       showRegisteredInfo();
@@ -171,6 +188,7 @@ async function init() {
   }
 }
 
+// ฟังก์ชันแปลงร่างหน้าเว็บตาม Config ลูกค้า
 function applyTemplate(config) {
   document.documentElement.style.setProperty('--primary', config.colorPrimary || '#4a5568');
   document.documentElement.style.setProperty('--secondary', config.colorSecondary || '#a0aec0');
@@ -188,15 +206,18 @@ function applyTemplate(config) {
   document.getElementById('lbl-info-pos').textContent = config.termPosition;
 }
 
+// แสดงการ์ดข้อมูลเดิม
 function showRegisteredInfo() {
   document.getElementById('ui-form').classList.add('hidden');
   document.getElementById('ui-already-registered').classList.remove('hidden');
   
   document.getElementById('info-level').textContent = existingMember.rank || '-';
   document.getElementById('info-fullname').textContent = existingMember.fullName || '-';
+  document.getElementById('info-nickname').textContent = existingMember.nickname || '-';
   document.getElementById('info-pos').textContent = existingMember.position || '-';
 }
 
+// แสดงฟอร์มกรณีต้องการแก้ไข
 function showEditForm() {
   document.getElementById('ui-already-registered').classList.add('hidden');
   document.getElementById('ui-form').classList.remove('hidden');
@@ -205,21 +226,27 @@ function showEditForm() {
   document.getElementById('btn-submit').textContent = "อัปเดตข้อมูล";
   document.getElementById('btn-cancel-edit').classList.remove('hidden');
   
+  // นำข้อมูลเดิมมาใส่ในช่องกรอก
   if (existingMember) {
     document.getElementById('inp-level').value = existingMember.rank;
     document.getElementById('inp-fullname').value = existingMember.fullName;
+    document.getElementById('inp-nickname').value = existingMember.nickname || '';
     document.getElementById('inp-position').value = existingMember.position;
   }
 }
 
-function cancelEdit() { showRegisteredInfo(); }
+// ยกเลิกการแก้ไข
+function cancelEdit() {
+  showRegisteredInfo();
+}
 
 async function submitData() {
   const level = document.getElementById('inp-level').value;
   const fullname = document.getElementById('inp-fullname').value.trim();
+  const nickname = document.getElementById('inp-nickname').value.trim();
   const position = document.getElementById('inp-position').value.trim();
 
-  if(!level || !fullname) return alert('กรุณากรอกข้อมูลระดับชั้นและชื่อให้ครบถ้วน');
+  if(!level || !fullname || !nickname) return alert('กรุณากรอกข้อมูลให้ครบถ้วน');
 
   const btn = document.getElementById('btn-submit');
   const isEditing = !!existingMember;
@@ -229,17 +256,20 @@ async function submitData() {
     const res = await callAPI('POST', {
       action: 'liff_register',
       userId: profile.userId,
-      displayName: profile.displayName, 
-      pictureUrl: profile.pictureUrl, // ⚠️ เพิ่มการส่งรูปโปรไฟล์
+      displayName: profile.displayName,
+      pictureUrl: profile.pictureUrl,
       rank: level,
       fullName: fullname,
+      nickname: nickname,
       position: position
     });
     
     if(res.status === 'ok') {
       alert(isEditing ? 'อัปเดตข้อมูลสำเร็จ!' : 'ลงทะเบียนสำเร็จ!');
       liff.closeWindow();
-    } else { throw new Error(res.message); }
+    } else {
+      throw new Error(res.message);
+    }
   } catch(e) {
     alert(e.message);
     btn.textContent = isEditing ? 'อัปเดตข้อมูล' : 'บันทึกข้อมูล'; 
