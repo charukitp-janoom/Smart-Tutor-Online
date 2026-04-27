@@ -76,24 +76,39 @@ select { cursor: pointer; appearance: none; background-image: url("data:image/sv
 .bar { width: 100%; background: #ccc; transition: height 0.5s ease; border-top-left-radius: 8px; border-top-right-radius: 8px;}
 .bar-count { font-size: 28px; font-weight: 800; margin-bottom: 10px; }
 
-/* Scoreboard */
+/* 🏆 Scoreboard (Podium) */
 .sb-screen { background: var(--config-primary); color: #fff; }
-.podium { display: flex; align-items: flex-end; justify-content: center; gap: 20px; height: 400px; margin-top: 60px; }
-.podium-place { display: flex; flex-direction: column; align-items: center; width: 220px; }
+.podium { display: flex; align-items: flex-end; justify-content: center; gap: 20px; height: 420px; margin-top: 50px; }
+.podium-place { display: flex; flex-direction: column; align-items: center; width: 220px; position: relative; }
 
-.pod-avatar { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 4px solid var(--config-primary); margin-bottom: -40px; z-index: 2; background: #fff; }
-.p-1 .pod-avatar { width: 120px; height: 120px; margin-bottom: -60px; border-color: #ffd700; }
+/* ส่วนรูปโปรไฟล์ */
+.pod-avatar-wrap { position: relative; z-index: 10; display: flex; justify-content: center; margin-bottom: -45px; }
+.p-1 .pod-avatar-wrap { margin-bottom: -65px; }
+
+.pod-avatar { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 5px solid var(--config-primary); background: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+.p-1 .pod-avatar { width: 130px; height: 130px; border-color: #ffd700; }
 .p-2 .pod-avatar { border-color: #c0c0c0; }
 .p-3 .pod-avatar { border-color: #cd7f32; }
 
-.p-name { font-size: 24px; font-weight: 800; margin-bottom: 10px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; background: rgba(255,255,255,0.15); padding: 45px 15px 10px; border-radius: 12px; width: 100%; }
-.p-1 .p-name { padding-top: 65px; font-size: 28px; background: rgba(255,215,0,0.2); }
+/* กล่องชื่อนักเรียน */
+.p-name { 
+  font-size: 22px; font-weight: 800; color: #fff; text-align: center; 
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
+  background: rgba(255,255,255,0.15); 
+  padding: 55px 15px 15px; /* เว้นที่ด้านบนให้รูป */
+  border-radius: 12px; width: 100%; 
+  margin-bottom: 15px; 
+  position: relative; z-index: 1;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+.p-1 .p-name { padding-top: 75px; font-size: 26px; background: rgba(255,215,0,0.2); border-color: rgba(255,215,0,0.5); color: #ffd700; }
 
-.p-score { font-size: 20px; font-family: monospace; margin-bottom: 20px; font-weight: 800; color: var(--config-secondary);}
+.p-score { font-size: 22px; font-family: monospace; margin-bottom: 15px; font-weight: 800; color: var(--config-secondary); text-shadow: 0 2px 4px rgba(0,0,0,0.5);}
 .p-block { width: 100%; background: rgba(0,0,0,0.2); border-top-left-radius: 16px; border-top-right-radius: 16px; display: flex; align-items: flex-start; justify-content: center; padding-top: 20px; font-size: 64px; font-weight: 800; color: rgba(255,255,255,0.5);}
-.p-1 .p-block { height: 300px; background: #ffd700; color: #b8860b; box-shadow: 0 0 30px rgba(255,215,0,0.5);}
-.p-2 .p-block { height: 220px; background: #c0c0c0; color: #808080; }
-.p-3 .p-block { height: 150px; background: #cd7f32; color: #8b4513; }
+.p-1 .p-block { height: 280px; background: #ffd700; color: #b8860b; box-shadow: 0 0 30px rgba(255,215,0,0.5);}
+.p-2 .p-block { height: 200px; background: #c0c0c0; color: #808080; }
+.p-3 .p-block { height: 140px; background: #cd7f32; color: #8b4513; }
 
 .top-controls { position: fixed; top: 20px; right: 20px; z-index: 100; display: flex; gap: 10px;}
 </style>
@@ -166,7 +181,7 @@ select { cursor: pointer; appearance: none; background-image: url("data:image/sv
 </div>
 
 <div id="screen-scoreboard" class="screen sb-screen hidden">
-  <h1 style="font-size: 64px; margin-top: 40px; text-shadow: 0 0 10px rgba(0,0,0,0.3);">🏆 อันดับคะแนน</h1>
+  <h1 style="font-size: 64px; margin-top: 40px; text-shadow: 0 4px 10px rgba(0,0,0,0.3);">🏆 อันดับคะแนน</h1>
   <div class="podium" id="podium-wrap">
     <!-- Rendered via JS -->
   </div>
@@ -178,8 +193,9 @@ select { cursor: pointer; appearance: none; background-image: url("data:image/sv
 </div>
 
 <script>
+// ⚠️ ใส่ข้อมูลให้ถูกต้อง
 const LIFF_ID = '2009896605-YBaQW9Fu'; // << [ใส่ LIFF ID สำหรับ Host]
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbwo_kB4DZSVmYqkztnf8n_-sjVvAFUxIH9dZAqby_SUvV5H8gH5hXhILHkzZJ59S2j6/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwo_kB4DZSVmYqkztnf8n_-sjVvAFUxIH9dZAqby_SUvV5H8gH5hXhILHkzZJ59S2j6/exec'; 
 
 let adminSecret = '';
 let pollInterval = null;
@@ -188,14 +204,19 @@ let countdownInterval = null;
 let currentState = {};
 let currentAnswers = [];
 let currentPlayers = [];
-let allMembers = []; // เก็บข้อมูลสมาชิกเพื่อดึงรูปภาพ
+let allMembers = []; 
 let appConfig = null;
 
 let qTimeLeft = 20;
 
 async function init() {
   try {
+    // 💡 การใช้ LIFF SDK อย่างถูกต้อง
     await liff.init({ liffId: LIFF_ID });
+    if (!liff.isLoggedIn()) { 
+      liff.login(); 
+      return; 
+    }
     
     // โหลด Config 
     const configRes = await callAPI('GET', { action: 'get_config' });
@@ -272,13 +293,13 @@ async function doLogin() {
 
 async function startRoom() {
   const subj = document.getElementById('sel-subject').value;
-  if (!subj) return alert('กรุณาเลือกวิชาที่จะเปิดสอบ');
-
+  if (!subj) return alert('ไม่มีข้อสอบให้เลือกเปิดห้อง');
+  
   const btn = document.getElementById('btn-start');
   btn.textContent = 'กำลังเปิดห้อง...'; btn.disabled = true;
 
   try {
-    const res = await callAPI('POST', { action:'live_host_action', secret:adminSecret, command:'START', subject:subj });
+    const res = await callAPI('POST', { action: 'live_host_action', secret: adminSecret, command: 'START', subject: subj });
     if(res.status === 'ok') {
       currentState = res.state;
       showScreen('screen-lobby');
@@ -286,15 +307,12 @@ async function startRoom() {
     } else {
       alert(res.message);
     }
-  } catch (e) {
-    alert('เกิดข้อผิดพลาดในการเชื่อมต่อ');
-  } finally {
-    btn.textContent = 'เปิดห้องเรียน'; btn.disabled = false;
-  }
+  } catch(e) { alert('เกิดข้อผิดพลาด'); }
+  finally { btn.textContent = 'เปิดห้องเรียน'; btn.disabled = false; }
 }
 
 function startPolling() {
-  clearInterval(pollInterval);
+  if(pollInterval) clearInterval(pollInterval);
   pollInterval = setInterval(async () => {
     try {
       const res = await callAPI('GET', { action:'live_get_state', isHost:'true' });
@@ -316,7 +334,7 @@ function updateHostUI() {
     // โชว์รูปโปรไฟล์ในหน้า Lobby 
     const newHtml = currentPlayers.map(p => `
       <div class="player-pill">
-        <img src="${getPicUrl(p.userId)}"> 
+        <img src="${getPicUrl(p.userId)}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/847/847969.png'"> 
         ${p.fullName}
       </div>`).join('');
     
@@ -423,13 +441,15 @@ function renderState() {
     const sorted = Object.values(scores).sort((a,b) => b.score - a.score).slice(0, 3);
     
     let html = '';
-    const displayOrder = [1, 0, 2]; 
+    const displayOrder = [1, 0, 2]; // ลำดับ 2, 1, 3
     displayOrder.forEach(idx => {
        if(sorted[idx]) {
           const p = sorted[idx];
           html += `
             <div class="podium-place p-${idx+1}">
-              <img src="${getPicUrl(p.userId)}" class="pod-avatar">
+              <div class="pod-avatar-wrap">
+                <img src="${getPicUrl(p.userId)}" class="pod-avatar" onerror="this.src='https://cdn-icons-png.flaticon.com/512/847/847969.png'">
+              </div>
               <div class="p-name">${p.name}</div>
               <div class="p-score">${p.score}</div>
               <div class="p-block">${idx+1}</div>
@@ -456,6 +476,7 @@ function handleNextStep() {
 }
 
 async function closeRoom() {
+  if(!confirm('ยืนยันปิดห้องเรียนและลบข้อมูลการสอบสดครั้งนี้?')) return;
   clearInterval(pollInterval);
   clearInterval(countdownInterval);
   await callAPI('POST', { action:'live_host_action', secret:adminSecret, command:'END' });
@@ -464,7 +485,6 @@ async function closeRoom() {
 
 async function callAPI(method, params) {
   let url = GAS_URL, opts = { method: 'POST', headers: {'Content-Type':'text/plain'}, body: JSON.stringify(params) };
-  // ✅ แก้ไขให้ใช้ URLSearchParams ได้อย่างถูกต้อง
   if(method === 'GET') { url += '?' + new URLSearchParams(params).toString(); opts = {method:'GET'}; }
   const resp = await fetch(url, opts);
   return await resp.json();
