@@ -179,7 +179,11 @@ select.form-control { cursor: pointer; }
   <div class="tab-content" id="tab-library">
     <div class="flex justify-between items-center mb-2">
       <h3 style="font-size:16px;">คลังความรู้</h3>
-      <button class="btn btn-primary btn-sm" onclick="openLibraryModal()">+ เพิ่มสื่อ</button>
+      <div class="flex gap-2">
+        <!-- 📢 เพิ่มปุ่มแจ้งเตือนตรงนี้ -->
+        <button class="btn btn-secondary btn-sm" onclick="openBroadcastModal()">📢 แจ้งเตือน</button>
+        <button class="btn btn-primary btn-sm" onclick="openLibraryModal()">+ เพิ่มสื่อ</button>
+      </div>
     </div>
     <div id="list-library" class="flex flex-col gap-2"></div>
   </div>
@@ -213,6 +217,22 @@ select.form-control { cursor: pointer; }
 </div>
 
 <!-- ================= MODALS ================= -->
+
+<!-- 📢 Modal: Broadcast Message -->
+<div id="modal-broadcast" class="modal-ov hidden" onclick="closeModal(event)">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-title" style="color:var(--secondary)">📢 แจ้งเตือนบทเรียน / ข่าวสาร</div>
+    <div class="stat-label mb-2" style="color:var(--muted)">ข้อความนี้จะถูกส่งไปยังแชท LINE ของสมาชิก<b>ทุกคน</b>ในระบบทันที</div>
+    
+    <label class="stat-label mt-2">พิมพ์ข้อความแจ้งเตือน</label>
+    <textarea id="inp-broadcast-msg" class="form-control" rows="5" placeholder="ตัวอย่าง: ประกาศ! มีการอัปเดตเอกสารประกอบการสอนใหม่ในคลังความรู้ กรุณาเข้าไปศึกษาเตรียมความพร้อมก่อนทำข้อสอบครับ..."></textarea>
+    
+    <div class="flex gap-2 mt-4">
+      <button class="btn btn-secondary" style="flex:1;" onclick="closeAllModal()">ยกเลิก</button>
+      <button class="btn btn-primary" style="flex:1; background:var(--secondary); color:#fff; border:none;" id="btn-send-broadcast" onclick="sendBroadcast()">🚀 ส่งแจ้งเตือน</button>
+    </div>
+  </div>
+</div>
 
 <!-- Modal: Add/Edit Question -->
 <div id="modal-q" class="modal-ov hidden" onclick="closeModal(event)">
@@ -317,7 +337,7 @@ const GAS_URL = 'https://script.google.com/macros/s/AKfycbwo_kB4DZSVmYqkztnf8n_-
 let adminSecret = '';
 let appData = {};
 let appConfig = null;
-let activeQuestionSubject = 'ALL'; // ตัวแปรเก็บสถานะแท็บวิชาปัจจุบัน
+let activeQuestionSubject = 'ALL'; 
 
 async function init() {
   try {
@@ -342,10 +362,8 @@ async function init() {
 function applyTemplate(config) {
   if(!config) return;
   
-  // Update CSS Variables ONLY if the active tab is not overriding it
   document.documentElement.style.setProperty('--primary', config.colorPrimary);
   
-  // For sub-tabs dynamic color
   let rootStyle = document.querySelector(':root');
   rootStyle.style.setProperty('--primary', config.colorPrimary);
   rootStyle.style.setProperty('--secondary', config.colorSecondary);
@@ -470,15 +488,12 @@ function renderQuestions() {
     return; 
   }
 
-  // 1. ดึงชื่อหมวดหมู่ทั้งหมดที่ไม่ซ้ำกัน
   const categories = [...new Set(qs.map(q => q.category || 'ทั่วไป'))];
   
-  // กรณีวิชาปัจจุบันโดนลบหมด ให้เด้งกลับไปที่แท็บ 'ALL'
   if (activeQuestionSubject !== 'ALL' && !categories.includes(activeQuestionSubject)) {
     activeQuestionSubject = 'ALL';
   }
 
-  // 2. วาดปุ่ม Sub-tabs
   let tabsHtml = `<div class="sub-tab ${activeQuestionSubject === 'ALL' ? 'active' : ''}" onclick="setQuestionFilter('ALL')">ทั้งหมด (${qs.length})</div>`;
   categories.forEach(cat => {
     const count = qs.filter(q => (q.category||'ทั่วไป') === cat).length;
@@ -486,7 +501,6 @@ function renderQuestions() {
   });
   subTabs.innerHTML = tabsHtml;
 
-  // 3. วาดส่วนควบคุมการเปิด-ปิดวิชา (แสดงเฉพาะตอนเลือกวิชา)
   if (activeQuestionSubject === 'ALL') {
      subjCtrl.classList.add('hidden');
   } else {
@@ -503,10 +517,7 @@ function renderQuestions() {
      `;
   }
 
-  // 4. กรองข้อสอบตามวิชาที่เลือก และนำมาแสดงผล
-  const filteredQs = activeQuestionSubject === 'ALL' 
-    ? qs 
-    : qs.filter(q => (q.category||'ทั่วไป') === activeQuestionSubject);
+  const filteredQs = activeQuestionSubject === 'ALL' ? qs : qs.filter(q => (q.category||'ทั่วไป') === activeQuestionSubject);
 
   filteredQs.forEach(q => {
     list.innerHTML += `
@@ -527,10 +538,9 @@ function renderQuestions() {
   });
 }
 
-// ฟังก์ชันสลับแท็บรายวิชา
 window.setQuestionFilter = function(cat) {
   activeQuestionSubject = cat;
-  renderQuestions(); // อัปเดตเฉพาะส่วนข้อสอบ
+  renderQuestions(); 
 }
 
 function renderLibrary() {
@@ -563,7 +573,6 @@ function renderStore() {
   const dList = document.getElementById('list-redemptions');
   rList.innerHTML = ''; dList.innerHTML = '';
 
-  // Rewards
   const rewards = appData.rewards || [];
   if(rewards.length === 0) rList.innerHTML = '<div class="text-muted">ยังไม่มีของรางวัล</div>';
   rewards.forEach(r => {
@@ -582,7 +591,6 @@ function renderStore() {
     `;
   });
 
-  // Redemptions
   const redemps = appData.redemptions || [];
   const pending = redemps.filter(r => r.status === 'PENDING');
   if(pending.length === 0) dList.innerHTML = '<div class="text-muted">ไม่มีรายการรออนุมัติ</div>';
@@ -616,7 +624,7 @@ function closeAllModal() { document.querySelectorAll('.modal-ov').forEach(m => m
 function openQuestionModal() {
   document.getElementById('mq-title').textContent = 'เพิ่มข้อสอบ';
   document.getElementById('mq-id').value = '';
-  document.getElementById('mq-cat').value = activeQuestionSubject === 'ALL' ? '' : activeQuestionSubject; // ดึงชื่อวิชามาใส่อัตโนมัติถ้าเลือกแท็บอยู่
+  document.getElementById('mq-cat').value = activeQuestionSubject === 'ALL' ? '' : activeQuestionSubject; 
   document.getElementById('mq-text').value = '';
   document.getElementById('mq-a').value = ''; document.getElementById('mq-b').value = '';
   document.getElementById('mq-c').value = ''; document.getElementById('mq-d').value = '';
@@ -647,10 +655,7 @@ async function saveQuestion() {
   try { 
     await callAPI('POST', payload); 
     closeAllModal(); 
-    
-    // ตั้งให้เปิดแท็บตามวิชาที่เพิ่งเพิ่ม/แก้
     if (cat) activeQuestionSubject = cat; 
-    
     await loadData(); 
     alert('บันทึกสำเร็จ'); 
   } catch(e) { alert(e.message); }
@@ -677,7 +682,7 @@ async function submitImport() {
   try {
     await callAPI('POST', {action:'import_questions', secret:adminSecret, questions:qs});
     closeAllModal(); document.getElementById('inp-import-data').value = ''; 
-    activeQuestionSubject = 'ALL'; // กลับไปหน้าทั้งหมดหลังนำเข้า
+    activeQuestionSubject = 'ALL';
     await loadData(); 
     alert('นำเข้าสำเร็จ '+qs.length+' ข้อ');
   } catch(e) { alert(e.message); }
@@ -708,6 +713,35 @@ async function saveLibrary() {
 async function delLibrary(id) {
   if(!confirm('ยืนยันลบข้อมูลนี้?')) return;
   try { await callAPI('POST', {action:'delete_library', secret:adminSecret, id}); await loadData(); } catch(e) { alert(e.message); }
+}
+
+// 📢 -- Broadcast (แจ้งเตือน) --
+function openBroadcastModal() {
+  document.getElementById('inp-broadcast-msg').value = '';
+  openModal('modal-broadcast');
+}
+
+async function sendBroadcast() {
+  const msg = document.getElementById('inp-broadcast-msg').value.trim();
+  if(!msg) return alert('กรุณาพิมพ์ข้อความที่ต้องการแจ้งเตือน');
+  if(!confirm('ยืนยันการส่งข้อความนี้ไปยังสมาชิก "ทุกคน" ในระบบใช่หรือไม่?')) return;
+  
+  const btn = document.getElementById('btn-send-broadcast');
+  btn.disabled = true; btn.textContent = 'กำลังส่ง...';
+  
+  try {
+    const res = await callAPI('POST', { action: 'broadcast_message', secret: adminSecret, textMessage: msg });
+    if(res.status === 'ok') {
+      alert('✅ ' + res.message);
+      closeAllModal();
+    } else {
+      throw new Error(res.message);
+    }
+  } catch(e) {
+    alert('❌ ' + e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = '🚀 ส่งแจ้งเตือน';
+  }
 }
 
 // -- Rewards --
