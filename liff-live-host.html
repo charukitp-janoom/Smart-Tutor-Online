@@ -43,7 +43,7 @@ select { cursor: pointer; appearance: none; background-image: url("data:image/sv
 .player-list { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; max-width: 900px; margin: 0 auto 30px; max-height: 200px; overflow-y: auto; padding: 10px;}
 .player-list::-webkit-scrollbar { display: none; }
 .player-pill { background: rgba(255,255,255,0.2); padding: 8px 20px 8px 10px; border-radius: 30px; font-weight: 700; font-size: 18px; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; align-items: center; gap: 10px;}
-.player-pill img { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; background: #fff; border: 2px solid #fff; }
+.player-pill img { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; background: #fff; border: 2px solid #fff; }
 @keyframes popIn { from {transform: scale(0); opacity: 0;} to {transform: scale(1); opacity: 1;} }
 .player-count { font-size: 24px; font-weight: 800; color: var(--config-secondary); margin-bottom: 20px; background: rgba(0,0,0,0.3); padding: 10px 30px; border-radius: 30px; display: inline-block;}
 
@@ -76,12 +76,12 @@ select { cursor: pointer; appearance: none; background-image: url("data:image/sv
 .bar { width: 100%; background: #ccc; transition: height 0.5s ease; border-top-left-radius: 8px; border-top-right-radius: 8px;}
 .bar-count { font-size: 28px; font-weight: 800; margin-bottom: 10px; }
 
-/* 🏆 Scoreboard (Podium) */
+/* 🏆 Scoreboard (Podium) - ปรับแต่งเลเยอร์และระยะห่างกันการซ้อนทับ */
 .sb-screen { background: var(--config-primary); color: #fff; }
 .podium { display: flex; align-items: flex-end; justify-content: center; gap: 20px; height: 420px; margin-top: 50px; }
 .podium-place { display: flex; flex-direction: column; align-items: center; width: 220px; position: relative; }
 
-/* ส่วนรูปโปรไฟล์ */
+/* ส่วนกรอบรูปโปรไฟล์ */
 .pod-avatar-wrap { position: relative; z-index: 10; display: flex; justify-content: center; margin-bottom: -45px; }
 .p-1 .pod-avatar-wrap { margin-bottom: -65px; }
 
@@ -90,20 +90,21 @@ select { cursor: pointer; appearance: none; background-image: url("data:image/sv
 .p-2 .pod-avatar { border-color: #c0c0c0; }
 .p-3 .pod-avatar { border-color: #cd7f32; }
 
-/* กล่องชื่อนักเรียน */
+/* กล่องชื่อเล่นนักเรียน */
 .p-name { 
   font-size: 22px; font-weight: 800; color: #fff; text-align: center; 
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
   background: rgba(255,255,255,0.15); 
-  padding: 55px 15px 15px; /* เว้นที่ด้านบนให้รูป */
+  padding: 55px 15px 15px; /* ดันเนื้อหาลงมาหลบรูปภาพ */
   border-radius: 12px; width: 100%; 
   margin-bottom: 15px; 
   position: relative; z-index: 1;
   box-shadow: 0 4px 10px rgba(0,0,0,0.1);
   border: 1px solid rgba(255,255,255,0.1);
 }
-.p-1 .p-name { padding-top: 75px; font-size: 26px; background: rgba(255,215,0,0.2); border-color: rgba(255,215,0,0.5); color: #ffd700; }
+.p-1 .p-name { padding-top: 75px; font-size: 28px; background: rgba(255,215,0,0.2); border-color: rgba(255,215,0,0.5); color: #ffd700; }
 
+/* กล่องคะแนนและแท่นวาง */
 .p-score { font-size: 22px; font-family: monospace; margin-bottom: 15px; font-weight: 800; color: var(--config-secondary); text-shadow: 0 2px 4px rgba(0,0,0,0.5);}
 .p-block { width: 100%; background: rgba(0,0,0,0.2); border-top-left-radius: 16px; border-top-right-radius: 16px; display: flex; align-items: flex-start; justify-content: center; padding-top: 20px; font-size: 64px; font-weight: 800; color: rgba(255,255,255,0.5);}
 .p-1 .p-block { height: 280px; background: #ffd700; color: #b8860b; box-shadow: 0 0 30px rgba(255,215,0,0.5);}
@@ -193,7 +194,7 @@ select { cursor: pointer; appearance: none; background-image: url("data:image/sv
 </div>
 
 <script>
-// ⚠️ ใส่ข้อมูลให้ถูกต้อง
+// ⚠️ ใส่ข้อมูลให้ถูกต้อง (LIFF_ID และ GAS_URL)
 const LIFF_ID = '2009896605-YBaQW9Fu'; // << [ใส่ LIFF ID สำหรับ Host]
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbwo_kB4DZSVmYqkztnf8n_-sjVvAFUxIH9dZAqby_SUvV5H8gH5hXhILHkzZJ59S2j6/exec'; 
 
@@ -204,14 +205,14 @@ let countdownInterval = null;
 let currentState = {};
 let currentAnswers = [];
 let currentPlayers = [];
-let allMembers = []; 
+let allMembers = []; // เก็บข้อมูลสมาชิกเพื่อดึงรูปภาพและชื่อเล่น
 let appConfig = null;
 
 let qTimeLeft = 20;
 
 async function init() {
   try {
-    // 💡 การใช้ LIFF SDK อย่างถูกต้อง
+    // 💡 การใช้งาน LIFF SDK อย่างถูกต้อง
     await liff.init({ liffId: LIFF_ID });
     if (!liff.isLoggedIn()) { 
       liff.login(); 
@@ -242,6 +243,14 @@ function applyTemplate(c) {
   document.querySelectorAll('.dynamic-term-user').forEach(el => el.textContent = c.termUser);
 }
 
+// 💡 ฟังก์ชันใหม่: ดึงชื่อเล่นจากข้อมูล Members
+function getDisplayName(uid, fallbackName) {
+  if(!uid) return fallbackName || '-';
+  const m = allMembers.find(x => String(x.userId) === String(uid));
+  // ถ้ามีชื่อเล่นให้โชว์ชื่อเล่น ถ้าไม่มีให้ใช้ชื่อจริงที่ดึงมา
+  return (m && m.nickname && m.nickname.trim() !== '') ? m.nickname : fallbackName;
+}
+
 function getPicUrl(uid) {
   if(!uid) return 'https://cdn-icons-png.flaticon.com/512/847/847969.png';
   const m = allMembers.find(x => String(x.userId) === String(uid));
@@ -264,11 +273,11 @@ async function doLogin() {
   btn.textContent = 'กำลังตรวจสอบ...'; btn.disabled = true;
 
   try {
-    // ดึงข้อมูล admin_data เพื่อได้ทั้งคำถามและรายชื่อ (สำหรับรูปโปรไฟล์) ในรอบเดียว
+    // ดึงข้อมูล admin_data เพื่อได้ทั้งคำถามและรายชื่อในรอบเดียว
     const res = await callAPI('GET', { action:'admin_data', secret: secret });
     if(res.status === 'ok') {
       adminSecret = secret;
-      allMembers = res.members || [];
+      allMembers = res.members || []; // มี Field nickname ถูกดึงมาด้วยจากอัปเดต v2.4
       
       if(res.config) { applyTemplate(res.config); }
 
@@ -307,7 +316,7 @@ async function startRoom() {
     } else {
       alert(res.message);
     }
-  } catch(e) { alert('เกิดข้อผิดพลาด'); }
+  } catch(e) { alert('เกิดข้อผิดพลาดในการเชื่อมต่อ'); }
   finally { btn.textContent = 'เปิดห้องเรียน'; btn.disabled = false; }
 }
 
@@ -331,11 +340,11 @@ function updateHostUI() {
     document.getElementById('h-player-count').textContent = currentPlayers.length;
     const listEl = document.getElementById('h-player-list');
     
-    // โชว์รูปโปรไฟล์ในหน้า Lobby 
+    // โชว์รูปโปรไฟล์ และ ชื่อเล่น (Nickname) ในหน้า Lobby
     const newHtml = currentPlayers.map(p => `
       <div class="player-pill">
         <img src="${getPicUrl(p.userId)}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/847/847969.png'"> 
-        ${p.fullName}
+        ${getDisplayName(p.userId, p.fullName)}
       </div>`).join('');
     
     if(listEl.innerHTML !== newHtml) { listEl.innerHTML = newHtml; }
@@ -434,14 +443,15 @@ function renderState() {
     
     const scores = {};
     currentAnswers.forEach(a => {
-      if(!scores[a.userId]) scores[a.userId] = { userId: a.userId, name: a.fullName, score: 0 };
+      // 💡 แปลงเป็นชื่อเล่นก่อนเซฟลงระบบคะแนน
+      if(!scores[a.userId]) scores[a.userId] = { userId: a.userId, name: getDisplayName(a.userId, a.fullName), score: 0 };
       scores[a.userId].score += a.score;
     });
     
     const sorted = Object.values(scores).sort((a,b) => b.score - a.score).slice(0, 3);
     
     let html = '';
-    const displayOrder = [1, 0, 2]; // ลำดับ 2, 1, 3
+    const displayOrder = [1, 0, 2]; // ลำดับโพเดียม: ที่ 2 (ซ้าย), ที่ 1 (กลาง), ที่ 3 (ขวา)
     displayOrder.forEach(idx => {
        if(sorted[idx]) {
           const p = sorted[idx];
