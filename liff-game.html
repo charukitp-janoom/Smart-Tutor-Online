@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>เกมเศรษฐี</title>
+<title>Unit School — เกมเศรษฐี</title>
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;800&family=IBM+Plex+Mono:wght@700&display=swap" rel="stylesheet">
 <style>
@@ -32,7 +32,11 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg-color); color: v
 .start-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; width: 100%; max-width: 500px; margin: 0 auto;}
 .start-logo { font-size: 80px; margin-bottom: 20px; text-shadow: 0 0 30px var(--gold-glow); }
 .start-title { font-size: 36px; font-weight: 800; color: var(--gold); margin-bottom: 10px; line-height: 1.2; }
-.start-sub { font-size: 15px; color: #aaa; margin-bottom: 40px; line-height: 1.6; }
+.start-sub { font-size: 15px; color: #aaa; margin-bottom: 20px; line-height: 1.6; }
+
+/* Subject Selector */
+.subject-select { width: 100%; max-width: 320px; padding: 14px 16px; background: rgba(255,255,255,0.05); border: 2px solid var(--gold); border-radius: 12px; color: #fff; font-family: 'Sarabun', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 24px; outline: none; appearance: none; text-align: center; cursor: pointer; }
+.subject-select option { background: var(--panel-bg); color: #fff; text-align: left; }
 
 .action-btn { background: var(--gold); color: #000; border: none; padding: 16px 32px; border-radius: 12px; font-size: 18px; font-weight: 800; cursor: pointer; width: 100%; max-width: 320px; font-family: 'Sarabun', sans-serif; transition: 0.2s; }
 .action-btn:active { transform: scale(0.96); }
@@ -102,6 +106,10 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg-color); color: v
     <div class="start-title">เกมเศรษฐี<br><span class="dynamic-app-name">System</span></div>
     <div class="start-sub">ตอบคำถาม 12 ข้อ เพื่อชิงเงินรางวัลจำลอง!<br>วัดความรู้ ท้าทายความสามารถ</div>
     
+    <select id="sel-subject" class="subject-select">
+      <option value="ALL">🌟 รวมทุกรายวิชา</option>
+    </select>
+
     <button class="action-btn" onclick="startRealGame()" style="margin-bottom:14px;">🎮 เริ่มเล่นเกม</button>
     <button class="action-btn btn-outline" onclick="showLeaderboard()">🏆 ดูทำเนียบเศรษฐี</button>
     
@@ -148,7 +156,7 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg-color); color: v
     <div style="color:#aaa;">คุณได้รับเงินรางวัลจำลองกลับบ้าน</div>
     <div class="end-prize" id="end-prize">฿0</div>
     
-    <button class="action-btn" onclick="startRealGame()" style="margin-bottom:12px;">🔄 เล่นใหม่อีกครั้ง</button>
+    <button class="action-btn" onclick="resetToStart()" style="margin-bottom:12px;">🔄 เล่นใหม่อีกครั้ง</button>
     <button class="action-btn btn-outline" onclick="showLeaderboard()">🏆 ดูทำเนียบเศรษฐี</button>
     <button class="quit-btn" style="margin-top:24px; font-size:14px; border:none;" onclick="liff.closeWindow()">← ปิดหน้าต่าง</button>
   </div>
@@ -178,8 +186,10 @@ async function init() {
     if (data.status === 'error') throw new Error(data.message);
 
     allQs = data.questions || [];
-    if (allQs.length < PRIZES.length) throw new Error(`ข้อสอบในระบบมีน้อยกว่า ${PRIZES.length} ข้อ (มี ${allQs.length} ข้อ)`);
+    if (allQs.length === 0) throw new Error("ไม่พบข้อสอบในระบบ");
     if (!allQs[0].correctAnswer) throw new Error("⚠️ ไม่พบข้อมูลเฉลย! กรุณาอัปเดต Code.gs เป็นเวอร์ชันล่าสุด");
+
+    populateSubjectSelect(allQs, 'sel-subject');
 
     document.getElementById('ov-load').classList.add('hidden');
     document.getElementById('start-ui').classList.remove('hidden');
@@ -196,15 +206,39 @@ function applyTemplate(c) {
   document.querySelectorAll('.dynamic-app-name').forEach(el => el.textContent = c.appName);
 }
 
+function populateSubjectSelect(qs, selectId) {
+  const select = document.getElementById(selectId);
+  const categories = [...new Set(qs.map(q => q.category || 'ทั่วไป'))];
+  let html = '<option value="ALL">🌟 รวมทุกรายวิชา</option>';
+  categories.forEach(c => {
+    const count = qs.filter(q => (q.category||'ทั่วไป') === c).length;
+    html += `<option value="${c}">${c} (${count} ข้อ)</option>`;
+  });
+  select.innerHTML = html;
+}
+
 function startRealGame() {
+  const subj = document.getElementById('sel-subject').value;
+  let targetQs = subj === 'ALL' ? allQs : allQs.filter(q => (q.category||'ทั่วไป') === subj);
+
+  if (targetQs.length < PRIZES.length) {
+    alert(`วิชานี้มีข้อสอบไม่พอสำหรับเกมเศรษฐี (${targetQs.length}/${PRIZES.length} ข้อ)\nกรุณาเลือกวิชาอื่น หรือเลือก "รวมทุกรายวิชา"`);
+    return;
+  }
+
   document.getElementById('start-ui').classList.add('hidden');
   document.getElementById('end-ui').classList.add('hidden');
   document.getElementById('game-ui').style.display = 'flex';
   
-  questions = allQs.sort(() => Math.random() - 0.5).slice(0, PRIZES.length);
+  questions = targetQs.sort(() => Math.random() - 0.5).slice(0, PRIZES.length);
   document.getElementById('btn-5050').classList.remove('used');
 
   buildLadder(); loadQuestion(0);
+}
+
+function resetToStart() {
+  document.getElementById('end-ui').classList.add('hidden');
+  document.getElementById('start-ui').classList.remove('hidden');
 }
 
 function buildLadder() {
@@ -404,7 +438,6 @@ async function showLeaderboard() {
         const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i+1}.`;
         const isMe = e.userId === userId ? 'font-weight:800; color:var(--gold);' : 'font-weight:700;';
         
-        // แทรกรูปภาพโปรไฟล์เข้ามาในการ์ด
         const pic = e.pictureUrl || 'https://cdn-icons-png.flaticon.com/512/847/847969.png';
         
         list.innerHTML += `
