@@ -23,8 +23,13 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
 
 /* UI Elements */
 .title { font-size: 32px; font-weight: 800; color: var(--primary); margin-bottom: 5px; text-shadow: 0 0 10px rgba(255,255,255,0.2); letter-spacing: 1px;}
-.subtitle { font-size: 14px; color: var(--muted); margin-bottom: 30px; line-height: 1.6; }
-.btn { background: var(--primary); color: #fff; border: none; padding: 16px 24px; border-radius: 12px; font-size: 18px; font-weight: 800; cursor: pointer; width: 100%; font-family: 'Sarabun', sans-serif; transition: 0.2s; box-shadow: 0 4px 15px rgba(255,255,255,0.1); margin-bottom: 12px; }
+.subtitle { font-size: 14px; color: var(--muted); margin-bottom: 20px; line-height: 1.6; }
+
+/* Subject Selector */
+.subject-select { width: 100%; max-width: 320px; padding: 14px 16px; background: rgba(255,255,255,0.05); border: 2px solid var(--primary); border-radius: 12px; color: #fff; font-family: 'Sarabun', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 24px; outline: none; appearance: none; text-align: center; cursor: pointer; }
+.subject-select option { background: var(--panel); color: #fff; text-align: left; }
+
+.btn { background: var(--primary); color: #fff; border: none; padding: 16px 24px; border-radius: 12px; font-size: 18px; font-weight: 800; cursor: pointer; width: 100%; max-width: 320px; font-family: 'Sarabun', sans-serif; transition: 0.2s; box-shadow: 0 4px 15px rgba(255,255,255,0.1); margin-bottom: 12px; }
 .btn:active { transform: scale(0.96); }
 .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); box-shadow: none; }
 .btn-outline:active { background: rgba(255,255,255,0.1); }
@@ -78,6 +83,10 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
   <div class="title">Flashcard</div>
   <div class="subtitle"><span class="dynamic-app-name">System</span><br>โหมดประจัญบาน อ่านโจทย์และคำตอบ<br><b>ปัดขวาถ้าถูก (✅) / ปัดซ้ายถ้าผิด (❌)</b><br>ทำคะแนนให้มากที่สุดใน 60 วินาที!</div>
   
+  <select id="sel-subject" class="subject-select">
+    <option value="ALL">🌟 รวมทุกรายวิชา</option>
+  </select>
+
   <button class="btn" onclick="startGame()">🚀 เริ่มประจัญบาน</button>
   <button class="btn btn-outline" onclick="showLeaderboard()">🏆 ทำเนียบคะแนนสูงสุด</button>
   <button class="btn-close" onclick="liff.closeWindow()">ปิดหน้าต่าง</button>
@@ -105,7 +114,7 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
   <div class="end-score" id="end-score">0</div>
   <div style="font-size: 14px; color:var(--muted); margin-bottom: 30px;">ใบ</div>
   
-  <button class="btn" onclick="startGame()">🔄 เล่นอีกครั้ง</button>
+  <button class="btn" onclick="resetToStart()">🔄 เล่นอีกครั้ง</button>
   <button class="btn btn-outline" onclick="showLeaderboardFromEnd()">🏆 ดูทำเนียบ</button>
 </div>
 
@@ -123,7 +132,7 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
 const LIFF_ID = '2009896605-1SYoKWK7'; 
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbwo_kB4DZSVmYqkztnf8n_-sjVvAFUxIH9dZAqby_SUvV5H8gH5hXhILHkzZJ59S2j6/exec';
 
-let allQs = [], flashcards = [], currentIndex = 0, score = 0, userId = '';
+let allQs = [], currentPlayQs = [], flashcards = [], currentIndex = 0, score = 0, userId = '';
 let appConfig = null;
 
 const TIME_LIMIT = 60;
@@ -150,7 +159,7 @@ async function init() {
     allQs = data.questions || [];
     if (allQs.length === 0) throw new Error(`ไม่พบข้อสอบในระบบ`);
 
-    generateFlashcards();
+    populateSubjectSelect(allQs, 'sel-subject');
 
     document.getElementById('ov-load').classList.add('hidden');
     document.getElementById('start-ui').classList.remove('hidden');
@@ -166,9 +175,20 @@ function applyTemplate(c) {
   document.querySelectorAll('.dynamic-app-name').forEach(el => el.textContent = c.appName);
 }
 
+function populateSubjectSelect(qs, selectId) {
+  const select = document.getElementById(selectId);
+  const categories = [...new Set(qs.map(q => q.category || 'ทั่วไป'))];
+  let html = '<option value="ALL">🌟 รวมทุกรายวิชา</option>';
+  categories.forEach(c => {
+    const count = qs.filter(q => (q.category||'ทั่วไป') === c).length;
+    html += `<option value="${c}">${c} (${count} ข้อ)</option>`;
+  });
+  select.innerHTML = html;
+}
+
 function generateFlashcards() {
   flashcards = [];
-  let tempArr = [...allQs].sort(() => Math.random() - 0.5); 
+  let tempArr = [...currentPlayQs].sort(() => Math.random() - 0.5); 
   
   tempArr.forEach(q => {
     const isTrueStatement = Math.random() > 0.5;
@@ -188,6 +208,13 @@ function generateFlashcards() {
 }
 
 function startGame() {
+  const subj = document.getElementById('sel-subject').value;
+  currentPlayQs = subj === 'ALL' ? [...allQs] : allQs.filter(q => (q.category||'ทั่วไป') === subj);
+
+  if(currentPlayQs.length === 0) {
+     alert('ไม่พบข้อสอบในวิชานี้ กรุณาเลือกวิชาอื่น'); return;
+  }
+
   document.getElementById('start-ui').classList.add('hidden');
   document.getElementById('end-ui').classList.add('hidden');
   document.getElementById('game-ui').classList.remove('hidden');
@@ -199,6 +226,11 @@ function startGame() {
   generateFlashcards(); 
   startTimer();
   renderCard();
+}
+
+function resetToStart() {
+  document.getElementById('end-ui').classList.add('hidden');
+  document.getElementById('start-ui').classList.remove('hidden');
 }
 
 function startTimer() {
@@ -367,7 +399,7 @@ async function callAPI(method, params, timeoutMs=20000) {
   const ctrl = new AbortController(); const tid  = setTimeout(() => ctrl.abort(), timeoutMs);
   try {
     let url = GAS_URL, opts = { signal:ctrl.signal, redirect:'follow' };
-    if (method === 'GET') { url += '?' + new URLSearchParams(params).toString(); opts.method = 'GET'; } 
+    if (method === 'GET') { url += '?' + newSearchParams(params).toString(); opts.method = 'GET'; } 
     else { opts.method  = 'POST'; opts.headers = { 'Content-Type':'text/plain' }; opts.body = JSON.stringify(params); }
     const resp = await fetch(url, opts); clearTimeout(tid);
     if (!resp.ok) throw new Error('HTTP ' + resp.status); return await resp.json();
