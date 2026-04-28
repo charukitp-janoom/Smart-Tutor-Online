@@ -3,82 +3,99 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>ภารกิจประจำวัน</title>
+<title>Daily Quests</title>
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700;800&family=IBM+Plex+Mono:wght@700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;800&family=IBM+Plex+Mono:wght@700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --config-secondary: #ffd700;
-  --bg: #0b0c10; --surface: #1f2833; --border: #30363d;
-  --primary: var(--config-secondary); 
-  --text: #e6edf3; --muted: #8b949e;
-  --success: #00e676; --danger: #ff5252;
+  --primary: #2563eb; --secondary: #f59e0b;
+  --bg: #0f1322; --surface: #161c36; --surf2: #1e2647;
+  --border: #2a3558; --text: #e8ecf8; --muted: #6e7aa0;
+  --green: #00c853;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
+body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; padding: 20px; }
 
-/* Overlays */
-.ov { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; padding: 20px; text-align: center; }
+.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.title { font-size: 24px; font-weight: 800; color: var(--text); }
+.coin-box { background: var(--surf2); border: 1px solid var(--border); padding: 8px 16px; border-radius: 20px; font-weight: 800; color: var(--secondary); font-family: 'IBM Plex Mono'; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);}
+
+.quest-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+.q-title { font-size: 16px; font-weight: 800; margin-bottom: 5px; }
+.q-reward { font-size: 14px; color: var(--secondary); font-weight: 700; margin-bottom: 15px; }
+
+.progress-bar { width: 100%; height: 8px; background: var(--surf2); border-radius: 10px; overflow: hidden; margin-bottom: 10px; position: relative; }
+.progress-fill { height: 100%; background: var(--primary); border-radius: 10px; transition: width 0.3s; }
+.progress-text { font-size: 12px; color: var(--muted); text-align: right; }
+
+.btn { width: 100%; padding: 14px; border-radius: 10px; font-size: 16px; font-weight: 800; font-family: 'Sarabun'; cursor: pointer; transition: 0.2s; border: none; margin-top: 15px; }
+.btn:active { transform: scale(0.96); }
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-disabled { background: var(--surf2); color: var(--muted); pointer-events: none; }
+.btn-success { background: rgba(0,200,83,0.1); color: var(--green); border: 1px solid rgba(0,200,83,0.3); pointer-events: none; }
+
+.ov { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; }
 .hidden { display: none !important; }
-.spinner { width: 50px; height: 50px; border: 3px solid rgba(255,215,0,0.1); border-top: 3px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
+.spinner { width: 50px; height: 50px; border: 4px solid var(--border); border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px;}
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* Header & Wallet */
-.header-card { background: linear-gradient(135deg, #1f2833, #161c24); padding: 24px 20px 30px; text-align: center; border-bottom: 1px solid var(--border); box-shadow: 0 4px 20px rgba(0,0,0,0.4); position: relative; overflow: hidden; }
-.header-card::before { content: '🎯'; position: absolute; top: -10px; right: -10px; font-size: 100px; opacity: 0.05; }
-.wallet-box { display: inline-flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.4); padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border); margin-bottom: 15px; }
-.wallet-title { font-size: 12px; color: var(--muted); }
-.wallet-balance { font-size: 18px; font-weight: 800; color: var(--primary); font-family: 'IBM Plex Mono', monospace; }
-
-.main-title { font-size: 26px; font-weight: 800; color: var(--text); margin-bottom: 5px; }
-.main-sub { font-size: 13px; color: var(--muted); line-height: 1.5; }
-
-/* Quests List */
-.quest-container { padding: 20px 16px; display: flex; flex-direction: column; gap: 16px; flex: 1; }
-.quest-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 18px; display: flex; flex-direction: column; gap: 12px; position: relative; overflow: hidden; transition: 0.2s; }
-.quest-card.completed { border-color: rgba(0,230,118,0.5); background: linear-gradient(to right, var(--surface), rgba(0,230,118,0.05)); }
-.quest-card.claimed { border-color: var(--border); opacity: 0.7; }
-
-.q-header { display: flex; justify-content: space-between; align-items: flex-start; }
-.q-title { font-size: 16px; font-weight: 700; color: var(--text); }
-.q-reward { background: rgba(255,215,0,0.15); color: var(--primary); font-weight: 800; font-size: 14px; padding: 4px 10px; border-radius: 8px; border: 1px solid rgba(255,215,0,0.3); display: flex; align-items: center; gap: 4px; }
-
-.q-progress-wrap { display: flex; align-items: center; gap: 12px; }
-.q-bar-bg { flex: 1; height: 8px; background: rgba(0,0,0,0.5); border-radius: 4px; overflow: hidden; }
-.q-bar-fill { height: 100%; background: var(--primary); border-radius: 4px; transition: width 0.5s ease; }
-.q-progress-text { font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 700; color: var(--muted); width: 40px; text-align: right; }
-
-.btn-claim { background: var(--surface); color: var(--muted); border: 1px solid var(--border); padding: 12px; border-radius: 10px; font-size: 15px; font-weight: 800; font-family: 'Sarabun', sans-serif; cursor: not-allowed; transition: 0.2s; text-align: center; }
-.btn-claim.ready { background: var(--primary); color: #000; border: none; cursor: pointer; box-shadow: 0 4px 15px rgba(255,215,0,0.3); animation: pulse 1.5s infinite alternate; }
-.btn-claim.claimed { background: rgba(0,230,118,0.1); color: var(--success); border: 1px solid rgba(0,230,118,0.3); cursor: not-allowed; }
-@keyframes pulse { from { transform: scale(1); } to { transform: scale(1.02); } }
+/* --- Custom Modal CSS --- */
+.modal-ov { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+.modal-ov.active { opacity: 1; pointer-events: auto; }
+.modal-box { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 32px 24px; width: 100%; max-width: 320px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.5); transform: scale(0.9); transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.modal-ov.active .modal-box { transform: scale(1); }
+.modal-icon { font-size: 60px; margin-bottom: 15px; line-height: 1; }
+.modal-title { font-size: 22px; font-weight: 800; color: var(--text); margin-bottom: 10px; }
+.modal-msg { font-size: 15px; color: var(--muted); margin-bottom: 24px; line-height: 1.6; }
+.modal-btn-group { display: flex; gap: 12px; justify-content: center; }
+.modal-btn { flex: 1; padding: 14px 0; border-radius: 12px; font-size: 16px; font-weight: 800; font-family: 'Sarabun'; cursor: pointer; transition: 0.2s; border: none; }
+.modal-btn-confirm { background: var(--primary); color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+.modal-btn:active { transform: scale(0.96); }
 </style>
 </head>
 <body>
 
 <div id="ov-load" class="ov">
   <div class="spinner"></div>
-  <div style="font-weight:800; color:var(--text);">กำลังเช็กภารกิจ...</div>
+  <div style="font-weight:800;">กำลังโหลดภารกิจ...</div>
 </div>
 
-<div class="header-card">
-  <div class="wallet-box">
-    <span class="wallet-title">คะแนนสะสม:</span>
-    <span class="wallet-balance" id="ui-balance">0</span><span style="font-size: 14px;" class="dynamic-term-coin">Point</span>
+<div id="custom-modal" class="modal-ov">
+  <div class="modal-box">
+    <div id="modal-icon" class="modal-icon">✅</div>
+    <div id="modal-title" class="modal-title">สำเร็จ</div>
+    <div id="modal-msg" class="modal-msg">ข้อความ</div>
+    <div id="modal-btn-group" class="modal-btn-group"></div>
   </div>
-  <div class="main-title">🎯 ภารกิจประจำวัน</div>
-  <div class="main-sub">ทำภารกิจ <span class="dynamic-app-name">App</span> ให้สำเร็จเพื่อรับคะแนนฟรี<br>ระบบจะรีเซ็ตภารกิจใหม่เวลาเที่ยงคืน</div>
 </div>
 
-<div class="quest-container" id="quest-list"></div>
+<div class="header">
+  <div class="title">🎯 ภารกิจประจำวัน</div>
+  <div class="coin-box">🪙 <span id="u-coin">0</span></div>
+</div>
+
+<div id="quest-list"></div>
+
+<button class="btn" style="background:transparent; border: 1px solid var(--border); color:var(--muted); margin-top:20px;" onclick="liff.closeWindow()">← กลับสู่หน้าหลัก</button>
 
 <script>
 const LIFF_ID = '2009896605-dxypaod6'; 
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbwo_kB4DZSVmYqkztnf8n_-sjVvAFUxIH9dZAqby_SUvV5H8gH5hXhILHkzZJ59S2j6/exec';
 
 let userId = '';
-let appConfig = null;
-let isClaiming = false;
+
+// --- Modal Functions ---
+function showModal(icon, title, msg) {
+  document.getElementById('modal-icon').textContent = icon;
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-msg').innerHTML = msg;
+  
+  document.getElementById('modal-btn-group').innerHTML = `
+    <button class="modal-btn modal-btn-confirm" onclick="closeModal()">ตกลง</button>
+  `;
+  document.getElementById('custom-modal').classList.add('active');
+}
+function closeModal() { document.getElementById('custom-modal').classList.remove('active'); }
 
 async function init() {
   try {
@@ -86,81 +103,90 @@ async function init() {
     if (!liff.isLoggedIn()) { liff.login(); return; }
     
     const configRes = await callAPI('GET', { action: 'get_config' });
-    if(configRes.status === 'ok') { appConfig = configRes.config; applyTemplate(appConfig); }
+    if(configRes.status === 'ok') { 
+      document.documentElement.style.setProperty('--primary', configRes.config.colorPrimary);
+      document.documentElement.style.setProperty('--secondary', configRes.config.colorSecondary);
+    }
     
     userId = (await liff.getProfile()).userId;
-    await fetchQuests();
-  } catch(e) { showError(e.message); }
+    loadQuests();
+  } catch(e) {
+    showModal('❌', 'ผิดพลาด', e.message);
+  }
 }
 
-function applyTemplate(c) {
-  if(!c) return;
-  document.documentElement.style.setProperty('--config-secondary', c.colorSecondary);
-  document.title = "ภารกิจ - " + c.appName;
-  document.querySelectorAll('.dynamic-app-name').forEach(el => el.textContent = c.appName);
-  document.querySelectorAll('.dynamic-term-coin').forEach(el => el.textContent = c.termCoin);
-}
-
-async function fetchQuests() {
+async function loadQuests() {
   try {
-    const data = await callAPI('GET', { action: 'get_quests', userId: userId });
-    if (data.status === 'error') throw new Error(data.message);
-    document.getElementById('ui-balance').textContent = data.balance || 0;
-    renderQuests(data.quests || []);
-    document.getElementById('ov-load').classList.add('hidden');
-  } catch(e) { showError('โหลดข้อมูลล้มเหลว: ' + e.message); }
+    const res = await callAPI('GET', { action: 'get_quests', userId: userId });
+    if(res.status === 'ok') {
+      document.getElementById('u-coin').textContent = res.balance || 0;
+      renderQuests(res.quests);
+      document.getElementById('ov-load').classList.add('hidden');
+    } else { showModal('❌', 'เกิดข้อผิดพลาด', res.message); }
+  } catch(e) { showModal('❌', 'การเชื่อมต่อขัดข้อง', e.message); }
 }
 
 function renderQuests(quests) {
-  const container = document.getElementById('quest-list');
-  if (quests.length === 0) { container.innerHTML = '<div style="text-align:center; color:var(--muted); margin-top: 40px;">ไม่มีภารกิจในขณะนี้</div>'; return; }
-  const coinTerm = appConfig ? appConfig.termCoin : '';
-
-  container.innerHTML = quests.map(q => {
-    let cardClass = 'quest-card' + (q.isClaimed ? ' claimed' : q.isCompleted ? ' completed' : '');
-    let btnHtml = q.isClaimed ? `<div class="btn-claim claimed">✅ รับรางวัลแล้ว</div>` : q.isCompleted ? `<button class="btn-claim ready" onclick="claimReward('${q.id}')">🎁 กดรับรางวัล</button>` : `<div class="btn-claim">ยังไม่สำเร็จ</div>`;
-    const pct = Math.min((q.current / q.target) * 100, 100);
-
-    return `
-      <div class="${cardClass}">
-        <div class="q-header">
-          <div class="q-title">${q.title}</div>
-          <div class="q-reward">+${q.reward} ${coinTerm}</div>
-        </div>
-        <div class="q-progress-wrap">
-          <div class="q-bar-bg">
-            <div class="q-bar-fill" style="width: ${pct}%; background: ${q.isCompleted ? 'var(--success)' : 'var(--primary)'}"></div>
-          </div>
-          <div class="q-progress-text" style="color: ${q.isCompleted ? 'var(--success)' : 'var(--muted)'}">${q.current}/${q.target}</div>
-        </div>
+  const list = document.getElementById('quest-list');
+  list.innerHTML = '';
+  
+  if(!quests || quests.length === 0) {
+    list.innerHTML = '<div style="text-align:center; padding:40px; color:var(--muted);">ยังไม่มีภารกิจในวันนี้</div>';
+    return;
+  }
+  
+  quests.forEach(q => {
+    const pct = (q.current / q.target) * 100;
+    let btnHtml = '';
+    
+    if(q.isClaimed) {
+      btnHtml = `<button class="btn btn-success">✅ รับรางวัลแล้ว</button>`;
+    } else if(q.isCompleted) {
+      btnHtml = `<button class="btn btn-primary" id="btn-claim-${q.id}" onclick="claimQuest('${q.id}')">🎁 กดรับรางวัล</button>`;
+    } else {
+      btnHtml = `<button class="btn btn-disabled">ยังไม่สำเร็จ</button>`;
+    }
+    
+    list.innerHTML += `
+      <div class="quest-card">
+        <div class="q-title">${q.title}</div>
+        <div class="q-reward">+${q.reward} Point</div>
+        <div class="progress-bar"><div class="progress-fill" style="width: ${pct}%"></div></div>
+        <div class="progress-text">${q.current} / ${q.target}</div>
         ${btnHtml}
       </div>
     `;
-  }).join('');
+  });
 }
 
-async function claimReward(questId) {
-  if (isClaiming) return; isClaiming = true;
-  document.getElementById('ov-load').classList.remove('hidden');
+async function claimQuest(qId) {
+  const btn = document.getElementById(`btn-claim-${qId}`);
+  btn.textContent = 'กำลังตรวจสอบ...'; btn.disabled = true;
+  
   try {
-    const res = await callAPI('POST', { action: 'claim_quest', userId: userId, questId: questId });
-    if (res.status === 'error') throw new Error(res.message);
-    await fetchQuests(); alert('✅ ' + res.message);
-  } catch(e) { document.getElementById('ov-load').classList.add('hidden'); alert('❌ ผิดพลาด: ' + e.message);
-  } finally { isClaiming = false; }
-}
-
-function showError(msg) {
-  const el = document.getElementById('ov-load');
-  el.innerHTML = `<div style="font-size:40px; margin-bottom:10px;">⚠️</div><p style="color:#ff5252;">${msg}</p><button onclick="liff.closeWindow()" style="margin-top:20px; padding:10px 20px; background:#1f2833; border:1px solid #30363d; color:#fff; border-radius:8px;">ปิดหน้าต่าง</button>`;
-  el.classList.remove('hidden');
+    const res = await callAPI('POST', { action: 'claim_quest', userId: userId, questId: qId });
+    if(res.status === 'ok') {
+      document.getElementById('u-coin').textContent = res.balance;
+      // ✅ ใช้ Custom Modal โชว์ความสำเร็จที่สวยงามแทน
+      showModal('✅', 'สำเร็จ!', res.message);
+      loadQuests(); // รีโหลดอัปเดตปุ่ม
+    } else {
+      showModal('❌', 'รับรางวัลไม่ได้', res.message);
+      btn.textContent = '🎁 กดรับรางวัล'; btn.disabled = false;
+    }
+  } catch(e) {
+    showModal('❌', 'ผิดพลาด', 'การเชื่อมต่อขัดข้อง');
+    btn.textContent = '🎁 กดรับรางวัล'; btn.disabled = false;
+  }
 }
 
 async function callAPI(method, params) {
   let url = GAS_URL, opts = { method: 'POST', headers: {'Content-Type':'text/plain'}, body: JSON.stringify(params) };
-  if (method === 'GET') { url += '?' + new URLSearchParams(params).toString(); opts = { method: 'GET' }; }
-  const resp = await fetch(url, opts); return await resp.json();
+  if(method === 'GET') { url += '?' + new URLSearchParams(params).toString(); opts = {method:'GET'}; }
+  const resp = await fetch(url, opts);
+  return await resp.json();
 }
+
 init();
 </script>
 </body>
