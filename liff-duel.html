@@ -34,7 +34,6 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
 .tab { flex: 1; padding: 10px; font-size: 14px; font-weight: 700; color: var(--muted); cursor: pointer; border-radius: 6px; transition: 0.2s; }
 .tab.active { background: var(--primary); color: #fff; }
 
-/* Subject Selector */
 .subject-select { width: 100%; padding: 14px 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; color: #fff; font-family: 'Sarabun', sans-serif; font-size: 14px; font-weight: 700; margin-bottom: 16px; outline: none; appearance: none; cursor: pointer; }
 .subject-select option { background: var(--panel); color: #fff; }
 
@@ -63,6 +62,20 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
 .score-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
 .score-name { font-weight: 700; font-size: 16px; }
 .score-val { font-family: 'IBM Plex Mono', monospace; font-weight: 800; font-size: 20px; color: var(--gold); }
+
+/* --- Custom Modal CSS --- */
+.modal-ov { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+.modal-ov.active { opacity: 1; pointer-events: auto; }
+.modal-box { background: var(--panel); border: 1px solid var(--border); border-radius: 24px; padding: 32px 24px; width: 100%; max-width: 320px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.5); transform: scale(0.9); transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.modal-ov.active .modal-box { transform: scale(1); }
+.modal-icon { font-size: 60px; margin-bottom: 15px; line-height: 1; }
+.modal-title { font-size: 22px; font-weight: 800; color: var(--text); margin-bottom: 10px; }
+.modal-msg { font-size: 15px; color: var(--muted); margin-bottom: 24px; line-height: 1.6; }
+.modal-btn-group { display: flex; gap: 12px; justify-content: center; }
+.modal-btn { flex: 1; padding: 14px 0; border-radius: 12px; font-size: 16px; font-weight: 800; font-family: 'Sarabun'; cursor: pointer; transition: 0.2s; border: none; }
+.modal-btn-cancel { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+.modal-btn-confirm { background: var(--primary); color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+.modal-btn:active { transform: scale(0.96); }
 </style>
 </head>
 <body>
@@ -70,6 +83,15 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
 <div id="ov-load" class="ov">
   <div class="spinner"></div>
   <div style="font-weight:800; color:var(--text);">กำลังโหลดลานประลอง...</div>
+</div>
+
+<div id="custom-modal" class="modal-ov">
+  <div class="modal-box">
+    <div id="modal-icon" class="modal-icon">⚠️</div>
+    <div id="modal-title" class="modal-title">แจ้งเตือน</div>
+    <div id="modal-msg" class="modal-msg">ข้อความ</div>
+    <div id="modal-btn-group" class="modal-btn-group"></div>
+  </div>
 </div>
 
 <div id="lobby-ui" class="screen hidden">
@@ -126,6 +148,28 @@ let currentDuel = null, targetUserId = null, questions = [], qIndex = 0, myScore
 
 let qStartTime = 0, totalTimeMs = 0, isAnswerLocked = false, gameTimerInterval = null;
 
+// --- Modal Functions ---
+function showModal(icon, title, msg, isConfirm = false, onConfirm = null) {
+  document.getElementById('modal-icon').textContent = icon;
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-msg').innerHTML = msg;
+  
+  const btnGroup = document.getElementById('modal-btn-group');
+  if (isConfirm) {
+    btnGroup.innerHTML = `
+      <button class="modal-btn modal-btn-cancel" onclick="closeModal()">ยกเลิก</button>
+      <button class="modal-btn modal-btn-confirm" id="btn-modal-ok">ตกลง</button>
+    `;
+    document.getElementById('btn-modal-ok').onclick = () => { closeModal(); if(onConfirm) onConfirm(); };
+  } else {
+    btnGroup.innerHTML = `
+      <button class="modal-btn modal-btn-confirm" onclick="closeModal()">ตกลง</button>
+    `;
+  }
+  document.getElementById('custom-modal').classList.add('active');
+}
+function closeModal() { document.getElementById('custom-modal').classList.remove('active'); }
+
 async function init() {
   try {
     await liff.init({ liffId: LIFF_ID });
@@ -136,7 +180,6 @@ async function init() {
 
     userId = (await liff.getProfile()).userId;
     
-    // โหลดคำถามทั้งหมดมาเก็บไว้ก่อน เพื่อสกัดหาหมวดหมู่
     const qData = await callAPI('GET', { action:'get_questions', userId: userId });
     if (qData.status === 'ok') {
       allQs = qData.questions || [];
@@ -230,16 +273,18 @@ async function initChallenge(tId, tName) {
   let targetQs = subj === 'ALL' ? allQs : allQs.filter(q => (q.category||'ทั่วไป') === subj);
   
   if (targetQs.length < 5) {
-     return alert('วิชานี้มีข้อสอบไม่ถึง 5 ข้อ ไม่สามารถใช้ท้าประลองได้ครับ');
+     return showModal('⚠️', 'คำเตือน', 'วิชานี้มีข้อสอบไม่ถึง 5 ข้อ ไม่สามารถใช้ท้าประลองได้ครับ');
   }
 
-  if(!confirm(`ต้องการส่งคำท้าประลอง ${tName} หรือไม่?`)) return;
-  showLoading('กำลังดึงชุดคำถาม...');
-  try {
-    questions = targetQs.sort(()=>Math.random()-0.5).slice(0,5); 
-    targetUserId = tId; currentDuel = null;
-    startQuizFlow();
-  } catch(e) { showError(e.message); }
+  // ✅ ใช้ Custom Confirm แทน
+  showModal('⚔️', 'ยืนยันการท้าประลอง', `ต้องการส่งคำท้าประลอง <b>${tName}</b> หรือไม่?`, true, async () => {
+    showLoading('กำลังดึงชุดคำถาม...');
+    try {
+      questions = targetQs.sort(()=>Math.random()-0.5).slice(0,5); 
+      targetUserId = tId; currentDuel = null;
+      startQuizFlow();
+    } catch(e) { showError(e.message); }
+  });
 }
 
 function startQuizFlow() { hideLoading(); showScreen('game-ui'); qIndex = 0; myScore = 0; totalTimeMs = 0; renderQuestion(); }
@@ -328,7 +373,12 @@ function backToLobby() { window.history.replaceState({}, document.title, window.
 function showScreen(id) { document.getElementById('lobby-ui').classList.add('hidden'); document.getElementById('game-ui').classList.add('hidden'); document.getElementById('result-ui').classList.add('hidden'); document.getElementById(id).classList.remove('hidden'); }
 function showLoading(text) { document.getElementById('ov-load').classList.remove('hidden'); document.getElementById('ov-load').querySelector('div:last-child').textContent = text; }
 function hideLoading() { document.getElementById('ov-load').classList.add('hidden'); }
-function showError(msg) { document.getElementById('ov-load').innerHTML = `<h2 style="color:var(--danger);">เกิดข้อผิดพลาด</h2><p style="color:var(--muted);">${msg}</p><button class="btn btn-outline" style="margin-top:20px;" onclick="liff.closeWindow()">ปิดหน้าต่าง</button>`; document.getElementById('ov-load').classList.remove('hidden'); }
+
+// ✅ แสดง Error ผ่าน Modal แทน alert()
+function showError(msg) { 
+  hideLoading();
+  showModal('❌', 'เกิดข้อผิดพลาด', msg);
+}
 
 async function callAPI(method, params, timeoutMs=20000) {
   const ctrl = new AbortController(); const tid = setTimeout(() => ctrl.abort(), timeoutMs);
