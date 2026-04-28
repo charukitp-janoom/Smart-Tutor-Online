@@ -8,18 +8,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;800&family=IBM+Plex+Mono:wght@700&display=swap" rel="stylesheet">
 <style>
 :root {
-  /* ค่าสีเริ่มต้น จะถูกเขียนทับโดย Config จากระบบหลังบ้าน */
   --config-primary: #46178f; 
   --config-secondary: #ffd700;
-
-  --bg: #f2f2f2;
-  --panel: #ffffff;
-  --text: #333333;
-  /* สีปุ่ม 4 สี สไตล์ Kahoot */
-  --shape-red: #e21b3c;
-  --shape-blue: #1368ce;
-  --shape-yellow: #d89e00;
-  --shape-green: #26890c;
+  --bg: #f2f2f2; --panel: #ffffff; --text: #333333;
+  --shape-red: #e21b3c; --shape-blue: #1368ce; --shape-yellow: #d89e00; --shape-green: #26890c;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--text); overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
@@ -76,20 +68,21 @@ select { cursor: pointer; appearance: none; background-image: url("data:image/sv
 .bar { width: 100%; background: #ccc; transition: height 0.5s ease; border-top-left-radius: 8px; border-top-right-radius: 8px;}
 .bar-count { font-size: 28px; font-weight: 800; margin-bottom: 10px; }
 
-/* 🏆 Scoreboard (Podium) - แก้ไข Layout การซ้อนทับให้เป็น Responsive */
+/* 🏆 Scoreboard (Podium) - แบบ Responsive & Flex Column แท้ๆ */
 .sb-screen { 
   background: var(--config-primary); 
   color: #fff; 
-  justify-content: flex-start; /* จัดเรียงเนื้อหาจากบนลงล่าง */
-  padding: 60px 20px 0; /* เว้นระยะด้านบนหลบปุ่ม Controls */
-  overflow-y: auto; /* อนุญาตให้ไถหน้าจอได้หากหน้าจอมีขนาดเล็ก */
+  justify-content: flex-start; 
+  padding: 60px 20px 0; 
+  overflow-y: auto; 
 }
 
-/* ดันแท่นรับรางวัลให้ลงไปด้านล่างสุดเสมอ */
 .sb-screen h1 {
   flex-shrink: 0;
-  margin-bottom: auto; 
+  margin-bottom: auto; /* ดันเนื้อหาแท่นให้ร่วงไปกองด้านล่างสุดเสมอ */
   text-align: center;
+  font-size: 64px;
+  text-shadow: 0 4px 10px rgba(0,0,0,0.3);
 }
 
 .podium { 
@@ -100,19 +93,17 @@ select { cursor: pointer; appearance: none; background-image: url("data:image/sv
   width: 100%; 
   max-width: 800px;
   margin-top: 40px; 
-  /* ลบ height: 420px; ทิ้งเพื่อให้สูงตามเนื้อหาด้านใน */
 }
 
 .podium-place { 
   display: flex; 
   flex-direction: column; 
   align-items: center; 
-  flex: 1; /* ให้ยืดหยุ่นตามความกว้างจอ */
+  flex: 1; 
   max-width: 220px; 
   position: relative; 
 }
 
-/* ส่วนกรอบรูปโปรไฟล์ */
 .pod-avatar-wrap { position: relative; z-index: 10; display: flex; justify-content: center; margin-bottom: -45px; }
 .p-1 .pod-avatar-wrap { margin-bottom: -65px; }
 
@@ -121,12 +112,11 @@ select { cursor: pointer; appearance: none; background-image: url("data:image/sv
 .p-2 .pod-avatar { border-color: #c0c0c0; }
 .p-3 .pod-avatar { border-color: #cd7f32; }
 
-/* กล่องชื่อเล่นนักเรียน */
 .p-name { 
   font-size: 22px; font-weight: 800; color: #fff; text-align: center; 
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
   background: rgba(255,255,255,0.15); 
-  padding: 55px 15px 15px; /* ดันเนื้อหาลงมาหลบรูปภาพ */
+  padding: 55px 15px 15px; 
   border-radius: 12px; width: 100%; 
   margin-bottom: 15px; 
   position: relative; z-index: 1;
@@ -135,36 +125,50 @@ select { cursor: pointer; appearance: none; background-image: url("data:image/sv
 }
 .p-1 .p-name { padding-top: 75px; font-size: 28px; background: rgba(255,215,0,0.2); border-color: rgba(255,215,0,0.5); color: #ffd700; }
 
-/* กล่องคะแนนและแท่นวาง */
 .p-score { font-size: 22px; font-family: monospace; margin-bottom: 15px; font-weight: 800; color: var(--config-secondary); text-shadow: 0 2px 4px rgba(0,0,0,0.5);}
-.p-block { width: 100%; background: rgba(0,0,0,0.2); border-top-left-radius: 16px; border-top-right-radius: 16px; display: flex; align-items: flex-start; justify-content: center; padding-top: 20px; font-size: 64px; font-weight: 800; color: rgba(255,255,255,0.5);}
 
-/* ใช้หน่วย vh และ min-height เพื่อให้แท่นหดขยายตามขนาดหน้าจอ (Responsive) */
+.p-block { 
+  width: 100%; background: rgba(0,0,0,0.2); border-top-left-radius: 16px; border-top-right-radius: 16px; 
+  display: flex; align-items: flex-start; justify-content: center; padding-top: 20px; 
+  font-size: 64px; font-weight: 800; color: rgba(255,255,255,0.5);
+}
+
+/* ใช้ความสูงแบบสัดส่วนหน้าจอ เพื่อกันการซ้อนทับกันเมื่อจอมีขนาดจำกัด */
 .p-1 .p-block { height: 35vh; min-height: 200px; background: #ffd700; color: #b8860b; box-shadow: 0 0 30px rgba(255,215,0,0.5);}
 .p-2 .p-block { height: 25vh; min-height: 140px; background: #c0c0c0; color: #808080; }
 .p-3 .p-block { height: 18vh; min-height: 100px; background: #cd7f32; color: #8b4513; }
 
-/* รองรับการเปิดบนจอขนาดเล็ก / Tablet */
-@media (max-width: 768px) {
-  .podium { gap: 10px; margin-top: 20px; }
-  .p-name { font-size: 16px; padding: 40px 10px 10px; margin-bottom: 10px; }
-  .p-1 .p-name { font-size: 18px; padding: 50px 10px 10px; }
-  .pod-avatar { width: 60px; height: 60px; border-width: 3px; }
-  .p-1 .pod-avatar { width: 80px; height: 80px; }
-  .pod-avatar-wrap { margin-bottom: -35px; }
-  .p-1 .pod-avatar-wrap { margin-bottom: -45px; }
-  .p-block { font-size: 40px; padding-top: 15px; }
-}
-
 .top-controls { position: fixed; top: 20px; right: 20px; z-index: 100; display: flex; gap: 10px;}
+
+/* --- Custom Modal CSS สำหรับแจ้งเตือน --- */
+.modal-ov { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+.modal-ov.active { opacity: 1; pointer-events: auto; }
+.modal-box { background: var(--panel, #fff); border: 1px solid #ccc; border-radius: 24px; padding: 32px 24px; width: 100%; max-width: 380px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.5); transform: scale(0.9); transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.modal-ov.active .modal-box { transform: scale(1); }
+.modal-icon { font-size: 70px; margin-bottom: 10px; line-height: 1; }
+.modal-title { font-size: 26px; font-weight: 800; color: var(--text, #333); margin-bottom: 10px; }
+.modal-msg { font-size: 18px; color: #666; margin-bottom: 30px; line-height: 1.6; }
+.modal-btn-group { display: flex; gap: 12px; justify-content: center; }
+.modal-btn { flex: 1; padding: 14px 0; border-radius: 12px; font-size: 20px; font-weight: 800; font-family: 'Sarabun'; cursor: pointer; transition: 0.2s; border: none; }
+.modal-btn-cancel { background: #f2f2f2; color: #666; }
+.modal-btn-confirm { background: var(--config-primary, #46178f); color: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+.modal-btn:active { transform: scale(0.96); }
 </style>
 </head>
 <body>
 
-<!-- หน้าจอกำลังโหลด -->
 <div id="ov-load" class="screen" style="z-index: 9999; background: #fff;">
   <div style="font-size: 40px; margin-bottom: 10px; animation: popIn 1s infinite alternate;">⏳</div>
   <div style="font-weight: 800; font-size: 20px; color: #333;">กำลังโหลดระบบ...</div>
+</div>
+
+<div id="custom-modal" class="modal-ov">
+  <div class="modal-box">
+    <div id="modal-icon" class="modal-icon">⚠️</div>
+    <div id="modal-title" class="modal-title">แจ้งเตือน</div>
+    <div id="modal-msg" class="modal-msg">ข้อความ</div>
+    <div id="modal-btn-group" class="modal-btn-group"></div>
+  </div>
 </div>
 
 <div id="screen-login" class="screen hidden">
@@ -191,9 +195,7 @@ select { cursor: pointer; appearance: none; background-image: url("data:image/sv
   <div class="join-info">ให้<span class="dynamic-term-user">ผู้ใช้งาน</span>เข้าเมนูใน LINE แล้วกดคำว่า</div>
   <div class="join-pin">"🎮 สอบสด"</div>
   <div class="player-count">ผู้เข้าร่วม: <span id="h-player-count">0</span> คน</div>
-  <div class="player-list" id="h-player-list">
-    <!-- รายชื่อจะแสดงตรงนี้ -->
-  </div>
+  <div class="player-list" id="h-player-list"></div>
   <button class="btn" style="background:#fff; color:#000; padding: 20px 60px; box-shadow: 0 6px 0 rgba(0,0,0,0.3);" onclick="nextState('QUESTION')">เริ่มข้อที่ 1</button>
 </div>
 
@@ -208,7 +210,6 @@ select { cursor: pointer; appearance: none; background-image: url("data:image/sv
         </div>
       </div>
       
-      <!-- Chart -->
       <div class="chart-container hidden" id="h-chart">
         <div class="bar-wrap"><div class="bar-count" id="c-A">0</div><div class="bar bg-red" id="b-A" style="height:0%"></div></div>
         <div class="bar-wrap"><div class="bar-count" id="c-B">0</div><div class="bar bg-blue" id="b-B" style="height:0%"></div></div>
@@ -227,19 +228,16 @@ select { cursor: pointer; appearance: none; background-image: url("data:image/sv
 </div>
 
 <div id="screen-scoreboard" class="screen sb-screen hidden">
-  <h1 style="font-size: 64px; margin-top: 40px; text-shadow: 0 4px 10px rgba(0,0,0,0.3);">🏆 อันดับคะแนน</h1>
-  <div class="podium" id="podium-wrap">
-    <!-- Rendered via JS -->
-  </div>
+  <h1>🏆 อันดับคะแนน</h1>
+  <div class="podium" id="podium-wrap"></div>
 </div>
 
 <div class="top-controls hidden" id="top-ctrl">
   <button class="btn" style="background:#fff; color:#000; padding:10px 20px; font-size:18px;" id="btn-next-step" onclick="handleNextStep()">ข้าม / ถัดไป</button>
-  <button class="btn" style="background:#e21b3c; color:#fff; padding:10px 20px; font-size:18px;" onclick="closeRoom()">ปิดห้อง</button>
+  <button class="btn" style="background:#e21b3c; color:#fff; padding:10px 20px; font-size:18px; margin-left:10px;" onclick="closeRoom()">ปิดห้อง</button>
 </div>
 
 <script>
-// ⚠️ ใส่ข้อมูลให้ถูกต้อง (LIFF_ID และ GAS_URL)
 const LIFF_ID = '2009896605-YBaQW9Fu'; // << [ใส่ LIFF ID สำหรับ Host]
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbwo_kB4DZSVmYqkztnf8n_-sjVvAFUxIH9dZAqby_SUvV5H8gH5hXhILHkzZJ59S2j6/exec'; 
 
@@ -250,32 +248,44 @@ let countdownInterval = null;
 let currentState = {};
 let currentAnswers = [];
 let currentPlayers = [];
-let allMembers = []; // เก็บข้อมูลสมาชิกเพื่อดึงรูปภาพและชื่อเล่น
+let allMembers = []; 
 let appConfig = null;
 
 let qTimeLeft = 20;
 
+// --- Modal Functions ---
+function showModal(icon, title, msg, isConfirm = false, onConfirm = null) {
+  document.getElementById('modal-icon').textContent = icon;
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-msg').innerHTML = msg;
+  
+  const btnGroup = document.getElementById('modal-btn-group');
+  if (isConfirm) {
+    btnGroup.innerHTML = `
+      <button class="modal-btn modal-btn-cancel" onclick="closeModal()">ยกเลิก</button>
+      <button class="modal-btn modal-btn-confirm" id="btn-modal-ok">ตกลง</button>
+    `;
+    document.getElementById('btn-modal-ok').onclick = () => { closeModal(); if(onConfirm) onConfirm(); };
+  } else {
+    btnGroup.innerHTML = `
+      <button class="modal-btn modal-btn-confirm" onclick="closeModal()">ตกลง</button>
+    `;
+  }
+  document.getElementById('custom-modal').classList.add('active');
+}
+function closeModal() { document.getElementById('custom-modal').classList.remove('active'); }
+
 async function init() {
   try {
-    // 💡 การใช้งาน LIFF SDK อย่างถูกต้อง
     await liff.init({ liffId: LIFF_ID });
-    if (!liff.isLoggedIn()) { 
-      liff.login(); 
-      return; 
-    }
+    if (!liff.isLoggedIn()) { liff.login(); return; }
     
-    // โหลด Config 
     const configRes = await callAPI('GET', { action: 'get_config' });
-    if(configRes.status === 'ok') { 
-      appConfig = configRes.config; 
-      applyTemplate(appConfig); 
-    }
+    if(configRes.status === 'ok') { appConfig = configRes.config; applyTemplate(appConfig); }
     
     document.getElementById('ov-load').classList.add('hidden');
     showScreen('screen-login');
-  } catch(e) {
-    alert('Init Error: ' + e.message);
-  }
+  } catch(e) { showModal('❌', 'ผิดพลาด', 'Init Error: ' + e.message); }
 }
 
 function applyTemplate(c) {
@@ -288,11 +298,9 @@ function applyTemplate(c) {
   document.querySelectorAll('.dynamic-term-user').forEach(el => el.textContent = c.termUser);
 }
 
-// 💡 ฟังก์ชันใหม่: ดึงชื่อเล่นจากข้อมูล Members
 function getDisplayName(uid, fallbackName) {
   if(!uid) return fallbackName || '-';
   const m = allMembers.find(x => String(x.userId) === String(uid));
-  // ถ้ามีชื่อเล่นให้โชว์ชื่อเล่น ถ้าไม่มีให้ใช้ชื่อจริงที่ดึงมา
   return (m && m.nickname && m.nickname.trim() !== '') ? m.nickname : fallbackName;
 }
 
@@ -303,9 +311,7 @@ function getPicUrl(uid) {
 }
 
 function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => {
-    if(s.id !== 'ov-load') s.classList.add('hidden');
-  });
+  document.querySelectorAll('.screen').forEach(s => { if(s.id !== 'ov-load') s.classList.add('hidden'); });
   document.getElementById(id).classList.remove('hidden');
   document.getElementById('top-ctrl').classList.toggle('hidden', id === 'screen-login' || id === 'screen-setup');
 }
@@ -318,11 +324,10 @@ async function doLogin() {
   btn.textContent = 'กำลังตรวจสอบ...'; btn.disabled = true;
 
   try {
-    // ดึงข้อมูล admin_data เพื่อได้ทั้งคำถามและรายชื่อในรอบเดียว
     const res = await callAPI('GET', { action:'admin_data', secret: secret });
     if(res.status === 'ok') {
       adminSecret = secret;
-      allMembers = res.members || []; // มี Field nickname ถูกดึงมาด้วยจากอัปเดต v2.4
+      allMembers = res.members || []; 
       
       if(res.config) { applyTemplate(res.config); }
 
@@ -335,19 +340,14 @@ async function doLogin() {
         }
       }
       showScreen('screen-setup');
-    } else {
-      alert('รหัสผ่านไม่ถูกต้อง');
-    }
-  } catch (e) {
-    alert('เกิดข้อผิดพลาด: ' + e.message);
-  } finally {
-    btn.textContent = 'เข้าสู่ระบบ'; btn.disabled = false;
-  }
+    } else { showModal('❌', 'เข้าสู่ระบบล้มเหลว', 'รหัสผ่านไม่ถูกต้อง'); }
+  } catch (e) { showModal('❌', 'เกิดข้อผิดพลาด', e.message); } 
+  finally { btn.textContent = 'เข้าสู่ระบบ'; btn.disabled = false; }
 }
 
 async function startRoom() {
   const subj = document.getElementById('sel-subject').value;
-  if (!subj) return alert('ไม่มีข้อสอบให้เลือกเปิดห้อง');
+  if (!subj) return showModal('⚠️', 'แจ้งเตือน', 'กรุณาเลือกวิชาที่จะเปิดสอบ');
   
   const btn = document.getElementById('btn-start');
   btn.textContent = 'กำลังเปิดห้อง...'; btn.disabled = true;
@@ -358,10 +358,8 @@ async function startRoom() {
       currentState = res.state;
       showScreen('screen-lobby');
       startPolling();
-    } else {
-      alert(res.message);
-    }
-  } catch(e) { alert('เกิดข้อผิดพลาดในการเชื่อมต่อ'); }
+    } else { showModal('❌', 'ผิดพลาด', res.message); }
+  } catch(e) { showModal('❌', 'การเชื่อมต่อขัดข้อง', 'โปรดตรวจสอบสัญญาณอินเทอร์เน็ต'); }
   finally { btn.textContent = 'เปิดห้องเรียน'; btn.disabled = false; }
 }
 
@@ -384,14 +382,11 @@ function updateHostUI() {
   if(currentState.status === 'LOBBY') {
     document.getElementById('h-player-count').textContent = currentPlayers.length;
     const listEl = document.getElementById('h-player-list');
-    
-    // โชว์รูปโปรไฟล์ และ ชื่อเล่น (Nickname) ในหน้า Lobby
     const newHtml = currentPlayers.map(p => `
       <div class="player-pill">
         <img src="${getPicUrl(p.userId)}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/847/847969.png'"> 
         ${getDisplayName(p.userId, p.fullName)}
       </div>`).join('');
-    
     if(listEl.innerHTML !== newHtml) { listEl.innerHTML = newHtml; }
   }
   else if(currentState.status === 'QUESTION' || currentState.status === 'REVEAL') {
@@ -405,15 +400,14 @@ async function nextState(newStatus) {
   if(newStatus === 'QUESTION' && currentState.status === 'SCOREBOARD') {
     nextQIdx++; 
     if(nextQIdx >= currentState.questions.length) {
-      alert('ทำข้อสอบครบทุกข้อแล้ว! จบเกม!');
-      closeRoom(); return;
+      showModal('🎉', 'จบเกม', 'ทำข้อสอบครบทุกข้อแล้ว!', false, closeRoom);
+      return;
     }
   }
   
   await callAPI('POST', { action:'live_host_action', secret:adminSecret, command:'UPDATE', status:newStatus, qIndex:nextQIdx });
   currentState.status = newStatus;
   currentState.currentQIndex = nextQIdx;
-  
   renderState();
 }
 
@@ -488,7 +482,6 @@ function renderState() {
     
     const scores = {};
     currentAnswers.forEach(a => {
-      // 💡 แปลงเป็นชื่อเล่นก่อนเซฟลงระบบคะแนน
       if(!scores[a.userId]) scores[a.userId] = { userId: a.userId, name: getDisplayName(a.userId, a.fullName), score: 0 };
       scores[a.userId].score += a.score;
     });
@@ -496,7 +489,7 @@ function renderState() {
     const sorted = Object.values(scores).sort((a,b) => b.score - a.score).slice(0, 3);
     
     let html = '';
-    const displayOrder = [1, 0, 2]; // ลำดับโพเดียม: ที่ 2 (ซ้าย), ที่ 1 (กลาง), ที่ 3 (ขวา)
+    const displayOrder = [1, 0, 2]; 
     displayOrder.forEach(idx => {
        if(sorted[idx]) {
           const p = sorted[idx];
@@ -530,12 +523,13 @@ function handleNextStep() {
   }
 }
 
-async function closeRoom() {
-  if(!confirm('ยืนยันปิดห้องเรียนและลบข้อมูลการสอบสดครั้งนี้?')) return;
-  clearInterval(pollInterval);
-  clearInterval(countdownInterval);
-  await callAPI('POST', { action:'live_host_action', secret:adminSecret, command:'END' });
-  showScreen('screen-setup');
+function closeRoom() {
+  showModal('🚪', 'ยืนยันปิดห้อง', 'ยืนยันปิดห้องเรียนและลบข้อมูลการสอบสดครั้งนี้?', true, async () => {
+    clearInterval(pollInterval);
+    clearInterval(countdownInterval);
+    await callAPI('POST', { action:'live_host_action', secret:adminSecret, command:'END' });
+    showScreen('screen-setup');
+  });
 }
 
 async function callAPI(method, params) {
