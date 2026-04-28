@@ -13,7 +13,7 @@
   --bg: #f7fafc;
   --surface: #ffffff;
   --text: #2d3748;
-  --green: #00c853;
+  --green: #00c853; --red: #ff5252;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--text); padding: 20px; display: flex; flex-direction: column; min-height: 100vh; }
@@ -49,9 +49,21 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
 /* Loading */
 .loader { border: 3px solid #f3f3f3; border-top: 3px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 20px; }
 @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
 #loading-screen { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 99; }
 .hidden { display: none !important; }
+
+/* 🌟 NEW: Custom Modal CSS (Light Theme for Registration) */
+.ca-ov { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.2s; backdrop-filter: blur(3px);}
+.ca-ov.active { opacity: 1; pointer-events: auto; }
+.ca-box { background: var(--surface); border-radius: 20px; padding: 32px 24px; width: 100%; max-width: 320px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.2); transform: scale(0.9); transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.ca-ov.active .ca-box { transform: scale(1); }
+.ca-icon { font-size: 60px; margin-bottom: 15px; line-height: 1; }
+.ca-title { font-size: 20px; font-weight: 800; color: var(--text); margin-bottom: 10px; }
+.ca-msg { font-size: 14px; color: #4a5568; margin-bottom: 24px; line-height: 1.6; }
+.ca-btn-group { display: flex; gap: 12px; justify-content: center; }
+.ca-btn { flex: 1; padding: 12px 0; border-radius: 10px; font-size: 15px; font-weight: 800; font-family: 'Sarabun'; cursor: pointer; transition: 0.2s; border: none; }
+.ca-btn-confirm { background: var(--primary); color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+.ca-btn:active { transform: scale(0.96); }
 </style>
 </head>
 <body>
@@ -60,6 +72,16 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
 <div id="loading-screen">
   <div class="loader"></div>
   <div style="font-weight: 600; color: var(--text);" id="load-text">กำลังตรวจสอบข้อมูล...</div>
+</div>
+
+<!-- 🌟 NEW: Custom Modal HTML -->
+<div id="custom-alert" class="ca-ov">
+  <div class="ca-box">
+    <div id="ca-icon" class="ca-icon">⚠️</div>
+    <div id="ca-title" class="ca-title">แจ้งเตือน</div>
+    <div id="ca-msg" class="ca-msg">ข้อความ</div>
+    <div id="ca-btn-group" class="ca-btn-group"></div>
+  </div>
 </div>
 
 <!-- ส่วนหัว และ รูปโปรไฟล์ LINE -->
@@ -76,22 +98,10 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
   <p style="color: var(--secondary); margin-bottom: 20px; font-size: 14px;">ข้อมูลปัจจุบันในระบบของท่าน</p>
   
   <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px 16px; margin-bottom: 20px;">
-    <div class="info-row">
-      <span class="info-label" id="lbl-info-level">ระดับชั้น</span>
-      <span class="info-value" id="info-level">-</span>
-    </div>
-    <div class="info-row">
-      <span class="info-label" id="lbl-info-fullname">ชื่อ-นามสกุล</span>
-      <span class="info-value" id="info-fullname">-</span>
-    </div>
-    <div class="info-row">
-      <span class="info-label">ชื่อเล่น</span>
-      <span class="info-value" id="info-nickname">-</span>
-    </div>
-    <div class="info-row">
-      <span class="info-label" id="lbl-info-pos">สาขา</span>
-      <span class="info-value" id="info-pos">-</span>
-    </div>
+    <div class="info-row"><span class="info-label" id="lbl-info-level">ระดับชั้น</span><span class="info-value" id="info-level">-</span></div>
+    <div class="info-row"><span class="info-label" id="lbl-info-fullname">ชื่อ-นามสกุล</span><span class="info-value" id="info-fullname">-</span></div>
+    <div class="info-row"><span class="info-label">ชื่อเล่น</span><span class="info-value" id="info-nickname">-</span></div>
+    <div class="info-row"><span class="info-label" id="lbl-info-pos">สาขา</span><span class="info-value" id="info-pos">-</span></div>
   </div>
 
   <button class="btn" onclick="liff.closeWindow()">เข้าสู่บทเรียน</button>
@@ -122,12 +132,10 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
     <label class="form-label" id="lbl-fullname">ชื่อ-นามสกุล</label>
     <input type="text" class="form-control" id="inp-fullname" placeholder="กรอกชื่อ-นามสกุล">
   </div>
-
   <div class="form-group">
     <label class="form-label">ชื่อเล่น</label>
-    <input type="text" class="form-control" id="inp-nickname" placeholder="กรอกชื่อเล่น">
+    <input type="text" class="form-control" id="inp-nickname" placeholder="กรอกชื่อเล่นสั้นๆ">
   </div>
-
   <div class="form-group">
     <label class="form-label" id="lbl-position">สาขา / กลุ่มเรียน</label>
     <input type="text" class="form-control" id="inp-position" placeholder="เช่น สาขาพญาไท, ห้อง 1">
@@ -140,41 +148,47 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
 <script>
 const LIFF_ID = '2009896605-DDyxB4Wy'; 
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbwo_kB4DZSVmYqkztnf8n_-sjVvAFUxIH9dZAqby_SUvV5H8gH5hXhILHkzZJ59S2j6/exec';
-
+  
 let profile = null;
 let existingMember = null;
 let appConfig = null;
+
+// 🌟 NEW: Custom Modal Functions
+let alertCallback = null;
+function customAlert(msg, title="แจ้งเตือน", icon="⚠️", callback=null) {
+  document.getElementById('ca-icon').textContent = icon;
+  document.getElementById('ca-title').textContent = title;
+  document.getElementById('ca-msg').innerHTML = msg;
+  alertCallback = callback;
+  document.getElementById('ca-btn-group').innerHTML = `<button class="ca-btn ca-btn-confirm" id="btn-ca-ok">ตกลง</button>`;
+  document.getElementById('btn-ca-ok').onclick = () => { closeCustomAlert(); if(alertCallback) alertCallback(); };
+  document.getElementById('custom-alert').classList.add('active');
+}
+function closeCustomAlert() { document.getElementById('custom-alert').classList.remove('active'); }
 
 async function init() {
   try {
     await liff.init({ liffId: LIFF_ID });
     if (!liff.isLoggedIn()) { liff.login(); return; }
     
-    // ดึงโปรไฟล์ LINE ของผู้ใช้งาน
     profile = await liff.getProfile();
     
-    // แสดงรูปโปรไฟล์ LINE ทันที
     if (profile.pictureUrl) {
       const img = document.getElementById('ui-profile-img');
       img.src = profile.pictureUrl;
       img.classList.remove('hidden');
     }
 
-    // เรียก API
     const [configRes, memberRes] = await Promise.all([
       callAPI('GET', { action: 'get_config' }),
       callAPI('GET', { action: 'get_member', userId: profile.userId })
     ]);
     
-    if (configRes.status === 'ok') {
-      appConfig = configRes.config;
-      applyTemplate(appConfig);
-    }
+    if (configRes.status === 'ok') { appConfig = configRes.config; applyTemplate(appConfig); }
     
     document.getElementById('loading-screen').classList.add('hidden');
     document.getElementById('ui-header').classList.remove('hidden');
 
-    // ตรวจสอบว่าเคยลงทะเบียนไว้หรือไม่
     if (memberRes.status === 'ok' && memberRes.member) {
       existingMember = memberRes.member;
       showRegisteredInfo();
@@ -188,7 +202,6 @@ async function init() {
   }
 }
 
-// ฟังก์ชันแปลงร่างหน้าเว็บตาม Config ลูกค้า
 function applyTemplate(config) {
   document.documentElement.style.setProperty('--primary', config.colorPrimary || '#4a5568');
   document.documentElement.style.setProperty('--secondary', config.colorSecondary || '#a0aec0');
@@ -200,13 +213,11 @@ function applyTemplate(config) {
   document.getElementById('lbl-level').textContent = `ระบุ${config.termLevel}ปัจจุบัน`;
   document.getElementById('lbl-fullname').textContent = `ชื่อ-นามสกุล${config.termUser}`;
   document.getElementById('lbl-position').textContent = `ระบุ${config.termPosition}`;
-
   document.getElementById('lbl-info-level').textContent = config.termLevel;
   document.getElementById('lbl-info-fullname').textContent = `ชื่อ-นามสกุล${config.termUser}`;
   document.getElementById('lbl-info-pos').textContent = config.termPosition;
 }
 
-// แสดงการ์ดข้อมูลเดิม
 function showRegisteredInfo() {
   document.getElementById('ui-form').classList.add('hidden');
   document.getElementById('ui-already-registered').classList.remove('hidden');
@@ -217,7 +228,6 @@ function showRegisteredInfo() {
   document.getElementById('info-pos').textContent = existingMember.position || '-';
 }
 
-// แสดงฟอร์มกรณีต้องการแก้ไข
 function showEditForm() {
   document.getElementById('ui-already-registered').classList.add('hidden');
   document.getElementById('ui-form').classList.remove('hidden');
@@ -226,7 +236,6 @@ function showEditForm() {
   document.getElementById('btn-submit').textContent = "อัปเดตข้อมูล";
   document.getElementById('btn-cancel-edit').classList.remove('hidden');
   
-  // นำข้อมูลเดิมมาใส่ในช่องกรอก
   if (existingMember) {
     document.getElementById('inp-level').value = existingMember.rank;
     document.getElementById('inp-fullname').value = existingMember.fullName;
@@ -235,10 +244,7 @@ function showEditForm() {
   }
 }
 
-// ยกเลิกการแก้ไข
-function cancelEdit() {
-  showRegisteredInfo();
-}
+function cancelEdit() { showRegisteredInfo(); }
 
 async function submitData() {
   const level = document.getElementById('inp-level').value;
@@ -246,7 +252,10 @@ async function submitData() {
   const nickname = document.getElementById('inp-nickname').value.trim();
   const position = document.getElementById('inp-position').value.trim();
 
-  if(!level || !fullname || !nickname) return alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+  if(!level || !fullname || !nickname) {
+    // 🌟 ใช้ Custom Alert แทน
+    return customAlert('กรุณากรอกข้อมูลระดับชั้น ชื่อ-นามสกุล และชื่อเล่นให้ครบถ้วนครับ', 'ข้อมูลไม่ครบ', '⚠️');
+  }
 
   const btn = document.getElementById('btn-submit');
   const isEditing = !!existingMember;
@@ -265,13 +274,13 @@ async function submitData() {
     });
     
     if(res.status === 'ok') {
-      alert(isEditing ? 'อัปเดตข้อมูลสำเร็จ!' : 'ลงทะเบียนสำเร็จ!');
-      liff.closeWindow();
-    } else {
-      throw new Error(res.message);
-    }
+      // 🌟 ใช้ Custom Alert และสั่งปิดหน้าต่างเมื่อกด "ตกลง"
+      customAlert(isEditing ? 'อัปเดตข้อมูลของท่านเรียบร้อยแล้ว' : 'ยินดีต้อนรับเข้าสู่ระบบครับ', 'บันทึกสำเร็จ!', '✅', () => {
+        liff.closeWindow();
+      });
+    } else { throw new Error(res.message); }
   } catch(e) {
-    alert(e.message);
+    customAlert(e.message, 'เกิดข้อผิดพลาด', '❌');
     btn.textContent = isEditing ? 'อัปเดตข้อมูล' : 'บันทึกข้อมูล'; 
     btn.disabled = false;
   }
