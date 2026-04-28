@@ -413,13 +413,26 @@ async function submitExam(isTimeout) {
       
       let resHtml = '';
       res.results.forEach((r, i) => {
-        const qText = questions.find(q => q.questionId === r.qid)?.questionText || '-';
+        // ค้นหาโจทย์ข้อนี้จาก Array เพื่อดึงข้อความของช้อยส์
+        const q = questions.find(q => q.questionId === r.qid);
+        const qText = q?.questionText || '-';
+        
+        // ดึงข้อความคำตอบของผู้ใช้
+        const userAnsLetter = r.userAnswer || '-';
+        const userAnsText = (q && q.choices && q.choices[userAnsLetter]) ? q.choices[userAnsLetter] : '';
+        const displayUserAns = userAnsText ? `${userAnsLetter}: ${userAnsText}` : (userAnsLetter === '-' ? 'ไม่ได้ตอบ' : userAnsLetter);
+        
+        // ดึงข้อความเฉลยที่ถูกต้อง
+        const correctLetter = r.correct || '-';
+        const correctText = (q && q.choices && q.choices[correctLetter]) ? q.choices[correctLetter] : '';
+        const displayCorrect = correctText ? `${correctLetter}: ${correctText}` : correctLetter;
+        
         resHtml += `
           <div class="ans-card ${r.isCorrect ? 'correct' : 'wrong'}">
             <div style="font-size:12px; font-weight:700; color:var(--muted); margin-bottom:4px;">ข้อ ${i+1}</div>
             <div style="font-size:14px; font-weight:600; margin-bottom:8px;">${qText}</div>
-            <div style="font-size:13px; color:var(--text);">คำตอบคุณ: <b>${r.userAnswer || '-'}</b></div>
-            <div style="font-size:13px; color:${r.isCorrect ? 'var(--success)' : 'var(--danger)'};">เฉลย: <b>${r.correct}</b></div>
+            <div style="font-size:13px; color:var(--text); margin-bottom:2px;">คำตอบคุณ: <b>${displayUserAns}</b></div>
+            <div style="font-size:13px; color:${r.isCorrect ? 'var(--success)' : 'var(--danger)'};">เฉลย: <b>${displayCorrect}</b></div>
           </div>
         `;
       });
