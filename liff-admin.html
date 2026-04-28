@@ -77,10 +77,25 @@ select.form-control { cursor: pointer; }
 .list-sub { font-size: 12px; color: var(--muted); }
 .badge { font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 4px; background: var(--surf2); border: 1px solid var(--border); }
 
-/* Modal */
+/* Custom Modal */
 .modal-ov { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 16px; }
 .modal-box { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; width: 100%; max-width: 400px; max-height: 90vh; overflow-y: auto; }
 .modal-title { font-size: 18px; font-weight: 800; margin-bottom: 16px; color: var(--primary); border-bottom: 1px solid var(--border); padding-bottom: 10px;}
+
+/* 🌟 NEW: Custom Alert & Confirm Modals */
+.ca-ov { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.2s; backdrop-filter: blur(2px);}
+.ca-ov.active { opacity: 1; pointer-events: auto; }
+.ca-box { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 32px 24px; width: 100%; max-width: 320px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.5); transform: scale(0.9); transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.ca-ov.active .ca-box { transform: scale(1); }
+.ca-icon { font-size: 60px; margin-bottom: 15px; line-height: 1; }
+.ca-title { font-size: 20px; font-weight: 800; color: var(--text); margin-bottom: 10px; }
+.ca-msg { font-size: 14px; color: var(--muted); margin-bottom: 24px; line-height: 1.6; }
+.ca-btn-group { display: flex; gap: 12px; justify-content: center; }
+.ca-btn { flex: 1; padding: 12px 0; border-radius: 10px; font-size: 15px; font-weight: 800; font-family: 'Sarabun'; cursor: pointer; transition: 0.2s; border: none; }
+.ca-btn-cancel { background: var(--surf2); border: 1px solid var(--border); color: var(--text); }
+.ca-btn-confirm { background: var(--primary); color: #fff; box-shadow: 0 4px 15px rgba(37,99,235,0.3); }
+.ca-btn-danger { background: var(--red); color: #fff; box-shadow: 0 4px 15px rgba(255,82,82,0.3); }
+.ca-btn:active { transform: scale(0.96); }
 </style>
 </head>
 <body>
@@ -89,6 +104,16 @@ select.form-control { cursor: pointer; }
 <div id="ov-load" class="ov">
   <div class="spinner"></div>
   <div style="font-weight: 700; color: var(--text);" id="load-msg">กำลังโหลดระบบ...</div>
+</div>
+
+<!-- 🌟 NEW: Custom Alert & Confirm HTML -->
+<div id="custom-alert" class="ca-ov">
+  <div class="ca-box">
+    <div id="ca-icon" class="ca-icon">⚠️</div>
+    <div id="ca-title" class="ca-title">แจ้งเตือน</div>
+    <div id="ca-msg" class="ca-msg">ข้อความ</div>
+    <div id="ca-btn-group" class="ca-btn-group"></div>
+  </div>
 </div>
 
 <!-- Login Screen -->
@@ -165,10 +190,8 @@ select.form-control { cursor: pointer; }
       </div>
     </div>
     
-    <!-- Sub Tabs สำหรับแยกหมวดหมู่วิชา -->
     <div class="sub-tabs" id="q-sub-tabs"></div>
 
-    <!-- ส่วนควบคุมการเปิด/ปิดวิชา จะแสดงเมื่อเลือกวิชาใดวิชาหนึ่ง -->
     <div id="q-subject-control" class="hidden" style="background: var(--surface); padding: 12px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 10px;">
     </div>
 
@@ -180,7 +203,6 @@ select.form-control { cursor: pointer; }
     <div class="flex justify-between items-center mb-2">
       <h3 style="font-size:16px;">คลังความรู้</h3>
       <div class="flex gap-2">
-        <!-- 📢 เพิ่มปุ่มแจ้งเตือนตรงนี้ -->
         <button class="btn btn-secondary btn-sm" onclick="openBroadcastModal()">📢 แจ้งเตือน</button>
         <button class="btn btn-primary btn-sm" onclick="openLibraryModal()">+ เพิ่มสื่อ</button>
       </div>
@@ -237,7 +259,7 @@ select.form-control { cursor: pointer; }
     </div>
     
     <label class="stat-label mt-2">พิมพ์ข้อความแจ้งเตือน</label>
-    <textarea id="inp-broadcast-msg" class="form-control" rows="5" placeholder="ตัวอย่าง: ประกาศ! มีการอัปเดตเอกสารประกอบการสอนใหม่ในคลังความรู้ กรุณาเข้าไปศึกษาเตรียมความพร้อมก่อนทำข้อสอบครับ..."></textarea>
+    <textarea id="inp-broadcast-msg" class="form-control" rows="5" placeholder="ตัวอย่าง: ประกาศ! มีการอัปเดตเอกสารประกอบการสอนใหม่ในคลังความรู้..."></textarea>
     
     <div class="flex gap-2 mt-4">
       <button class="btn btn-secondary" style="flex:1;" onclick="closeAllModal()">ยกเลิก</button>
@@ -351,6 +373,30 @@ let appData = {};
 let appConfig = null;
 let activeQuestionSubject = 'ALL'; 
 
+// 🌟 NEW: Custom Alert & Confirm Functions
+function customAlert(msg, title="แจ้งเตือน", icon="⚠️") {
+  document.getElementById('ca-icon').textContent = icon;
+  document.getElementById('ca-title').textContent = title;
+  document.getElementById('ca-msg').innerHTML = msg;
+  document.getElementById('ca-btn-group').innerHTML = `<button class="ca-btn ca-btn-confirm" onclick="closeCustomAlert()">ตกลง</button>`;
+  document.getElementById('custom-alert').classList.add('active');
+}
+function closeCustomAlert() { document.getElementById('custom-alert').classList.remove('active'); }
+
+let confirmCallback = null;
+function customConfirm(msg, callback, title="ยืนยันการดำเนินการ", icon="❓", btnClass="ca-btn-confirm") {
+  document.getElementById('ca-icon').textContent = icon;
+  document.getElementById('ca-title').textContent = title;
+  document.getElementById('ca-msg').innerHTML = msg;
+  document.getElementById('ca-btn-group').innerHTML = `
+    <button class="ca-btn ca-btn-cancel" onclick="closeCustomAlert()">ยกเลิก</button>
+    <button class="ca-btn ${btnClass}" id="btn-ca-ok">ตกลง</button>
+  `;
+  confirmCallback = callback;
+  document.getElementById('btn-ca-ok').onclick = () => { closeCustomAlert(); if(confirmCallback) confirmCallback(); };
+  document.getElementById('custom-alert').classList.add('active');
+}
+
 async function init() {
   try {
     await liff.init({ liffId: LIFF_ID });
@@ -364,18 +410,13 @@ async function init() {
     document.getElementById('ov-load').classList.add('hidden');
     document.getElementById('ov-login').classList.remove('hidden');
   } catch(e) {
-    alert('Liff Error: ' + e.message);
+    customAlert('Liff Error: ' + e.message, 'เกิดข้อผิดพลาด', '❌');
   }
 }
 
-// ==============================================
-// TEMPLATE ENGINE
-// ==============================================
 function applyTemplate(config) {
   if(!config) return;
-  
   document.documentElement.style.setProperty('--primary', config.colorPrimary);
-  
   let rootStyle = document.querySelector(':root');
   rootStyle.style.setProperty('--primary', config.colorPrimary);
   rootStyle.style.setProperty('--secondary', config.colorSecondary);
@@ -387,9 +428,6 @@ function applyTemplate(config) {
   document.querySelectorAll('.dynamic-term-coin').forEach(el => el.textContent = config.termCoin);
 }
 
-// ==============================================
-// CORE FUNCTIONS
-// ==============================================
 async function doLogin() {
   const pin = document.getElementById('inp-pin').value.trim();
   if(!pin) return;
@@ -404,13 +442,11 @@ async function doLogin() {
       await loadData();
       document.getElementById('ov-load').classList.add('hidden');
       document.getElementById('app').classList.remove('hidden');
-    } else {
-      throw new Error('รหัสผ่านไม่ถูกต้อง');
-    }
+    } else { throw new Error('รหัสผ่านไม่ถูกต้อง'); }
   } catch(e) {
     document.getElementById('ov-load').classList.add('hidden');
     document.getElementById('ov-login').classList.remove('hidden');
-    alert(e.message);
+    customAlert(e.message, 'เข้าสู่ระบบล้มเหลว', '❌');
   }
 }
 
@@ -423,7 +459,7 @@ async function loadData() {
       if(res.config) { appConfig = res.config; applyTemplate(appConfig); }
       renderAll();
     } else { throw new Error(res.message); }
-  } catch(e) { alert(e.message); }
+  } catch(e) { customAlert(e.message, 'โหลดข้อมูลล้มเหลว', '❌'); }
   finally { document.getElementById('ov-load').classList.add('hidden'); }
 }
 
@@ -440,15 +476,9 @@ function renderAll() {
   renderQuestions();
   renderLibrary();
   renderStore();
-  
-  if (appData.settings) {
-    document.getElementById('inp-exam-time').value = appData.settings.examTimeMinutes;
-  }
+  if (appData.settings) { document.getElementById('inp-exam-time').value = appData.settings.examTimeMinutes; }
 }
 
-// ==============================================
-// RENDER TABS
-// ==============================================
 function renderDashboard() {
   const st = appData.stats || {};
   document.getElementById('stat-members').textContent = st.totalMembers || 0;
@@ -459,9 +489,7 @@ function renderDashboard() {
 
 function renderMembers() {
   const q = document.getElementById('search-member').value.toLowerCase();
-  const list = document.getElementById('list-members');
-  list.innerHTML = '';
-  
+  const list = document.getElementById('list-members'); list.innerHTML = '';
   let members = appData.members || [];
   if (q) members = members.filter(m => m.fullName.toLowerCase().includes(q) || m.rank.toLowerCase().includes(q));
 
@@ -487,24 +515,14 @@ function renderMembers() {
 }
 
 function renderQuestions() {
-  const list = document.getElementById('list-questions');
-  const subTabs = document.getElementById('q-sub-tabs');
-  const subjCtrl = document.getElementById('q-subject-control');
-  
+  const list = document.getElementById('list-questions'); const subTabs = document.getElementById('q-sub-tabs'); const subjCtrl = document.getElementById('q-subject-control');
   list.innerHTML = ''; subTabs.innerHTML = ''; subjCtrl.innerHTML = '';
   const qs = appData.questions || [];
 
-  if (qs.length === 0) { 
-    list.innerHTML = '<div class="text-center text-muted">ยังไม่มีข้อสอบ</div>'; 
-    subjCtrl.classList.add('hidden');
-    return; 
-  }
+  if (qs.length === 0) { list.innerHTML = '<div class="text-center text-muted">ยังไม่มีข้อสอบ</div>'; subjCtrl.classList.add('hidden'); return; }
 
   const categories = [...new Set(qs.map(q => q.category || 'ทั่วไป'))];
-  
-  if (activeQuestionSubject !== 'ALL' && !categories.includes(activeQuestionSubject)) {
-    activeQuestionSubject = 'ALL';
-  }
+  if (activeQuestionSubject !== 'ALL' && !categories.includes(activeQuestionSubject)) activeQuestionSubject = 'ALL';
 
   let tabsHtml = `<div class="sub-tab ${activeQuestionSubject === 'ALL' ? 'active' : ''}" onclick="setQuestionFilter('ALL')">ทั้งหมด (${qs.length})</div>`;
   categories.forEach(cat => {
@@ -513,9 +531,8 @@ function renderQuestions() {
   });
   subTabs.innerHTML = tabsHtml;
 
-  if (activeQuestionSubject === 'ALL') {
-     subjCtrl.classList.add('hidden');
-  } else {
+  if (activeQuestionSubject === 'ALL') { subjCtrl.classList.add('hidden'); } 
+  else {
      subjCtrl.classList.remove('hidden');
      const qInCat = qs.filter(q => (q.category||'ทั่วไป') === activeQuestionSubject);
      const isActive = qInCat.some(q => q.active === 'YES');
@@ -550,14 +567,10 @@ function renderQuestions() {
   });
 }
 
-window.setQuestionFilter = function(cat) {
-  activeQuestionSubject = cat;
-  renderQuestions(); 
-}
+window.setQuestionFilter = function(cat) { activeQuestionSubject = cat; renderQuestions(); }
 
 function renderLibrary() {
-  const list = document.getElementById('list-library');
-  list.innerHTML = '';
+  const list = document.getElementById('list-library'); list.innerHTML = '';
   const libs = appData.library || [];
   if (libs.length === 0) return list.innerHTML = '<div class="text-center text-muted">ยังไม่มีสื่อการสอน</div>';
 
@@ -581,8 +594,7 @@ function renderLibrary() {
 }
 
 function renderStore() {
-  const rList = document.getElementById('list-rewards');
-  const dList = document.getElementById('list-redemptions');
+  const rList = document.getElementById('list-rewards'); const dList = document.getElementById('list-redemptions');
   rList.innerHTML = ''; dList.innerHTML = '';
 
   const rewards = appData.rewards || [];
@@ -603,8 +615,7 @@ function renderStore() {
     `;
   });
 
-  const redemps = appData.redemptions || [];
-  const pending = redemps.filter(r => r.status === 'PENDING');
+  const redemps = appData.redemptions || []; const pending = redemps.filter(r => r.status === 'PENDING');
   if(pending.length === 0) dList.innerHTML = '<div class="text-muted">ไม่มีรายการรออนุมัติ</div>';
   pending.forEach(r => {
     dList.innerHTML += `
@@ -632,228 +643,129 @@ function openModal(id) { document.getElementById(id).classList.remove('hidden');
 function closeModal(e) { if(e.target.classList.contains('modal-ov')) closeAllModal(); }
 function closeAllModal() { document.querySelectorAll('.modal-ov').forEach(m => m.classList.add('hidden')); }
 
-// -- Question --
 function openQuestionModal() {
-  document.getElementById('mq-title').textContent = 'เพิ่มข้อสอบ';
-  document.getElementById('mq-id').value = '';
+  document.getElementById('mq-title').textContent = 'เพิ่มข้อสอบ'; document.getElementById('mq-id').value = '';
   document.getElementById('mq-cat').value = activeQuestionSubject === 'ALL' ? '' : activeQuestionSubject; 
-  document.getElementById('mq-text').value = '';
-  document.getElementById('mq-a').value = ''; document.getElementById('mq-b').value = '';
-  document.getElementById('mq-c').value = ''; document.getElementById('mq-d').value = '';
-  document.getElementById('mq-ans').value = 'A';
+  document.getElementById('mq-text').value = ''; document.getElementById('mq-a').value = ''; document.getElementById('mq-b').value = '';
+  document.getElementById('mq-c').value = ''; document.getElementById('mq-d').value = ''; document.getElementById('mq-ans').value = 'A';
   openModal('modal-q');
 }
 function editQuestion(q) {
-  document.getElementById('mq-title').textContent = 'แก้ไขข้อสอบ';
-  document.getElementById('mq-id').value = q.questionId;
-  document.getElementById('mq-cat').value = q.category;
-  document.getElementById('mq-text').value = q.questionText;
+  document.getElementById('mq-title').textContent = 'แก้ไขข้อสอบ'; document.getElementById('mq-id').value = q.questionId;
+  document.getElementById('mq-cat').value = q.category; document.getElementById('mq-text').value = q.questionText;
   document.getElementById('mq-a').value = q.choiceA; document.getElementById('mq-b').value = q.choiceB;
-  document.getElementById('mq-c').value = q.choiceC; document.getElementById('mq-d').value = q.choiceD;
-  document.getElementById('mq-ans').value = q.correctAnswer;
+  document.getElementById('mq-c').value = q.choiceC; document.getElementById('mq-d').value = q.choiceD; document.getElementById('mq-ans').value = q.correctAnswer;
   openModal('modal-q');
 }
 async function saveQuestion() {
-  const id = document.getElementById('mq-id').value;
-  const cat = document.getElementById('mq-cat').value;
-  const payload = {
-    action: 'save_question', secret: adminSecret, questionId: id,
-    category: cat,
-    questionText: document.getElementById('mq-text').value,
-    choiceA: document.getElementById('mq-a').value, choiceB: document.getElementById('mq-b').value,
-    choiceC: document.getElementById('mq-c').value, choiceD: document.getElementById('mq-d').value,
-    correctAnswer: document.getElementById('mq-ans').value
-  };
-  try { 
-    await callAPI('POST', payload); 
-    closeAllModal(); 
-    if (cat) activeQuestionSubject = cat; 
-    await loadData(); 
-    alert('บันทึกสำเร็จ'); 
-  } catch(e) { alert(e.message); }
+  const id = document.getElementById('mq-id').value; const cat = document.getElementById('mq-cat').value;
+  const payload = { action: 'save_question', secret: adminSecret, questionId: id, category: cat, questionText: document.getElementById('mq-text').value, choiceA: document.getElementById('mq-a').value, choiceB: document.getElementById('mq-b').value, choiceC: document.getElementById('mq-c').value, choiceD: document.getElementById('mq-d').value, correctAnswer: document.getElementById('mq-ans').value };
+  try { await callAPI('POST', payload); closeAllModal(); if (cat) activeQuestionSubject = cat; await loadData(); customAlert('บันทึกข้อมูลเรียบร้อย', 'สำเร็จ', '✅'); } catch(e) { customAlert(e.message, 'ผิดพลาด', '❌'); }
 }
-async function delQuestion(id) {
-  if(!confirm('ยืนยันลบข้อสอบนี้?')) return;
-  try { await callAPI('POST', {action:'delete_question', secret:adminSecret, questionId:id}); await loadData(); } catch(e) { alert(e.message); }
+function delQuestion(id) {
+  customConfirm('ยืนยันลบข้อสอบข้อนี้ออกจากระบบ?', async () => {
+    try { await callAPI('POST', {action:'delete_question', secret:adminSecret, questionId:id}); await loadData(); } catch(e) { customAlert(e.message, 'ผิดพลาด', '❌'); }
+  }, 'ยืนยันการลบ', '🗑️', 'ca-btn-danger');
 }
-async function toggleSubject(sub, status) {
-  if(!confirm(`ต้องการ ${status==='YES'?'เปิด':'ปิด'} วิชา ${sub} ใช่หรือไม่?`)) return;
-  try { await callAPI('POST', {action:'toggle_subject_active', secret:adminSecret, subject:sub, activeStatus:status}); await loadData(); } catch(e) { alert(e.message); }
+function toggleSubject(sub, status) {
+  customConfirm(`ต้องการ <b>${status==='YES'?'เปิด':'ปิด'}</b> รายวิชา ${sub} ใช่หรือไม่?`, async () => {
+    try { await callAPI('POST', {action:'toggle_subject_active', secret:adminSecret, subject:sub, activeStatus:status}); await loadData(); } catch(e) { customAlert(e.message, 'ผิดพลาด', '❌'); }
+  }, 'จัดการวิชา');
 }
 async function submitImport() {
-  const text = document.getElementById('inp-import-data').value.trim();
-  if(!text) return alert('กรุณาวางข้อมูล');
+  const text = document.getElementById('inp-import-data').value.trim(); if(!text) return customAlert('กรุณาวางข้อมูลในช่องว่าง', 'แจ้งเตือน', '⚠️');
   const lines = text.split('\n'); const qs = [];
-  for(let l of lines) {
-    const cols = l.split('\t');
-    if(cols.length >= 6) {
-      qs.push({ q:cols[0], a:cols[1], b:cols[2], c:cols[3], d:cols[4], ans:cols[5], cat:cols[6]||'ทั่วไป' });
-    }
-  }
-  if(qs.length === 0) return alert('รูปแบบข้อมูลไม่ถูกต้อง');
+  for(let l of lines) { const cols = l.split('\t'); if(cols.length >= 6) { qs.push({ q:cols[0], a:cols[1], b:cols[2], c:cols[3], d:cols[4], ans:cols[5], cat:cols[6]||'ทั่วไป' }); } }
+  if(qs.length === 0) return customAlert('รูปแบบข้อมูลไม่ถูกต้อง กรุณาตรวจสอบ Excel', 'แจ้งเตือน', '⚠️');
   try {
     await callAPI('POST', {action:'import_questions', secret:adminSecret, questions:qs});
-    closeAllModal(); document.getElementById('inp-import-data').value = ''; 
-    activeQuestionSubject = 'ALL';
-    await loadData(); 
-    alert('นำเข้าสำเร็จ '+qs.length+' ข้อ');
-  } catch(e) { alert(e.message); }
+    closeAllModal(); document.getElementById('inp-import-data').value = ''; activeQuestionSubject = 'ALL'; await loadData(); 
+    customAlert(`นำเข้าสำเร็จ ${qs.length} ข้อ`, 'สำเร็จ', '✅');
+  } catch(e) { customAlert(e.message, 'ผิดพลาด', '❌'); }
 }
 
-// -- Library --
 function openLibraryModal() {
-  document.getElementById('ml-title').textContent = 'เพิ่มสื่อคลังความรู้';
-  document.getElementById('ml-id').value = ''; document.getElementById('ml-name').value = '';
-  document.getElementById('ml-cat').value = ''; document.getElementById('ml-url').value = '';
-  openModal('modal-lib');
+  document.getElementById('ml-title').textContent = 'เพิ่มสื่อคลังความรู้'; document.getElementById('ml-id').value = ''; document.getElementById('ml-name').value = '';
+  document.getElementById('ml-cat').value = ''; document.getElementById('ml-url').value = ''; openModal('modal-lib');
 }
 function editLibrary(l) {
-  document.getElementById('ml-title').textContent = 'แก้ไขสื่อคลังความรู้';
-  document.getElementById('ml-id').value = l.id; document.getElementById('ml-name').value = l.title;
-  document.getElementById('ml-cat').value = l.category; document.getElementById('ml-type').value = l.type;
-  document.getElementById('ml-url').value = l.url;
-  openModal('modal-lib');
+  document.getElementById('ml-title').textContent = 'แก้ไขสื่อคลังความรู้'; document.getElementById('ml-id').value = l.id; document.getElementById('ml-name').value = l.title;
+  document.getElementById('ml-cat').value = l.category; document.getElementById('ml-type').value = l.type; document.getElementById('ml-url').value = l.url; openModal('modal-lib');
 }
 async function saveLibrary() {
-  const payload = {
-    action: 'save_library', secret: adminSecret, id: document.getElementById('ml-id').value,
-    title: document.getElementById('ml-name').value, category: document.getElementById('ml-cat').value,
-    type: document.getElementById('ml-type').value, url: document.getElementById('ml-url').value
-  };
-  try { await callAPI('POST', payload); closeAllModal(); await loadData(); alert('บันทึกสำเร็จ'); } catch(e) { alert(e.message); }
+  const payload = { action: 'save_library', secret: adminSecret, id: document.getElementById('ml-id').value, title: document.getElementById('ml-name').value, category: document.getElementById('ml-cat').value, type: document.getElementById('ml-type').value, url: document.getElementById('ml-url').value };
+  try { await callAPI('POST', payload); closeAllModal(); await loadData(); customAlert('บันทึกสำเร็จ', 'สำเร็จ', '✅'); } catch(e) { customAlert(e.message, 'ผิดพลาด', '❌'); }
 }
-async function delLibrary(id) {
-  if(!confirm('ยืนยันลบข้อมูลนี้?')) return;
-  try { await callAPI('POST', {action:'delete_library', secret:adminSecret, id}); await loadData(); } catch(e) { alert(e.message); }
+function delLibrary(id) {
+  customConfirm('ยืนยันลบสื่อการสอนนี้?', async () => {
+    try { await callAPI('POST', {action:'delete_library', secret:adminSecret, id}); await loadData(); } catch(e) { customAlert(e.message, 'ผิดพลาด', '❌'); }
+  }, 'ยืนยันการลบ', '🗑️', 'ca-btn-danger');
 }
 
-// 📢 -- Broadcast (แจ้งเตือน) --
 function openBroadcastModal() {
-  document.getElementById('inp-broadcast-target-type').value = 'ALL';
-  document.getElementById('wrap-broadcast-target-val').classList.add('hidden');
-  document.getElementById('inp-broadcast-msg').value = '';
-  updateBroadcastTargetOptions();
-  openModal('modal-broadcast');
+  document.getElementById('inp-broadcast-target-type').value = 'ALL'; document.getElementById('wrap-broadcast-target-val').classList.add('hidden'); document.getElementById('inp-broadcast-msg').value = ''; updateBroadcastTargetOptions(); openModal('modal-broadcast');
 }
-
 function updateBroadcastTargetOptions() {
-  const type = document.getElementById('inp-broadcast-target-type').value;
-  const wrap = document.getElementById('wrap-broadcast-target-val');
-  const select = document.getElementById('inp-broadcast-target-val');
+  const type = document.getElementById('inp-broadcast-target-type').value; const wrap = document.getElementById('wrap-broadcast-target-val'); const select = document.getElementById('inp-broadcast-target-val');
+  if (type === 'ALL') { wrap.classList.add('hidden'); return; }
+  wrap.classList.remove('hidden'); select.innerHTML = '';
+  const members = appData.members || []; let options = new Set();
+  if (type === 'LEVEL') { members.forEach(m => { if(m.rank) options.add(m.rank); }); } else if (type === 'POSITION') { members.forEach(m => { if(m.position) options.add(m.position); }); }
+  if(options.size === 0) { select.innerHTML = '<option value="">ไม่มีข้อมูล</option>'; } else { [...options].sort().forEach(opt => { select.innerHTML += `<option value="${opt}">${opt}</option>`; }); }
+}
+function sendBroadcast() {
+  const msg = document.getElementById('inp-broadcast-msg').value.trim(); const targetType = document.getElementById('inp-broadcast-target-type').value; const targetValue = document.getElementById('inp-broadcast-target-val').value;
+  if(!msg) return customAlert('กรุณาพิมพ์ข้อความที่ต้องการแจ้งเตือน', 'แจ้งเตือน', '⚠️');
   
-  if (type === 'ALL') {
-    wrap.classList.add('hidden');
-    return;
-  }
-  
-  wrap.classList.remove('hidden');
-  select.innerHTML = '';
-  
-  const members = appData.members || [];
-  let options = new Set();
-  
-  if (type === 'LEVEL') {
-    members.forEach(m => { if(m.rank) options.add(m.rank); });
-  } else if (type === 'POSITION') {
-    members.forEach(m => { if(m.position) options.add(m.position); });
-  }
-  
-  if(options.size === 0) {
-    select.innerHTML = '<option value="">ไม่มีข้อมูล</option>';
-  } else {
-    [...options].sort().forEach(opt => {
-      select.innerHTML += `<option value="${opt}">${opt}</option>`;
-    });
-  }
+  let confirmMsg = 'ยืนยันส่งข้อความไปยัง <b>"สมาชิกทุกคน"</b> ใช่หรือไม่?';
+  if(targetType === 'LEVEL') confirmMsg = `ยืนยันส่งข้อความไปยังระดับชั้น <b>"${targetValue}"</b> ใช่หรือไม่?`;
+  if(targetType === 'POSITION') confirmMsg = `ยืนยันส่งข้อความไปยังสาขา <b>"${targetValue}"</b> ใช่หรือไม่?`;
+
+  customConfirm(confirmMsg, async () => {
+    const btn = document.getElementById('btn-send-broadcast'); btn.disabled = true; btn.textContent = 'กำลังส่ง...';
+    try {
+      const res = await callAPI('POST', { action: 'broadcast_message', secret: adminSecret, textMessage: msg, targetType: targetType, targetValue: targetValue });
+      if(res.status === 'ok') { customAlert(res.message, 'ส่งสำเร็จ', '🚀'); closeAllModal(); } else { throw new Error(res.message); }
+    } catch(e) { customAlert(e.message, 'ส่งล้มเหลว', '❌'); } finally { btn.disabled = false; btn.textContent = '🚀 ส่งแจ้งเตือน'; }
+  }, 'ส่งประกาศ', '📢');
 }
 
-async function sendBroadcast() {
-  const msg = document.getElementById('inp-broadcast-msg').value.trim();
-  const targetType = document.getElementById('inp-broadcast-target-type').value;
-  const targetValue = document.getElementById('inp-broadcast-target-val').value;
-
-  if(!msg) return alert('กรุณาพิมพ์ข้อความที่ต้องการแจ้งเตือน');
-  
-  let confirmMsg = 'ยืนยันการส่งข้อความนี้ไปยังสมาชิก "ทุกคน" ในระบบใช่หรือไม่?';
-  if(targetType === 'LEVEL') confirmMsg = `ยืนยันส่งข้อความไปยังระดับชั้น "${targetValue}" ใช่หรือไม่?`;
-  if(targetType === 'POSITION') confirmMsg = `ยืนยันส่งข้อความไปยังสาขาวิชา "${targetValue}" ใช่หรือไม่?`;
-
-  if(!confirm(confirmMsg)) return;
-  
-  const btn = document.getElementById('btn-send-broadcast');
-  btn.disabled = true; btn.textContent = 'กำลังส่ง...';
-  
-  try {
-    const res = await callAPI('POST', { 
-      action: 'broadcast_message', 
-      secret: adminSecret, 
-      textMessage: msg,
-      targetType: targetType,
-      targetValue: targetValue
-    });
-    if(res.status === 'ok') {
-      alert('✅ ' + res.message);
-      closeAllModal();
-    } else {
-      throw new Error(res.message);
-    }
-  } catch(e) {
-    alert('❌ ' + e.message);
-  } finally {
-    btn.disabled = false; btn.textContent = '🚀 ส่งแจ้งเตือน';
-  }
-}
-
-// -- Rewards --
 function openRewardModal() {
-  document.getElementById('mr-title').textContent = 'เพิ่มของรางวัล';
-  document.getElementById('mr-id').value = ''; document.getElementById('mr-name').value = '';
-  document.getElementById('mr-desc').value = ''; document.getElementById('mr-price').value = '100';
-  document.getElementById('mr-stock').value = '10'; document.getElementById('mr-img').value = '';
-  openModal('modal-rew');
+  document.getElementById('mr-title').textContent = 'เพิ่มของรางวัล'; document.getElementById('mr-id').value = ''; document.getElementById('mr-name').value = ''; document.getElementById('mr-desc').value = ''; document.getElementById('mr-price').value = '100'; document.getElementById('mr-stock').value = '10'; document.getElementById('mr-img').value = ''; openModal('modal-rew');
 }
 function editReward(r) {
-  document.getElementById('mr-title').textContent = 'แก้ไขของรางวัล';
-  document.getElementById('mr-id').value = r.id; document.getElementById('mr-name').value = r.name;
-  document.getElementById('mr-desc').value = r.desc; document.getElementById('mr-price').value = r.price;
-  document.getElementById('mr-stock').value = r.stock; document.getElementById('mr-img').value = r.image;
-  openModal('modal-rew');
+  document.getElementById('mr-title').textContent = 'แก้ไขของรางวัล'; document.getElementById('mr-id').value = r.id; document.getElementById('mr-name').value = r.name; document.getElementById('mr-desc').value = r.desc; document.getElementById('mr-price').value = r.price; document.getElementById('mr-stock').value = r.stock; document.getElementById('mr-img').value = r.image; openModal('modal-rew');
 }
 async function saveReward() {
-  const payload = {
-    action: 'save_reward', secret: adminSecret, id: document.getElementById('mr-id').value,
-    name: document.getElementById('mr-name').value, desc: document.getElementById('mr-desc').value,
-    price: Number(document.getElementById('mr-price').value), stock: Number(document.getElementById('mr-stock').value),
-    image: document.getElementById('mr-img').value
-  };
-  try { await callAPI('POST', payload); closeAllModal(); await loadData(); alert('บันทึกสำเร็จ'); } catch(e) { alert(e.message); }
+  const payload = { action: 'save_reward', secret: adminSecret, id: document.getElementById('mr-id').value, name: document.getElementById('mr-name').value, desc: document.getElementById('mr-desc').value, price: Number(document.getElementById('mr-price').value), stock: Number(document.getElementById('mr-stock').value), image: document.getElementById('mr-img').value };
+  try { await callAPI('POST', payload); closeAllModal(); await loadData(); customAlert('บันทึกสำเร็จ', 'สำเร็จ', '✅'); } catch(e) { customAlert(e.message, 'ผิดพลาด', '❌'); }
 }
-async function delReward(id) {
-  if(!confirm('ยืนยันลบของรางวัลนี้?')) return;
-  try { await callAPI('POST', {action:'delete_reward', secret:adminSecret, id}); await loadData(); } catch(e) { alert(e.message); }
+function delReward(id) {
+  customConfirm('ยืนยันลบของรางวัลนี้?', async () => {
+    try { await callAPI('POST', {action:'delete_reward', secret:adminSecret, id}); await loadData(); } catch(e) { customAlert(e.message, 'ผิดพลาด', '❌'); }
+  }, 'ยืนยันการลบ', '🗑️', 'ca-btn-danger');
 }
-async function updateRedeem(id, status) {
-  if(!confirm(`ต้องการ ${status==='APPROVED'?'อนุมัติ':'ปฏิเสธ'} คำขอนี้ใช่หรือไม่?`)) return;
-  try { await callAPI('POST', {action:'update_redemption', secret:adminSecret, id, status}); await loadData(); } catch(e) { alert(e.message); }
+function updateRedeem(id, status) {
+  customConfirm(`ต้องการ <b>${status==='APPROVED'?'อนุมัติ':'ปฏิเสธ'}</b> คำขอนี้ใช่หรือไม่?`, async () => {
+    try { await callAPI('POST', {action:'update_redemption', secret:adminSecret, id, status}); await loadData(); } catch(e) { customAlert(e.message, 'ผิดพลาด', '❌'); }
+  }, 'จัดการคำขอแลกรางวัล');
 }
 
-// -- Settings & Resets --
 async function saveSettings() {
   const t = document.getElementById('inp-exam-time').value;
-  try { await callAPI('POST', {action:'save_settings', secret:adminSecret, examTimeMinutes:Number(t)}); alert('✅ บันทึกเวลาแล้ว'); } catch(e) { alert(e.message); }
+  try { await callAPI('POST', {action:'save_settings', secret:adminSecret, examTimeMinutes:Number(t)}); customAlert('บันทึกเวลาทำข้อสอบแล้ว', 'สำเร็จ', '✅'); } catch(e) { customAlert(e.message, 'ผิดพลาด', '❌'); }
 }
-async function resetUserExam(uid, name) {
-  if(!confirm(`ยืนยันการล้างผลสอบของ ${name} ?`)) return;
-  try { await callAPI('POST', {action:'reset_exam', secret:adminSecret, userId:uid}); await loadData(); alert('ล้างสำเร็จ'); } catch(e) { alert(e.message); }
+function resetUserExam(uid, name) {
+  customConfirm(`ยืนยันการ <b>ล้างผลสอบ</b> ของ ${name} ?<br><span style="font-size:12px; color:var(--muted)">เพื่อให้กลับไปทำข้อสอบใหม่ได้</span>`, async () => {
+    try { await callAPI('POST', {action:'reset_exam', secret:adminSecret, userId:uid}); await loadData(); customAlert('ล้างผลสอบสำเร็จ', 'สำเร็จ', '✅'); } catch(e) { customAlert(e.message, 'ผิดพลาด', '❌'); }
+  }, 'รีเซ็ตสอบ', '🔄');
 }
-async function resetAllExams() {
-  if(!confirm(`⚠️ คำเตือน! คุณกำลังจะล้างผลสอบของทุกคนในระบบ ยืนยันหรือไม่?`)) return;
-  try { await callAPI('POST', {action:'reset_exam', secret:adminSecret}); await loadData(); alert('ล้างผลสอบทุกคนแล้ว'); } catch(e) { alert(e.message); }
+function resetAllExams() {
+  customConfirm(`<span style="color:var(--red);">⚠️ คำเตือน!</span><br>คุณกำลังจะล้างผลสอบของทุกคนในระบบ<br>ยืนยันหรือไม่?`, async () => {
+    try { await callAPI('POST', {action:'reset_exam', secret:adminSecret}); await loadData(); customAlert('ล้างผลสอบของทุกคนในระบบแล้ว', 'ล้างสำเร็จ', '✅'); } catch(e) { customAlert(e.message, 'ผิดพลาด', '❌'); }
+  }, 'Danger Zone', '⚠️', 'ca-btn-danger');
 }
 
-// ==============================================
-// API HELPER
-// ==============================================
 async function callAPI(method, params, timeoutMs=30000) {
   const ctrl = new AbortController(); const tid = setTimeout(()=>ctrl.abort(), timeoutMs);
   try {
