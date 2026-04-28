@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Online Exam</title>
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700;800&family=IBM+Plex+Mono:wght@600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700;800&family=IBM+Plex+Mono:wght@600;700&display=swap" rel="stylesheet">
 <style>
 :root {
   --primary: #2563eb; 
@@ -15,7 +15,7 @@
   --gold: #ffc107; --danger: #ff5252; --success: #00e676;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
 
 /* Header & Timer */
 .top-bar { background: var(--surface); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10; box-shadow: 0 4px 15px rgba(0,0,0,0.2);}
@@ -62,7 +62,7 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
 @keyframes spin { to { transform: rotate(360deg); } }
 .hidden { display: none !important; }
 
-/* 🌟 NEW: Custom Modal CSS (Native Look) */
+/* Custom Modal CSS (Native Look) */
 .ca-ov { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.2s; backdrop-filter: blur(3px);}
 .ca-ov.active { opacity: 1; pointer-events: auto; }
 .ca-box { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 32px 24px; width: 100%; max-width: 320px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.5); transform: scale(0.9); transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
@@ -74,14 +74,47 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
 .ca-btn { flex: 1; padding: 12px 0; border-radius: 10px; font-size: 15px; font-weight: 800; font-family: 'Sarabun'; cursor: pointer; transition: 0.2s; border: none; }
 .ca-btn-cancel { background: var(--surf2); border: 1px solid var(--border); color: var(--text); }
 .ca-btn-confirm { background: var(--primary); color: #fff; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3); }
+.ca-btn-danger { background: var(--danger); color: #fff; box-shadow: 0 4px 15px rgba(255, 82, 82, 0.3); }
 .ca-btn:active { transform: scale(0.96); }
 
-/* Result Page */
-.res-card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 30px 20px; text-align: center; margin-bottom: 20px; }
-.res-score { font-family: 'IBM Plex Mono'; font-size: 60px; font-weight: 800; color: var(--gold); line-height: 1; margin: 15px 0; text-shadow: 0 0 20px rgba(255,193,7,0.3); }
-.ans-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 10px; text-align: left; }
-.ans-card.correct { border-left: 4px solid var(--success); }
-.ans-card.wrong { border-left: 4px solid var(--danger); }
+/* 🌟 NEW: Premium Result Page Styles */
+.res-header-card { background: linear-gradient(135deg, #1e3a8a 0%, #172554 100%); border-radius: 24px; padding: 30px 20px 24px; text-align: center; margin-bottom: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+.score-circle-wrap { display: flex; justify-content: center; margin-bottom: 20px; }
+.score-circle { width: 130px; height: 130px; border-radius: 50%; border: 6px solid var(--gold); display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(255,193,7,0.3); }
+.score-circle .sc-val { font-size: 46px; font-weight: 800; font-family: 'IBM Plex Mono', monospace; color: var(--gold); line-height: 1; margin-bottom: -5px;}
+.score-circle .sc-max { font-size: 16px; color: rgba(255,255,255,0.7); font-family: 'IBM Plex Mono', monospace; }
+
+.badge-status { display: inline-flex; align-items: center; gap: 8px; padding: 6px 18px; border-radius: 20px; font-weight: 700; font-size: 15px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);}
+.badge-status.pass { background: rgba(0,230,118,0.15); color: var(--success); border: 1px solid rgba(0,230,118,0.3); }
+.badge-status.fail { background: rgba(255,82,82,0.15); color: var(--danger); border: 1px solid rgba(255,82,82,0.3); }
+
+.res-user-name { font-size: 20px; font-weight: 800; margin-bottom: 4px; color: #fff;}
+.res-user-sub { font-size: 13px; color: rgba(255,255,255,0.6); }
+
+.stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 12px; }
+.stat-box-small { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 16px 8px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.15);}
+.stat-box-small .st-val { font-size: 26px; font-weight: 800; color: var(--gold); font-family: 'IBM Plex Mono', monospace; line-height: 1; margin-bottom: 6px; }
+.stat-box-small .st-lbl { font-size: 12px; color: var(--muted); }
+
+.rank-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; text-align: center; margin-bottom: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);}
+.rank-val { font-size: 44px; font-weight: 800; color: var(--gold); font-family: 'IBM Plex Mono', monospace; line-height: 1; text-shadow: 0 0 15px rgba(255,193,7,0.2); margin-bottom: 8px; }
+.rank-lbl { font-size: 13px; color: var(--muted); }
+
+.ans-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin-bottom: 12px; text-align: left; box-shadow: 0 4px 12px rgba(0,0,0,0.1);}
+.ans-card.correct { border-left: 6px solid var(--success); }
+.ans-card.wrong { border-left: 6px solid var(--danger); }
+
+.ans-header { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.ans-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+.ans-card.correct .ans-icon { background: rgba(0,230,118,0.15); color: var(--success); }
+.ans-card.wrong .ans-icon { background: rgba(255,82,82,0.15); color: var(--danger); }
+.ans-q-text { font-size: 15px; font-weight: 600; color: var(--text); line-height: 1.5; padding-top: 4px;}
+
+.ans-row { display: flex; gap: 10px; font-size: 14px; margin-bottom: 8px; align-items: flex-start;}
+.ans-lbl { color: var(--muted); width: 45px; flex-shrink: 0; text-align: right;}
+.ans-val { font-weight: 600; line-height: 1.5; flex: 1; }
+.val-correct { color: var(--success); }
+.val-wrong { color: var(--danger); }
 </style>
 </head>
 <body>
@@ -91,7 +124,7 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
   <div style="font-weight:700; color:var(--text);">กำลังเตรียมระบบสอบ...</div>
 </div>
 
-<!-- 🌟 NEW: Custom Modal HTML -->
+<!-- Custom Modal HTML -->
 <div id="custom-alert" class="ca-ov">
   <div class="ca-box">
     <div id="ca-icon" class="ca-icon">⚠️</div>
@@ -148,24 +181,53 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
   </div>
 </div>
 
-<!-- Result Screen -->
-<div id="ui-result" class="main-area hidden">
-  <div class="res-card">
-    <div style="font-size: 50px;">🎉</div>
-    <h2 style="margin-top: 10px;">ส่งข้อสอบสำเร็จ!</h2>
-    <div class="res-score"><span id="r-score">0</span>/<span id="r-max">0</span></div>
-    <div style="color:var(--muted); font-size:14px;">คะแนนคิดเป็น <span id="r-pct" style="color:var(--text); font-weight:700;">0%</span></div>
+<!-- 🌟 NEW: Premium Result Screen -->
+<div id="ui-result" class="main-area hidden" style="padding: 15px;">
+  
+  <div class="res-header-card">
+    <div class="score-circle-wrap">
+      <div class="score-circle">
+        <div class="sc-val" id="r-score">0</div>
+        <div class="sc-max">/ <span id="r-max">0</span></div>
+      </div>
+    </div>
+    <div class="badge-status" id="r-badge">✅ สอบผ่าน</div>
+    <div class="res-user-name" id="r-name">ชื่อ-นามสกุล</div>
+    <div class="res-user-sub" id="r-sub">ระดับชั้น · สาขาวิชา</div>
   </div>
   
-  <h3 style="font-size: 16px; margin: 20px 0 10px;">สรุปผลและเฉลย</h3>
+  <div class="stats-grid">
+    <div class="stat-box-small">
+      <div class="st-val" id="r-pct">0%</div>
+      <div class="st-lbl">คะแนนเปอร์เซ็นต์</div>
+    </div>
+    <div class="stat-box-small">
+      <div class="st-val" id="r-correct">0</div>
+      <div class="st-lbl">ตอบถูก</div>
+    </div>
+    <div class="stat-box-small">
+      <div class="st-val" id="r-wrong">0</div>
+      <div class="st-lbl">ตอบผิด</div>
+    </div>
+  </div>
+
+  <div class="rank-card">
+    <div class="rank-val" id="r-rank">#1</div>
+    <div class="rank-lbl" id="r-rank-total">อันดับปัจจุบัน จากผู้เข้าสอบทั้งหมด 1 นาย</div>
+  </div>
+  
+  <div style="display:flex; align-items:center; gap:8px; margin: 10px 5px 15px; font-weight:700; font-size:15px; color:var(--text);">
+    📝 เฉลยข้อสอบ
+  </div>
+  
   <div id="r-list"></div>
   
-  <button class="btn btn-primary" style="margin-top:20px;" onclick="liff.closeWindow()">กลับสู่หน้าแชท</button>
+  <button class="btn btn-primary" style="margin-top:20px; font-size:18px;" onclick="liff.closeWindow()">กลับสู่หน้าแชท</button>
 </div>
 
 <script>
 const LIFF_ID = '2009896605-Wd1uqyvU';   
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbwo_kB4DZSVmYqkztnf8n_-sjVvAFUxIH9dZAqby_SUvV5H8gH5hXhILHkzZJ59S2j6/exec'; 
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwo_kB4DZSVmYqkztnf8n_-sjVvAFUxIH9dZAqby_SUvV5H8gH5hXhILHkzZJ59S2j6/exec';
 
 let userId = '';
 let allSubjects = [];
@@ -176,36 +238,32 @@ let timeLeft = 0;
 let timerInt = null;
 let submitted = false;
 let selectedSubject = '';
-let alerted5Min = false; // 🌟 เพิ่มตัวแปรสำหรับเช็กสถานะการเตือน 5 นาที
+let alerted5Min = false;
+let memberInfo = null; // เก็บข้อมูลผู้ใช้สำหรับแสดงในหน้าผลสอบ
 
-// 🌟 NEW: ฟังก์ชันสร้างเสียงแจ้งเตือน (Web Audio API) แบบไม่ต้องใช้ไฟล์ภายนอก
+// ฟังก์ชันสร้างเสียงแจ้งเตือน (Web Audio API)
 function playNotificationSound() {
   try {
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     const ctx = new AudioContext();
-    
     function playTone(freq, startTime) {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.type = 'sine';
       osc.frequency.setValueAtTime(freq, startTime);
-      gain.gain.setValueAtTime(0.3, startTime); // ความดัง
-      gain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.5); // ค่อยๆ เบาลง
+      gain.gain.setValueAtTime(0.3, startTime); 
+      gain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.5);
       osc.connect(gain);
       gain.connect(ctx.destination);
       osc.start(startTime);
       osc.stop(startTime + 0.5);
     }
-    
-    // เล่นเสียง 2 จังหวะ (ติ๊ง-ต่อง)
-    playTone(880, ctx.currentTime);          // โน้ตตัวที่ 1
-    playTone(1108.73, ctx.currentTime + 0.15); // โน้ตตัวที่ 2
-  } catch (e) {
-    console.log("อุปกรณ์ไม่รองรับการเล่นเสียง");
-  }
+    playTone(880, ctx.currentTime);
+    playTone(1108.73, ctx.currentTime + 0.15);
+  } catch (e) { console.log("Audio not supported"); }
 }
 
-// 🌟 NEW: Custom Modal Functions
+// Custom Modal Functions
 function customAlert(msg, title="แจ้งเตือน", icon="⚠️") {
   document.getElementById('ca-icon').textContent = icon;
   document.getElementById('ca-title').textContent = title;
@@ -240,6 +298,7 @@ async function init() {
     if(res.status === 'ok') {
       if(res.config) { document.querySelectorAll('.dynamic-app-name').forEach(el => el.textContent = res.config.appName); }
       
+      memberInfo = res.member; // เก็บข้อมูลตำแหน่ง/ชื่อ
       allSubjects = res.subjects || [];
       const completed = res.completedSubjects || [];
       const sel = document.getElementById('inp-subject');
@@ -279,7 +338,6 @@ async function startExam() {
       questions = res.questions || [];
       if(questions.length === 0) throw new Error('ไม่พบข้อสอบในวิชานี้');
       
-      // Auto-save State Restoration
       const saved = localStorage.getItem(`exam_${userId}_${selectedSubject}`);
       if(saved) {
         try {
@@ -289,7 +347,6 @@ async function startExam() {
         } catch(e){}
       }
 
-      // 🌟 ดักไว้เพื่อไม่ให้แจ้งเตือนซ้ำ หากเน็ตหลุดแล้วกลับมาตอนเวลาเหลือน้อยกว่า 5 นาที
       if (timeLeft <= 300) alerted5Min = true; 
       
       document.getElementById('t-subj-name').textContent = `วิชา: ${selectedSubject}`;
@@ -362,20 +419,17 @@ function startTimer() {
     const el = document.getElementById('timer');
     el.textContent = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
     
-    // 🌟 เพิ่มป๊อปอัปและ "เสียงแจ้งเตือน" เมื่อเวลาเหลือ 5 นาที (300 วินาที)
     if(timeLeft === 300 && !alerted5Min) {
       alerted5Min = true;
-      playNotificationSound(); // 🔔 สั่งเล่นเสียง "ติ๊ง-ต่อง"
+      playNotificationSound(); 
       customAlert('เหลือเวลาทำข้อสอบอีก 5 นาทีสุดท้าย กรุณาตรวจสอบคำตอบนะครับ!', 'แจ้งเตือนเวลา', '⏳');
     }
     
-    // แจ้งเตือนกระพริบสีแดงเมื่อเหลือ 1 นาที
     if(timeLeft <= 60) el.classList.add('danger');
     
     if(timeLeft <= 0) {
       clearInterval(timerInt);
-      playNotificationSound(); // 🔔 เล่นเสียงตอนหมดเวลาด้วยก็ได้
-      // 🌟 ใช้ Custom Alert เมื่อหมดเวลา
+      playNotificationSound(); 
       customAlert('หมดเวลาทำข้อสอบ ระบบกำลังส่งคำตอบอัตโนมัติ', 'หมดเวลา!', '⏰');
       setTimeout(() => { submitExam(true); }, 2000);
     }
@@ -385,12 +439,10 @@ function startTimer() {
 function confirmSubmit() {
   const unanswered = questions.length - Object.keys(answers).length;
   if(unanswered > 0) {
-    // 🌟 ใช้ Custom Confirm สีแดงสำหรับเตือนว่าทำไม่ครบ
     customConfirm(`ยังมีข้อที่ไม่ได้ตอบอีก <strong style="color:var(--danger)">${unanswered} ข้อ</strong><br>ยืนยันการส่งข้อสอบหรือไม่?`, () => {
       submitExam(false);
     }, 'แจ้งเตือน', '⚠️', 'ca-btn-danger');
   } else {
-    // 🌟 ใช้ Custom Confirm แบบปกติ
     customConfirm(`ท่านทำข้อสอบครบแล้ว<br>ยืนยันการส่งข้อสอบใช่หรือไม่?`, () => {
       submitExam(false);
     }, 'ส่งข้อสอบ', '📤');
@@ -407,32 +459,62 @@ async function submitExam(isTimeout) {
     if(res.status === 'ok') {
       localStorage.removeItem(`exam_${userId}_${selectedSubject}`);
       
+      // 🌟 นำข้อมูลไปใส่ใน UI แบบใหม่
       document.getElementById('r-score').textContent = res.totalScore;
       document.getElementById('r-max').textContent = res.maxScore;
+      
+      const pct = res.percentage;
+      const isPass = pct >= 60; // กำหนดเกณฑ์ผ่านที่ 60%
+      
+      const badgeEl = document.getElementById('r-badge');
+      badgeEl.className = `badge-status ${isPass ? 'pass' : 'fail'}`;
+      badgeEl.innerHTML = isPass ? '✅ ผ่านเกณฑ์' : '❌ ยังไม่ผ่าน';
+      
+      if(memberInfo) {
+        document.getElementById('r-name').textContent = memberInfo.fullName || '-';
+        document.getElementById('r-sub').textContent = `${memberInfo.rank || ''} ${memberInfo.position ? '· ' + memberInfo.position : ''}`;
+      } else {
+        liff.getProfile().then(p => document.getElementById('r-name').textContent = p.displayName);
+        document.getElementById('r-sub').textContent = 'ผู้เข้าสอบ';
+      }
+
       document.getElementById('r-pct').textContent = res.percentage + '%';
+      document.getElementById('r-correct').textContent = res.totalScore;
+      document.getElementById('r-wrong').textContent = res.maxScore - res.totalScore;
+      
+      document.getElementById('r-rank').textContent = '#' + (res.rank || 1);
+      document.getElementById('r-rank-total').textContent = `อันดับปัจจุบัน จากผู้เข้าสอบทั้งหมด ${res.total || 1} นาย`;
       
       let resHtml = '';
       res.results.forEach((r, i) => {
-        // ค้นหาโจทย์ข้อนี้จาก Array เพื่อดึงข้อความของช้อยส์
         const q = questions.find(q => q.questionId === r.qid);
         const qText = q?.questionText || '-';
         
-        // ดึงข้อความคำตอบของผู้ใช้
         const userAnsLetter = r.userAnswer || '-';
         const userAnsText = (q && q.choices && q.choices[userAnsLetter]) ? q.choices[userAnsLetter] : '';
-        const displayUserAns = userAnsText ? `${userAnsLetter}: ${userAnsText}` : (userAnsLetter === '-' ? 'ไม่ได้ตอบ' : userAnsLetter);
+        const userAnsFull = userAnsLetter !== '-' ? `${userAnsLetter} ${userAnsText}` : 'ไม่ได้ตอบ';
         
-        // ดึงข้อความเฉลยที่ถูกต้อง
         const correctLetter = r.correct || '-';
         const correctText = (q && q.choices && q.choices[correctLetter]) ? q.choices[correctLetter] : '';
-        const displayCorrect = correctText ? `${correctLetter}: ${correctText}` : correctLetter;
+        const correctFull = `${correctLetter} ${correctText}`;
         
+        const icon = r.isCorrect ? '✅' : '❌';
+        const userValClass = r.isCorrect ? 'val-correct' : 'val-wrong';
+
         resHtml += `
           <div class="ans-card ${r.isCorrect ? 'correct' : 'wrong'}">
-            <div style="font-size:12px; font-weight:700; color:var(--muted); margin-bottom:4px;">ข้อ ${i+1}</div>
-            <div style="font-size:14px; font-weight:600; margin-bottom:8px;">${qText}</div>
-            <div style="font-size:13px; color:var(--text); margin-bottom:2px;">คำตอบคุณ: <b>${displayUserAns}</b></div>
-            <div style="font-size:13px; color:${r.isCorrect ? 'var(--success)' : 'var(--danger)'};">เฉลย: <b>${displayCorrect}</b></div>
+            <div class="ans-header">
+              <div class="ans-icon">${icon}</div>
+              <div class="ans-q-text">ข้อ ${i+1}: ${qText}</div>
+            </div>
+            <div class="ans-row">
+              <div class="ans-lbl">คุณตอบ:</div>
+              <div class="ans-val ${userValClass}">${userAnsFull}</div>
+            </div>
+            <div class="ans-row">
+              <div class="ans-lbl">เฉลย:</div>
+              <div class="ans-val val-correct">${correctFull}</div>
+            </div>
           </div>
         `;
       });
