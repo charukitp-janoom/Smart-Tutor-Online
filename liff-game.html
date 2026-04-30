@@ -172,6 +172,24 @@ let appConfig = null;
 
 let qTimerInterval = null, qTimeLeft = 60, MAX_Q_TIME = 60, startTimestamp = 0;
 
+
+function escHtml(s) {
+  if (s == null) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function showNoQError(msg) {
+  const ov = document.getElementById('start-ui');
+  const box = ov.querySelector('.start-screen') || ov;
+  const err = document.createElement('div');
+  err.style.cssText = 'color:#ff5252;background:rgba(255,82,82,0.1);border:1px solid #ff5252;border-radius:12px;padding:16px;margin-bottom:16px;font-weight:700;';
+  err.textContent = msg || 'ไม่พบข้อสอบในวิชานี้ กรุณาเลือกวิชาอื่น';
+  // insert before first button
+  const firstBtn = box.querySelector('button');
+  if (firstBtn) box.insertBefore(err, firstBtn);
+  setTimeout(() => err.remove(), 4000);
+}
+
 async function init() {
   try {
     await liff.init({ liffId: LIFF_ID });
@@ -195,7 +213,7 @@ async function init() {
     document.getElementById('start-ui').classList.remove('hidden');
 
   } catch(e) {
-    document.getElementById('ov-load').innerHTML = `<h2 style="color:var(--gold);font-size:24px;margin-bottom:10px">พบข้อผิดพลาด</h2><p style="color:#ff5252;padding:0 20px;line-height:1.6">${e.message}</p><button class="action-btn" style="margin-top:30px; font-size: 16px" onclick="liff.closeWindow()">ปิดหน้าต่าง</button>`;
+    document.getElementById('ov-load').innerHTML = `<h2 style="color:var(--gold);font-size:24px;margin-bottom:10px">พบข้อผิดพลาด</h2><p style="color:#ff5252;padding:0 20px;line-height:1.6">${escHtml(e.message)}</p><button class="action-btn" style="margin-top:30px; font-size: 16px" onclick="liff.closeWindow()">ปิดหน้าต่าง</button>`;
   }
 }
 
@@ -222,7 +240,7 @@ function startRealGame() {
   let targetQs = subj === 'ALL' ? allQs : allQs.filter(q => (q.category||'ทั่วไป') === subj);
 
   if (targetQs.length < PRIZES.length) {
-    alert(`วิชานี้มีข้อสอบไม่พอสำหรับเกมเศรษฐี (${targetQs.length}/${PRIZES.length} ข้อ)\nกรุณาเลือกวิชาอื่น หรือเลือก "รวมทุกรายวิชา"`);
+    showNoQError(`วิชานี้มีข้อสอบไม่พอ (${targetQs.length}/${PRIZES.length} ข้อ) กรุณาเลือกวิชาอื่น`);
     return;
   }
 
@@ -443,10 +461,10 @@ async function showLeaderboard() {
         list.innerHTML += `
           <div class="lb-item">
             <div class="lb-rank">${medal}</div>
-            <img src="${pic}" class="lb-avatar">
+            <img src="${pic}" class="lb-avatar" onerror="this.src='https://cdn-icons-png.flaticon.com/512/847/847969.png'">
             <div class="lb-name">
-              <div style="${isMe}">${e.fullName} ${e.userId === userId ? '(คุณ)' : ''}</div>
-              <div style="font-size:11px; color:#888;">${e.rank} ${e.position}</div>
+              <div style="${isMe}">${escHtml(e.fullName)} ${e.userId === userId ? '(คุณ)' : ''}</div>
+              <div style="font-size:11px; color:#888;">${escHtml(e.rank)} ${escHtml(e.position)}</div>
             </div>
             <div class="lb-prize">฿${e.prizeText}</div>
           </div>
