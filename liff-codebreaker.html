@@ -171,6 +171,18 @@ let startTimestamp = 0;
 
 let appConfig = null;
 
+
+function escHtml(s) {
+  if (s == null) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function showNoQError() {
+  const ov = document.getElementById('ov-load');
+  ov.innerHTML = '<div style="font-size:40px;margin-bottom:15px;">⚠️</div><h2 style="margin-bottom:10px;">ไม่พบข้อสอบในวิชานี้</h2><p style="margin-bottom:20px;opacity:0.7;">กรุณาเลือกวิชาอื่น หรือ &quot;รวมทุกรายวิชา&quot;</p><button onclick="document.getElementById(\'ov-load\').classList.add(\'hidden\')" style="padding:12px 24px;border-radius:10px;border:none;font-size:16px;font-weight:800;font-family:\'Sarabun\',sans-serif;cursor:pointer;">ตกลง</button>';
+  ov.classList.remove('hidden');
+}
+
 async function init() {
   try {
     await liff.init({ liffId: LIFF_ID });
@@ -193,7 +205,7 @@ async function init() {
     document.getElementById('ov-load').classList.add('hidden');
     document.getElementById('start-ui').classList.remove('hidden');
   } catch(e) {
-    document.getElementById('ov-load').innerHTML = `<h2 style="color:var(--red);">ผิดพลาด</h2><p style="color:#aaa; max-width:80%;">${e.message}</p>`;
+    document.getElementById('ov-load').innerHTML = `<h2 style="color:var(--red);">ผิดพลาด</h2><p style="color:#aaa; max-width:80%;">${escHtml(e.message)}</p>`;
   }
 }
 
@@ -228,7 +240,7 @@ function startGame() {
   currentPlayQs = subj === 'ALL' ? [...allQs] : allQs.filter(q => (q.category||'ทั่วไป') === subj);
 
   if(currentPlayQs.length === 0) {
-     alert('ไม่พบข้อสอบในวิชานี้ กรุณาเลือกวิชาอื่น'); return;
+     showNoQError(); return;
   }
 
   document.getElementById('start-ui').classList.add('hidden');
@@ -401,10 +413,10 @@ async function loadLeaderboardData() {
         list.innerHTML += `
           <div class="lb-item">
             <div style="font-size:16px; font-weight:800; width:30px; color:#aaa;">${medal}</div>
-            <img src="${pic}" class="lb-avatar">
+            <img src="${pic}" class="lb-avatar" onerror="this.src='https://cdn-icons-png.flaticon.com/512/847/847969.png'">
             <div style="flex:1; ${isMe}">
-              <div>${e.fullName}</div>
-              <div style="font-size:11px; color:#666;">${e.rank} ${e.position}</div>
+              <div>${escHtml(e.fullName)}</div>
+              <div style="font-size:11px; color:#666;">${escHtml(e.rank)} ${escHtml(e.position)}</div>
             </div>
             <div style="font-size:18px; font-weight:800; color:var(--green); font-family:monospace;">${e.defusedCount}</div>
           </div>
