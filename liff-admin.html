@@ -8,34 +8,34 @@
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --primary: #2563eb;
+  --primary: #2563eb; 
   --secondary: #f59e0b;
-  --bg: #0f1322; --surface: #161c36; --surf2: #1e2647;
+  --bg: #0f1322; --surface:#161c36; --surf2:  #1e2647;
   --border: #2a3558; --text: #e8ecf8; --muted: #6e7aa0;
   --green: #00c853; --red: #ff5252; --blue: #4fc3f7;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Sarabun', sans-serif; }
 body { background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
 
+/* Utilities */
 .hidden { display: none !important; }
 .text-center { text-align: center; }
 .flex { display: flex; } .flex-col { flex-direction: column; }
 .items-center { align-items: center; } .justify-between { justify-content: space-between; }
 .gap-2 { gap: 8px; } .gap-4 { gap: 16px; }
 .mt-2 { margin-top: 8px; } .mt-4 { margin-top: 16px; } .mb-2 { margin-bottom: 8px; } .mb-4 { margin-bottom: 16px; }
-.text-muted { color: var(--muted); }
 
 /* Buttons */
-.btn { padding: 10px 16px; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 6px; touch-action: manipulation; user-select: none; }
+.btn { padding: 10px 16px; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
 .btn:active { transform: scale(0.96); }
-.btn-primary   { background: var(--primary); color: #fff; }
+.btn-primary { background: var(--primary); color: #fff; }
 .btn-secondary { background: var(--surf2); border: 1px solid var(--border); color: var(--text); }
-.btn-danger    { background: rgba(255,82,82,0.1); border: 1px solid rgba(255,82,82,0.3); color: var(--red); }
-.btn-success   { background: rgba(0,200,83,0.1); border: 1px solid rgba(0,200,83,0.3); color: var(--green); }
-.btn-sm        { padding: 6px 12px; font-size: 12px; }
+.btn-danger { background: rgba(255,82,82,0.1); border: 1px solid rgba(255,82,82,0.3); color: var(--red); }
+.btn-success { background: rgba(0,200,83,0.1); border: 1px solid rgba(0,200,83,0.3); color: var(--green); }
+.btn-sm { padding: 6px 12px; font-size: 12px; }
 
 /* Forms */
-.form-control { width: 100%; padding: 12px 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 14px; margin-bottom: 12px; outline: none; transition: 0.2s; font-family: 'Sarabun', sans-serif; }
+.form-control { width: 100%; padding: 12px 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 14px; margin-bottom: 12px; outline: none; transition: 0.2s;}
 .form-control:focus { border-color: var(--primary); }
 select.form-control { cursor: pointer; }
 
@@ -49,53 +49,53 @@ select.form-control { cursor: pointer; }
 /* App Layout */
 .app-header { background: var(--surface); padding: 16px 20px; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; }
 .app-title { font-size: 18px; font-weight: 800; color: var(--primary); }
-.app-org   { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.app-org { font-size: 12px; color: var(--muted); margin-top: 2px;}
 
 .tabs { display: flex; overflow-x: auto; background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 10px; }
 .tabs::-webkit-scrollbar { display: none; }
-.tab { padding: 14px 16px; font-size: 14px; font-weight: 700; color: var(--muted); cursor: pointer; border-bottom: 3px solid transparent; white-space: nowrap; user-select: none; }
+.tab { padding: 14px 16px; font-size: 14px; font-weight: 700; color: var(--muted); cursor: pointer; border-bottom: 3px solid transparent; white-space: nowrap; }
 .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
 
-.tab-content { padding: 20px 16px; display: none; flex-direction: column; gap: 16px; max-width: 800px; margin: 0 auto; width: 100%; }
+.tab-content { padding: 20px 16px; display: none; flex-direction: column; gap: 16px; max-width: 800px; margin: 0 auto; width: 100%;}
 .tab-content.active { display: flex; }
 
-/* Sub Tabs */
+/* Sub Tabs (For Questions) */
 .sub-tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 4px; }
 .sub-tabs::-webkit-scrollbar { display: none; }
-.sub-tab { padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 700; background: var(--bg); border: 1px solid var(--border); color: var(--muted); cursor: pointer; white-space: nowrap; transition: 0.2s; user-select: none; }
-.sub-tab.active { background: rgba(37,99,235,0.15); border-color: var(--primary); color: var(--primary); }
+.sub-tab { padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 700; background: var(--bg); border: 1px solid var(--border); color: var(--muted); cursor: pointer; white-space: nowrap; transition: 0.2s; }
+.sub-tab.active { background: rgba(37, 99, 235, 0.15); border-color: var(--primary); color: var(--primary); }
 
-/* Cards */
+/* Cards & Lists */
 .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
 .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; text-align: center; }
-.stat-val   { font-size: 28px; font-weight: 800; color: var(--primary); font-family: 'IBM Plex Mono', monospace; margin-bottom: 4px; }
+.stat-val { font-size: 28px; font-weight: 800; color: var(--primary); font-family: 'IBM Plex Mono', monospace; margin-bottom: 4px; }
 .stat-label { font-size: 12px; color: var(--muted); }
 
-.list-card   { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+.list-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 8px; }
 .list-header { display: flex; justify-content: space-between; align-items: flex-start; }
-.list-title  { font-size: 15px; font-weight: 700; color: var(--text); }
-.list-sub    { font-size: 12px; color: var(--muted); }
-.badge       { font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 4px; background: var(--surf2); border: 1px solid var(--border); }
+.list-title { font-size: 15px; font-weight: 700; color: var(--text); }
+.list-sub { font-size: 12px; color: var(--muted); }
+.badge { font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 4px; background: var(--surf2); border: 1px solid var(--border); }
 
-/* Modal (form modal) */
-.modal-ov  { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 16px; }
+/* Custom Modal */
+.modal-ov { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 16px; }
 .modal-box { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; width: 100%; max-width: 400px; max-height: 90vh; overflow-y: auto; }
-.modal-title { font-size: 18px; font-weight: 800; margin-bottom: 16px; color: var(--primary); border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+.modal-title { font-size: 18px; font-weight: 800; margin-bottom: 16px; color: var(--primary); border-bottom: 1px solid var(--border); padding-bottom: 10px;}
 
-/* Custom Alert/Confirm Modal */
-.ca-ov { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.2s; backdrop-filter: blur(2px); }
+/* 🌟 NEW: Custom Alert & Confirm Modals */
+.ca-ov { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.2s; backdrop-filter: blur(2px);}
 .ca-ov.active { opacity: 1; pointer-events: auto; }
 .ca-box { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 32px 24px; width: 100%; max-width: 320px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.5); transform: scale(0.9); transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
 .ca-ov.active .ca-box { transform: scale(1); }
-.ca-icon      { font-size: 60px; margin-bottom: 15px; line-height: 1; }
-.ca-title     { font-size: 20px; font-weight: 800; color: var(--text); margin-bottom: 10px; }
-.ca-msg       { font-size: 14px; color: var(--muted); margin-bottom: 24px; line-height: 1.6; }
+.ca-icon { font-size: 60px; margin-bottom: 15px; line-height: 1; }
+.ca-title { font-size: 20px; font-weight: 800; color: var(--text); margin-bottom: 10px; }
+.ca-msg { font-size: 14px; color: var(--muted); margin-bottom: 24px; line-height: 1.6; }
 .ca-btn-group { display: flex; gap: 12px; justify-content: center; }
-.ca-btn         { flex: 1; padding: 12px 0; border-radius: 10px; font-size: 15px; font-weight: 800; font-family: 'Sarabun'; cursor: pointer; transition: 0.2s; border: none; }
-.ca-btn-cancel  { background: var(--surf2); border: 1px solid var(--border); color: var(--text); }
+.ca-btn { flex: 1; padding: 12px 0; border-radius: 10px; font-size: 15px; font-weight: 800; font-family: 'Sarabun'; cursor: pointer; transition: 0.2s; border: none; }
+.ca-btn-cancel { background: var(--surf2); border: 1px solid var(--border); color: var(--text); }
 .ca-btn-confirm { background: var(--primary); color: #fff; box-shadow: 0 4px 15px rgba(37,99,235,0.3); }
-.ca-btn-danger  { background: var(--red); color: #fff; box-shadow: 0 4px 15px rgba(255,82,82,0.3); }
-.ca-btn:active  { transform: scale(0.96); }
+.ca-btn-danger { background: var(--red); color: #fff; box-shadow: 0 4px 15px rgba(255,82,82,0.3); }
+.ca-btn:active { transform: scale(0.96); }
 </style>
 </head>
 <body>
@@ -103,15 +103,15 @@ select.form-control { cursor: pointer; }
 <!-- Loading Overlay -->
 <div id="ov-load" class="ov">
   <div class="spinner"></div>
-  <div style="font-weight:700; color:var(--text);" id="load-msg">กำลังโหลดระบบ...</div>
+  <div style="font-weight: 700; color: var(--text);" id="load-msg">กำลังโหลดระบบ...</div>
 </div>
 
-<!-- Custom Alert/Confirm Modal -->
-<div id="custom-alert" class="ca-ov" role="dialog" aria-modal="true">
+<!-- 🌟 NEW: Custom Alert & Confirm HTML -->
+<div id="custom-alert" class="ca-ov">
   <div class="ca-box">
-    <div id="ca-icon"      class="ca-icon">⚠️</div>
-    <div id="ca-title"     class="ca-title">แจ้งเตือน</div>
-    <div id="ca-msg"       class="ca-msg">ข้อความ</div>
+    <div id="ca-icon" class="ca-icon">⚠️</div>
+    <div id="ca-title" class="ca-title">แจ้งเตือน</div>
+    <div id="ca-msg" class="ca-msg">ข้อความ</div>
     <div id="ca-btn-group" class="ca-btn-group"></div>
   </div>
 </div>
@@ -119,12 +119,11 @@ select.form-control { cursor: pointer; }
 <!-- Login Screen -->
 <div id="ov-login" class="ov hidden">
   <div class="login-box">
-    <div style="font-size:48px; margin-bottom:10px;">🔐</div>
-    <h2 style="margin-bottom:5px; color:var(--primary);" class="dynamic-app-name">Admin Dashboard</h2>
-    <div style="font-size:13px; color:var(--muted); margin-bottom:24px;" class="dynamic-org-name">Organization</div>
-    <!-- [FIX] เพิ่ม autocomplete=off กัน browser autofill รหัสผ่านโดยไม่ได้ตั้งใจ -->
-    <input type="password" id="inp-pin" class="form-control" style="text-align:center; font-size:20px; letter-spacing:4px;" placeholder="รหัสผ่าน Admin" autocomplete="current-password">
-    <button class="btn btn-primary" style="width:100%;" id="btn-login" onclick="doLogin()">เข้าสู่ระบบ</button>
+    <div style="font-size: 48px; margin-bottom: 10px;">🔐</div>
+    <h2 style="margin-bottom: 5px; color: var(--primary);" class="dynamic-app-name">Admin Dashboard</h2>
+    <div style="font-size: 13px; color: var(--muted); margin-bottom: 24px;" class="dynamic-org-name">Organization</div>
+    <input type="password" id="inp-pin" class="form-control" style="text-align:center; font-size:20px; letter-spacing:4px;" placeholder="รหัสผ่าน Admin">
+    <button class="btn btn-primary" style="width: 100%;" onclick="doLogin()">เข้าสู่ระบบ</button>
   </div>
 </div>
 
@@ -141,13 +140,13 @@ select.form-control { cursor: pointer; }
     </div>
   </div>
 
-  <div class="tabs" id="main-tabs">
-    <div class="tab active" data-tab="dashboard">📊 ภาพรวม</div>
-    <div class="tab" data-tab="members">👥 สมาชิก</div>
-    <div class="tab" data-tab="questions">📝 ข้อสอบ</div>
-    <div class="tab" data-tab="library">📚 คลังความรู้</div>
-    <div class="tab" data-tab="store">🛒 สวัสดิการ</div>
-    <div class="tab" data-tab="settings">⚙️ ตั้งค่า</div>
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('dashboard')">📊 ภาพรวม</div>
+    <div class="tab" onclick="showTab('members')">👥 สมาชิก</div>
+    <div class="tab" onclick="showTab('questions')">📝 ข้อสอบ</div>
+    <div class="tab" onclick="showTab('library')">📚 คลังความรู้</div>
+    <div class="tab" onclick="showTab('store')">🛒 สวัสดิการ</div>
+    <div class="tab" onclick="showTab('settings')">⚙️ ตั้งค่า</div>
   </div>
 
   <!-- TAB: Dashboard -->
@@ -158,15 +157,15 @@ select.form-control { cursor: pointer; }
         <div class="stat-label">ยอด<span class="dynamic-term-user">สมาชิก</span>รวม</div>
       </div>
       <div class="stat-card">
-        <div class="stat-val" id="stat-examed" style="color:var(--green);">0</div>
+        <div class="stat-val" id="stat-examed" style="color: var(--green);">0</div>
         <div class="stat-label">ทำสอบแล้ว</div>
       </div>
       <div class="stat-card">
-        <div class="stat-val" id="stat-questions" style="color:var(--secondary);">0</div>
+        <div class="stat-val" id="stat-questions" style="color: var(--secondary);">0</div>
         <div class="stat-label">ข้อสอบในระบบ</div>
       </div>
       <div class="stat-card">
-        <div class="stat-val" id="stat-avg" style="color:var(--blue);">0%</div>
+        <div class="stat-val" id="stat-avg" style="color: var(--blue);">0%</div>
         <div class="stat-label">คะแนนเฉลี่ย</div>
       </div>
     </div>
@@ -176,8 +175,7 @@ select.form-control { cursor: pointer; }
   <div class="tab-content" id="tab-members">
     <div class="flex justify-between items-center mb-2">
       <h3 style="font-size:16px;">รายชื่อ<span class="dynamic-term-user">สมาชิก</span>ทั้งหมด</h3>
-      <!-- [FIX] ใช้ addEventListener แทน onkeyup inline -->
-      <input type="text" id="search-member" class="form-control" style="width:150px; margin:0; padding:6px 12px;" placeholder="ค้นหาชื่อ...">
+      <input type="text" id="search-member" class="form-control" style="width: 150px; margin:0; padding:6px 12px;" placeholder="ค้นหาชื่อ..." onkeyup="renderMembers()">
     </div>
     <div id="list-members" class="flex flex-col gap-2"></div>
   </div>
@@ -191,8 +189,12 @@ select.form-control { cursor: pointer; }
         <button class="btn btn-primary btn-sm" onclick="openQuestionModal()">+ เพิ่มข้อ</button>
       </div>
     </div>
+    
     <div class="sub-tabs" id="q-sub-tabs"></div>
-    <div id="q-subject-control" class="hidden" style="background:var(--surface); padding:12px; border-radius:8px; border:1px solid var(--border); margin-bottom:10px;"></div>
+
+    <div id="q-subject-control" class="hidden" style="background: var(--surface); padding: 12px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 10px;">
+    </div>
+
     <div id="list-questions" class="flex flex-col gap-2"></div>
   </div>
 
@@ -215,7 +217,8 @@ select.form-control { cursor: pointer; }
       <button class="btn btn-primary btn-sm" onclick="openRewardModal()">+ เพิ่มของ</button>
     </div>
     <div id="list-rewards" class="flex flex-col gap-2 mb-4"></div>
-    <h3 style="font-size:16px; border-top:1px solid var(--border); padding-top:16px;">รายการขอแลกรางวัล</h3>
+
+    <h3 style="font-size:16px; border-top: 1px solid var(--border); padding-top: 16px;">รายการขอแลกรางวัล</h3>
     <div id="list-redemptions" class="flex flex-col gap-2"></div>
   </div>
 
@@ -224,36 +227,40 @@ select.form-control { cursor: pointer; }
     <div class="list-card">
       <div class="list-title mb-2">ตั้งค่าระบบทั่วไป</div>
       <label class="stat-label">เวลาทำข้อสอบมาตรฐาน (นาที)</label>
-      <input type="number" id="inp-exam-time" class="form-control" value="20" min="1" max="180">
+      <input type="number" id="inp-exam-time" class="form-control" value="20">
       <button class="btn btn-primary" onclick="saveSettings()">💾 บันทึกการตั้งค่า</button>
     </div>
-    <div class="list-card mt-4" style="border-color:rgba(255,82,82,0.3);">
-      <div class="list-title" style="color:var(--red);">ระบบอันตราย (Danger Zone)</div>
+    <div class="list-card mt-4" style="border-color: rgba(255,82,82,0.3);">
+      <div class="list-title" style="color: var(--red);">ระบบอันตราย (Danger Zone)</div>
       <div class="list-sub mb-2">รีเซ็ตกระดานคะแนนของทุกคน (ข้อมูลผลสอบเก่าจะหายไปทั้งหมด)</div>
       <button class="btn btn-danger" onclick="resetAllExams()">⚠️ ล้างผลสอบทุกคน</button>
     </div>
   </div>
 </div>
 
-<!-- ═══ MODALS ═══ -->
+<!-- ================= MODALS ================= -->
 
-<!-- Modal: Broadcast -->
-<div id="modal-broadcast" class="modal-ov hidden">
-  <div class="modal-box">
+<!-- 📢 Modal: Broadcast Message -->
+<div id="modal-broadcast" class="modal-ov hidden" onclick="closeModal(event)">
+  <div class="modal-box" onclick="event.stopPropagation()">
     <div class="modal-title" style="color:var(--secondary)">📢 แจ้งเตือนบทเรียน / ข่าวสาร</div>
-    <div class="stat-label mb-2" style="color:var(--muted)">ข้อความจะถูกส่งไปยังแชท LINE ของเป้าหมายที่เลือก</div>
-    <label class="stat-label">กลุ่มเป้าหมาย</label>
+    <div class="stat-label mb-2" style="color:var(--muted)">ข้อความนี้จะถูกส่งไปยังแชท LINE ของเป้าหมายที่เลือก</div>
+    
+    <label class="stat-label mt-2">กลุ่มเป้าหมาย</label>
     <select id="inp-broadcast-target-type" class="form-control" onchange="updateBroadcastTargetOptions()">
       <option value="ALL">สมาชิกทุกคนในระบบ</option>
       <option value="LEVEL">ระบุตาม ระดับชั้น</option>
       <option value="POSITION">ระบุตาม สาขาวิชา</option>
     </select>
+    
     <div id="wrap-broadcast-target-val" class="hidden">
       <label class="stat-label">เลือกกลุ่ม</label>
       <select id="inp-broadcast-target-val" class="form-control"></select>
     </div>
+    
     <label class="stat-label mt-2">พิมพ์ข้อความแจ้งเตือน</label>
-    <textarea id="inp-broadcast-msg" class="form-control" rows="5" placeholder="ตัวอย่าง: มีการอัปเดตเอกสารใหม่ในคลังความรู้..."></textarea>
+    <textarea id="inp-broadcast-msg" class="form-control" rows="5" placeholder="ตัวอย่าง: ประกาศ! มีการอัปเดตเอกสารประกอบการสอนใหม่ในคลังความรู้..."></textarea>
+    
     <div class="flex gap-2 mt-4">
       <button class="btn btn-secondary" style="flex:1;" onclick="closeAllModal()">ยกเลิก</button>
       <button class="btn btn-primary" style="flex:1; background:var(--secondary); color:#fff; border:none;" id="btn-send-broadcast" onclick="sendBroadcast()">🚀 ส่งแจ้งเตือน</button>
@@ -262,8 +269,8 @@ select.form-control { cursor: pointer; }
 </div>
 
 <!-- Modal: Add/Edit Question -->
-<div id="modal-q" class="modal-ov hidden">
-  <div class="modal-box">
+<div id="modal-q" class="modal-ov hidden" onclick="closeModal(event)">
+  <div class="modal-box" onclick="event.stopPropagation()">
     <div class="modal-title" id="mq-title">เพิ่มข้อสอบ</div>
     <input type="hidden" id="mq-id">
     <label class="stat-label">หมวดหมู่ / วิชา</label>
@@ -278,7 +285,7 @@ select.form-control { cursor: pointer; }
       <input type="text" id="mq-c" class="form-control" placeholder="ตัวเลือก C">
       <input type="text" id="mq-d" class="form-control" placeholder="ตัวเลือก D">
     </div>
-    <label class="stat-label">เฉลยที่ถูกต้อง</label>
+    <label class="stat-label">เฉลยที่ถูกต้อง (A, B, C หรือ D)</label>
     <select id="mq-ans" class="form-control">
       <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option>
     </select>
@@ -289,9 +296,9 @@ select.form-control { cursor: pointer; }
   </div>
 </div>
 
-<!-- Modal: Import Questions -->
-<div id="modal-import-q" class="modal-ov hidden">
-  <div class="modal-box">
+<!-- Modal: Bulk Import Questions -->
+<div id="modal-import-q" class="modal-ov hidden" onclick="closeModal(event)">
+  <div class="modal-box" onclick="event.stopPropagation()">
     <div class="modal-title">นำเข้าข้อสอบ (Excel/CSV)</div>
     <div class="stat-label mb-2">รูปแบบ: คำถาม | A | B | C | D | เฉลย | วิชา<br>(คัดลอกตารางจาก Excel มาวางได้เลย)</div>
     <textarea id="inp-import-data" class="form-control" rows="8" placeholder="วางข้อมูลที่นี่..."></textarea>
@@ -303,8 +310,8 @@ select.form-control { cursor: pointer; }
 </div>
 
 <!-- Modal: Add/Edit Library -->
-<div id="modal-lib" class="modal-ov hidden">
-  <div class="modal-box">
+<div id="modal-lib" class="modal-ov hidden" onclick="closeModal(event)">
+  <div class="modal-box" onclick="event.stopPropagation()">
     <div class="modal-title" id="ml-title">เพิ่มสื่อคลังความรู้</div>
     <input type="hidden" id="ml-id">
     <label class="stat-label">ชื่อสื่อ/บทเรียน</label>
@@ -327,8 +334,8 @@ select.form-control { cursor: pointer; }
 </div>
 
 <!-- Modal: Add/Edit Reward -->
-<div id="modal-rew" class="modal-ov hidden">
-  <div class="modal-box">
+<div id="modal-rew" class="modal-ov hidden" onclick="closeModal(event)">
+  <div class="modal-box" onclick="event.stopPropagation()">
     <div class="modal-title" id="mr-title">เพิ่มของรางวัล</div>
     <input type="hidden" id="mr-id">
     <label class="stat-label">ชื่อของรางวัล</label>
@@ -338,11 +345,11 @@ select.form-control { cursor: pointer; }
     <div class="flex gap-2">
       <div style="flex:1;">
         <label class="stat-label">ราคา (<span class="dynamic-term-coin">Coin</span>)</label>
-        <input type="number" id="mr-price" class="form-control" min="0">
+        <input type="number" id="mr-price" class="form-control">
       </div>
       <div style="flex:1;">
         <label class="stat-label">จำนวน (Stock)</label>
-        <input type="number" id="mr-stock" class="form-control" min="0">
+        <input type="number" id="mr-stock" class="form-control">
       </div>
     </div>
     <label class="stat-label">ลิงก์รูปภาพ (URL)</label>
@@ -355,167 +362,75 @@ select.form-control { cursor: pointer; }
 </div>
 
 <script>
-/* ════════════════════════════════════════════════════════
-   CONFIG
-   ════════════════════════════════════════════════════════ */
-const LIFF_ID = '2009896605-Af6su93v';
+// ==============================================
+// CONFIGURATION
+// ==============================================
+const LIFF_ID = '2009896605-Af6su93v'; // << [ใส่ LIFF ID ของหน้า Admin]
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbwo_kB4DZSVmYqkztnf8n_-sjVvAFUxIH9dZAqby_SUvV5H8gH5hXhILHkzZJ59S2j6/exec';
 
-/* ════════════════════════════════════════════════════════
-   STATE
-   ════════════════════════════════════════════════════════ */
-let adminSecret          = '';
-let appData              = {};
-let appConfig            = null;
-let activeQuestionSubject = 'ALL';
-let isLoggingIn          = false; // [FIX] guard double login click
+let adminSecret = '';
+let appData = {};
+let appConfig = null;
+let activeQuestionSubject = 'ALL'; 
 
-/* ════════════════════════════════════════════════════════
-   UTILITIES
-   ════════════════════════════════════════════════════════ */
-/** Escape HTML ป้องกัน XSS ใน innerHTML */
-function escHtml(s) {
-  if (s == null) return '';
-  return String(s)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
-
-/** Escape สำหรับ HTML attribute value */
-function escAttr(s) {
-  if (s == null) return '';
-  return String(s)
-    .replace(/&/g, '&amp;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
-}
-
-/* ════════════════════════════════════════════════════════
-   MODAL HELPERS
-   ════════════════════════════════════════════════════════ */
-/**
- * Alert modal — ใช้ textContent กัน XSS
- * ยกเว้น safeHtml=true สำหรับ msg ที่สร้างจาก code เอง (ไม่ใช่ API/user)
- */
-function customAlert(msg, title = 'แจ้งเตือน', icon = '⚠️', safeHtml = false) {
-  document.getElementById('ca-icon').textContent  = icon;
+// 🌟 NEW: Custom Alert & Confirm Functions
+function customAlert(msg, title="แจ้งเตือน", icon="⚠️") {
+  document.getElementById('ca-icon').textContent = icon;
   document.getElementById('ca-title').textContent = title;
-  // [FIX] default ใช้ textContent, ถ้า safeHtml=true ค่อย innerHTML
-  if (safeHtml) {
-    document.getElementById('ca-msg').innerHTML = msg;
-  } else {
-    document.getElementById('ca-msg').textContent = msg;
-  }
+  document.getElementById('ca-msg').innerHTML = msg;
+  document.getElementById('ca-btn-group').innerHTML = `<button class="ca-btn ca-btn-confirm" onclick="closeCustomAlert()">ตกลง</button>`;
+  document.getElementById('custom-alert').classList.add('active');
+}
+function closeCustomAlert() { document.getElementById('custom-alert').classList.remove('active'); }
 
-  const group = document.getElementById('ca-btn-group');
-  group.innerHTML = '';
-  const ok = document.createElement('button');
-  ok.className   = 'ca-btn ca-btn-confirm';
-  ok.textContent = 'ตกลง';
-  ok.addEventListener('click', closeCustomAlert, { once: true });
-  group.appendChild(ok);
+let confirmCallback = null;
+function customConfirm(msg, callback, title="ยืนยันการดำเนินการ", icon="❓", btnClass="ca-btn-confirm") {
+  document.getElementById('ca-icon').textContent = icon;
+  document.getElementById('ca-title').textContent = title;
+  document.getElementById('ca-msg').innerHTML = msg;
+  document.getElementById('ca-btn-group').innerHTML = `
+    <button class="ca-btn ca-btn-cancel" onclick="closeCustomAlert()">ยกเลิก</button>
+    <button class="ca-btn ${btnClass}" id="btn-ca-ok">ตกลง</button>
+  `;
+  confirmCallback = callback;
+  document.getElementById('btn-ca-ok').onclick = () => { closeCustomAlert(); if(confirmCallback) confirmCallback(); };
   document.getElementById('custom-alert').classList.add('active');
 }
 
-function closeCustomAlert() {
-  document.getElementById('custom-alert').classList.remove('active');
-}
-
-/**
- * Confirm modal
- * [FIX] เปลี่ยนจาก global confirmCallback → closure + once:true
- * @param {string}   msg        — ข้อความ (safeHtml=true ถ้ามี HTML)
- * @param {Function} onConfirm  — callback เมื่อกด "ตกลง"
- * @param {string}   title
- * @param {string}   icon
- * @param {string}   btnClass   — CSS class ของปุ่มยืนยัน
- * @param {boolean}  safeHtml   — ถ้า true ใช้ innerHTML (เฉพาะ msg จาก code เอง)
- */
-function customConfirm(msg, onConfirm, title = 'ยืนยันการดำเนินการ', icon = '❓', btnClass = 'ca-btn-confirm', safeHtml = false) {
-  document.getElementById('ca-icon').textContent  = icon;
-  document.getElementById('ca-title').textContent = title;
-  if (safeHtml) {
-    document.getElementById('ca-msg').innerHTML = msg;
-  } else {
-    document.getElementById('ca-msg').textContent = msg;
-  }
-
-  const group = document.getElementById('ca-btn-group');
-  group.innerHTML = '';
-
-  const cancelBtn = document.createElement('button');
-  cancelBtn.className   = 'ca-btn ca-btn-cancel';
-  cancelBtn.textContent = 'ยกเลิก';
-  cancelBtn.addEventListener('click', closeCustomAlert, { once: true });
-
-  const okBtn = document.createElement('button');
-  okBtn.className   = `ca-btn ${btnClass}`;
-  okBtn.textContent = 'ตกลง';
-  // [FIX] once:true กัน double-click confirm
-  okBtn.addEventListener('click', () => { closeCustomAlert(); onConfirm(); }, { once: true });
-
-  group.append(cancelBtn, okBtn);
-  document.getElementById('custom-alert').classList.add('active');
-}
-
-/* ════════════════════════════════════════════════════════
-   INIT
-   ════════════════════════════════════════════════════════ */
 async function init() {
   try {
     await liff.init({ liffId: LIFF_ID });
-
+    
     const configRes = await callAPI('GET', { action: 'get_config' });
-    if (configRes.status === 'ok') {
-      appConfig = configRes.config;
-      applyTemplate(appConfig);
+    if(configRes.status === 'ok') { 
+      appConfig = configRes.config; 
+      applyTemplate(appConfig); 
     }
-
+    
     document.getElementById('ov-load').classList.add('hidden');
     document.getElementById('ov-login').classList.remove('hidden');
-
-    // [FIX] กด Enter บน input รหัสผ่านเพื่อ login ได้
-    document.getElementById('inp-pin').addEventListener('keydown', e => {
-      if (e.key === 'Enter') doLogin();
-    });
-  } catch (e) {
+  } catch(e) {
     customAlert('Liff Error: ' + e.message, 'เกิดข้อผิดพลาด', '❌');
   }
 }
 
 function applyTemplate(config) {
-  if (!config) return;
-  document.documentElement.style.setProperty('--primary',   config.colorPrimary   || '#2563eb');
-  document.documentElement.style.setProperty('--secondary', config.colorSecondary || '#f59e0b');
-
-  // [FIX] ใช้ textContent แทน innerHTML กัน XSS
-  document.title = escHtml(config.appName || 'System') + ' - Admin';
-  document.querySelectorAll('.dynamic-app-name').forEach(el => el.textContent  = config.appName    || '');
-  document.querySelectorAll('.dynamic-org-name').forEach(el => el.textContent  = config.orgName    || '');
-  document.querySelectorAll('.dynamic-term-user').forEach(el => el.textContent = config.termUser   || 'สมาชิก');
-  document.querySelectorAll('.dynamic-term-coin').forEach(el => el.textContent = config.termCoin   || 'Point');
+  if(!config) return;
+  document.documentElement.style.setProperty('--primary', config.colorPrimary);
+  let rootStyle = document.querySelector(':root');
+  rootStyle.style.setProperty('--primary', config.colorPrimary);
+  rootStyle.style.setProperty('--secondary', config.colorSecondary);
+  
+  document.title = `${config.appName} - Admin`;
+  document.querySelectorAll('.dynamic-app-name').forEach(el => el.textContent = config.appName);
+  document.querySelectorAll('.dynamic-org-name').forEach(el => el.textContent = config.orgName);
+  document.querySelectorAll('.dynamic-term-user').forEach(el => el.textContent = config.termUser);
+  document.querySelectorAll('.dynamic-term-coin').forEach(el => el.textContent = config.termCoin);
 }
 
-/* ════════════════════════════════════════════════════════
-   LOGIN
-   ════════════════════════════════════════════════════════ */
 async function doLogin() {
-  // [FIX] guard double click
-  if (isLoggingIn) return;
-
   const pin = document.getElementById('inp-pin').value.trim();
-  if (!pin) return;
-
-  isLoggingIn = true;
-  const btn = document.getElementById('btn-login');
-  btn.textContent = 'กำลังตรวจสอบ...';
-  btn.disabled    = true;
-
+  if(!pin) return;
   document.getElementById('load-msg').textContent = 'ตรวจสอบรหัส...';
   document.getElementById('ov-login').classList.add('hidden');
   document.getElementById('ov-load').classList.remove('hidden');
@@ -527,755 +442,340 @@ async function doLogin() {
       await loadData();
       document.getElementById('ov-load').classList.add('hidden');
       document.getElementById('app').classList.remove('hidden');
-    } else {
-      throw new Error('รหัสผ่านไม่ถูกต้อง');
-    }
-  } catch (e) {
+    } else { throw new Error('รหัสผ่านไม่ถูกต้อง'); }
+  } catch(e) {
     document.getElementById('ov-load').classList.add('hidden');
     document.getElementById('ov-login').classList.remove('hidden');
     customAlert(e.message, 'เข้าสู่ระบบล้มเหลว', '❌');
-  } finally {
-    isLoggingIn      = false;
-    btn.textContent  = 'เข้าสู่ระบบ';
-    btn.disabled     = false;
   }
 }
 
-/* ════════════════════════════════════════════════════════
-   LOAD DATA
-   ════════════════════════════════════════════════════════ */
 async function loadData() {
   document.getElementById('ov-load').classList.remove('hidden');
   try {
     const res = await callAPI('GET', { action: 'admin_data', secret: adminSecret });
-    if (res.status === 'ok') {
+    if(res.status === 'ok') {
       appData = res;
-      if (res.config) { appConfig = res.config; applyTemplate(appConfig); }
+      if(res.config) { appConfig = res.config; applyTemplate(appConfig); }
       renderAll();
-    } else {
-      throw new Error(res.message);
-    }
-  } catch (e) {
-    customAlert(e.message, 'โหลดข้อมูลล้มเหลว', '❌');
-  } finally {
-    document.getElementById('ov-load').classList.add('hidden');
-  }
+    } else { throw new Error(res.message); }
+  } catch(e) { customAlert(e.message, 'โหลดข้อมูลล้มเหลว', '❌'); }
+  finally { document.getElementById('ov-load').classList.add('hidden'); }
 }
 
-/* ════════════════════════════════════════════════════════
-   TAB NAVIGATION
-   ════════════════════════════════════════════════════════ */
-/*
- * [FIX] ใช้ event delegation แทน onclick inline ทุกปุ่ม tab
- * กัน showTab(tabId) เรียกโดยไม่มี event object → ไม่ crash
- */
-document.getElementById('main-tabs').addEventListener('click', e => {
-  const tab = e.target.closest('.tab[data-tab]');
-  if (!tab) return;
-  const tabId = tab.dataset.tab;
-  document.querySelectorAll('#main-tabs .tab').forEach(t => t.classList.remove('active'));
+function showTab(tabId) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-  tab.classList.add('active');
+  event.target.classList.add('active');
   document.getElementById('tab-' + tabId).classList.add('active');
-});
+}
 
-/* ════════════════════════════════════════════════════════
-   RENDER ALL
-   ════════════════════════════════════════════════════════ */
 function renderAll() {
   renderDashboard();
   renderMembers();
   renderQuestions();
   renderLibrary();
   renderStore();
-  if (appData.settings) {
-    document.getElementById('inp-exam-time').value = appData.settings.examTimeMinutes;
-  }
+  if (appData.settings) { document.getElementById('inp-exam-time').value = appData.settings.examTimeMinutes; }
 }
 
 function renderDashboard() {
   const st = appData.stats || {};
-  document.getElementById('stat-members').textContent   = st.totalMembers   || 0;
-  document.getElementById('stat-examed').textContent    = st.totalExamed    || 0;
+  document.getElementById('stat-members').textContent = st.totalMembers || 0;
+  document.getElementById('stat-examed').textContent = st.totalExamed || 0;
   document.getElementById('stat-questions').textContent = st.totalQuestions || 0;
-  document.getElementById('stat-avg').textContent       = (st.avgScore || 0) + '%';
+  document.getElementById('stat-avg').textContent = (st.avgScore || 0) + '%';
 }
 
-/* ─── Members ─── */
 function renderMembers() {
-  const q       = (document.getElementById('search-member').value || '').toLowerCase();
-  const list    = document.getElementById('list-members');
-  let members   = appData.members || [];
+  const q = document.getElementById('search-member').value.toLowerCase();
+  const list = document.getElementById('list-members'); list.innerHTML = '';
+  let members = appData.members || [];
+  if (q) members = members.filter(m => m.fullName.toLowerCase().includes(q) || m.rank.toLowerCase().includes(q));
 
-  if (q) {
-    members = members.filter(m =>
-      (m.fullName || '').toLowerCase().includes(q) ||
-      (m.rank     || '').toLowerCase().includes(q)
-    );
-  }
+  if (members.length === 0) return list.innerHTML = '<div class="text-center text-muted">ไม่พบข้อมูล</div>';
 
-  list.innerHTML = '';
-  if (!members.length) {
-    list.innerHTML = '<div class="text-center text-muted">ไม่พบข้อมูล</div>';
-    return;
-  }
-
-  // [FIX] ใช้ DocumentFragment ลด DOM re-flow
-  const frag = document.createDocumentFragment();
   members.forEach(m => {
-    const scoreObj = (appData.scores || []).find(s => s.userId === m.userId);
-    const card     = document.createElement('div');
-    card.className = 'list-card';
-
-    // [FIX] สร้าง DOM ด้วย textContent แทน innerHTML ทุก field จาก API
-    const header = document.createElement('div');
-    header.className = 'list-header';
-
-    const info = document.createElement('div');
-    const titleEl = document.createElement('div');
-    titleEl.className   = 'list-title';
-    titleEl.textContent = m.fullName || '-';
-
-    const subEl = document.createElement('div');
-    subEl.className = 'list-sub';
-    subEl.textContent = `${appConfig ? appConfig.termLevel : 'ระดับ'}: ${m.rank || '-'} | ${appConfig ? appConfig.termPosition : 'แผนก'}: ${m.position || '-'}`;
-
-    const scoreEl = document.createElement('div');
-    scoreEl.className = 'list-sub mt-2';
-    if (scoreObj) {
-      scoreEl.innerHTML = `ผลสอบ: <span style="color:var(--green)">${escHtml(String(scoreObj.percentage))}%</span>`;
-    } else {
-      scoreEl.innerHTML = `ผลสอบ: <span style="color:var(--muted)">ยังไม่สอบ</span>`;
-    }
-    info.append(titleEl, subEl, scoreEl);
-
-    // [FIX] ปุ่ม reset ผูก event ผ่าน addEventListener — ไม่ใช้ onclick inline ที่มี userId/fullName
-    const resetBtn = document.createElement('button');
-    resetBtn.className   = 'btn btn-danger btn-sm';
-    resetBtn.textContent = 'รีเซ็ตสอบ';
-    resetBtn.addEventListener('click', () => resetUserExam(m.userId, m.fullName));
-
-    header.append(info, resetBtn);
-    card.appendChild(header);
-    frag.appendChild(card);
+    const scoreObj = (appData.scores||[]).find(s => s.userId === m.userId);
+    let sText = scoreObj ? `<span style="color:var(--green)">${scoreObj.percentage}%</span>` : `<span style="color:var(--muted)">ยังไม่สอบ</span>`;
+    
+    list.innerHTML += `
+      <div class="list-card">
+        <div class="list-header">
+          <div>
+            <div class="list-title">${m.fullName}</div>
+            <div class="list-sub">${appConfig ? appConfig.termLevel : 'ระดับ'}: ${m.rank} | ${appConfig ? appConfig.termPosition : 'แผนก'}: ${m.position}</div>
+            <div class="list-sub mt-2">ผลสอบ: ${sText}</div>
+          </div>
+          <button class="btn btn-danger btn-sm" onclick="resetUserExam('${m.userId}', '${m.fullName}')">รีเซ็ตสอบ</button>
+        </div>
+      </div>
+    `;
   });
-  list.appendChild(frag);
 }
 
-/* ─── Questions ─── */
 function renderQuestions() {
-  const list     = document.getElementById('list-questions');
-  const subTabs  = document.getElementById('q-sub-tabs');
-  const subjCtrl = document.getElementById('q-subject-control');
+  const list = document.getElementById('list-questions'); const subTabs = document.getElementById('q-sub-tabs'); const subjCtrl = document.getElementById('q-subject-control');
   list.innerHTML = ''; subTabs.innerHTML = ''; subjCtrl.innerHTML = '';
-
   const qs = appData.questions || [];
-  if (!qs.length) {
-    list.innerHTML = '<div class="text-center text-muted">ยังไม่มีข้อสอบ</div>';
-    subjCtrl.classList.add('hidden');
-    return;
-  }
+
+  if (qs.length === 0) { list.innerHTML = '<div class="text-center text-muted">ยังไม่มีข้อสอบ</div>'; subjCtrl.classList.add('hidden'); return; }
 
   const categories = [...new Set(qs.map(q => q.category || 'ทั่วไป'))];
-  if (activeQuestionSubject !== 'ALL' && !categories.includes(activeQuestionSubject)) {
-    activeQuestionSubject = 'ALL';
-  }
+  if (activeQuestionSubject !== 'ALL' && !categories.includes(activeQuestionSubject)) activeQuestionSubject = 'ALL';
 
-  // Sub-tabs — ใช้ createElement
-  const allTab     = document.createElement('div');
-  allTab.className = `sub-tab${activeQuestionSubject === 'ALL' ? ' active' : ''}`;
-  allTab.textContent = `ทั้งหมด (${qs.length})`;
-  allTab.addEventListener('click', () => { activeQuestionSubject = 'ALL'; renderQuestions(); });
-  subTabs.appendChild(allTab);
-
+  let tabsHtml = `<div class="sub-tab ${activeQuestionSubject === 'ALL' ? 'active' : ''}" onclick="setQuestionFilter('ALL')">ทั้งหมด (${qs.length})</div>`;
   categories.forEach(cat => {
-    const count  = qs.filter(q => (q.category || 'ทั่วไป') === cat).length;
-    const tabEl  = document.createElement('div');
-    tabEl.className   = `sub-tab${activeQuestionSubject === cat ? ' active' : ''}`;
-    tabEl.textContent = `${cat} (${count})`;
-    tabEl.addEventListener('click', () => { activeQuestionSubject = cat; renderQuestions(); });
-    subTabs.appendChild(tabEl);
+    const count = qs.filter(q => (q.category||'ทั่วไป') === cat).length;
+    tabsHtml += `<div class="sub-tab ${activeQuestionSubject === cat ? 'active' : ''}" onclick="setQuestionFilter('${cat}')">${cat} (${count})</div>`;
   });
+  subTabs.innerHTML = tabsHtml;
 
-  // Subject control (toggle active)
-  if (activeQuestionSubject === 'ALL') {
-    subjCtrl.classList.add('hidden');
-  } else {
-    subjCtrl.classList.remove('hidden');
-    const qInCat  = qs.filter(q => (q.category || 'ทั่วไป') === activeQuestionSubject);
-    const isActive = qInCat.some(q => q.active === 'YES');
-
-    const ctrlRow  = document.createElement('div');
-    ctrlRow.className = 'flex justify-between items-center';
-    const ctrlLabel = document.createElement('div');
-    ctrlLabel.style.cssText = 'font-size:13px; font-weight:700; color:var(--text)';
-    ctrlLabel.innerHTML = `สถานะวิชา: <span style="color:var(--primary)">${escHtml(activeQuestionSubject)}</span>`;
-
-    const toggleBtn = document.createElement('button');
-    toggleBtn.className   = `btn ${isActive ? 'btn-success' : 'btn-danger'} btn-sm`;
-    toggleBtn.textContent = isActive ? '🟢 เปิดให้สอบ' : '🔴 ปิดซ่อนไว้';
-    toggleBtn.addEventListener('click', () => toggleSubject(activeQuestionSubject, isActive ? 'NO' : 'YES'));
-
-    ctrlRow.append(ctrlLabel, toggleBtn);
-    subjCtrl.appendChild(ctrlRow);
+  if (activeQuestionSubject === 'ALL') { subjCtrl.classList.add('hidden'); } 
+  else {
+     subjCtrl.classList.remove('hidden');
+     const qInCat = qs.filter(q => (q.category||'ทั่วไป') === activeQuestionSubject);
+     const isActive = qInCat.some(q => q.active === 'YES');
+     subjCtrl.innerHTML = `
+       <div class="flex justify-between items-center">
+         <div style="font-size:13px; font-weight:700; color:var(--text);">สถานะวิชา: <span style="color:var(--primary)">${activeQuestionSubject}</span></div>
+         <button class="btn ${isActive ? 'btn-success' : 'btn-danger'} btn-sm" onclick="toggleSubject('${activeQuestionSubject}', '${isActive ? 'NO' : 'YES'}')">
+           ${isActive ? '🟢 เปิดให้สอบ' : '🔴 ปิดซ่อนไว้'}
+         </button>
+       </div>
+     `;
   }
 
-  const filtered = activeQuestionSubject === 'ALL'
-    ? qs
-    : qs.filter(q => (q.category || 'ทั่วไป') === activeQuestionSubject);
+  const filteredQs = activeQuestionSubject === 'ALL' ? qs : qs.filter(q => (q.category||'ทั่วไป') === activeQuestionSubject);
 
-  const frag = document.createDocumentFragment();
-  filtered.forEach(q => {
-    const card = document.createElement('div');
-    card.className = 'list-card';
-
-    // [FIX] ใช้ textContent กัน XSS จาก questionText
-    const header = document.createElement('div');
-    header.className = 'list-header';
-
-    const info     = document.createElement('div');
-    const badge    = document.createElement('div');
-    badge.className   = 'badge mb-2';
-    badge.textContent = q.category || 'ทั่วไป';
-
-    const qTitle   = document.createElement('div');
-    qTitle.className   = 'list-title';
-    qTitle.textContent = q.questionText || '-';
-
-    const ansEl    = document.createElement('div');
-    ansEl.className = 'list-sub mt-2';
-    const ansText  = q.choices ? (q.choices[q.correctAnswer] || '-') : '-';
-    ansEl.textContent = `✅ ${q.correctAnswer}: ${ansText}`;
-
-    info.append(badge, qTitle, ansEl);
-
-    const actions  = document.createElement('div');
-    actions.className = 'flex flex-col gap-2';
-
-    const editBtn  = document.createElement('button');
-    editBtn.className   = 'btn btn-secondary btn-sm';
-    editBtn.textContent = 'แก้ไข';
-    editBtn.addEventListener('click', () => editQuestion(q)); // [FIX] ส่ง object ตรง ไม่ stringify ใน HTML
-
-    const delBtn   = document.createElement('button');
-    delBtn.className   = 'btn btn-danger btn-sm';
-    delBtn.textContent = 'ลบ';
-    delBtn.addEventListener('click', () => delQuestion(q.questionId));
-
-    actions.append(editBtn, delBtn);
-    header.append(info, actions);
-    card.appendChild(header);
-    frag.appendChild(card);
+  filteredQs.forEach(q => {
+    list.innerHTML += `
+      <div class="list-card">
+        <div class="list-header">
+          <div>
+            <div class="badge mb-2">${q.category}</div>
+            <div class="list-title">${q.questionText}</div>
+            <div class="list-sub mt-2">✅ ${q.correctAnswer}: ${q.choices ? q.choices[q.correctAnswer] : '-'}</div>
+          </div>
+          <div class="flex flex-col gap-2">
+            <button class="btn btn-secondary btn-sm" onclick='editQuestion(${JSON.stringify(q).replace(/'/g, "&#39;")})'>แก้ไข</button>
+            <button class="btn btn-danger btn-sm" onclick="delQuestion('${q.questionId}')">ลบ</button>
+          </div>
+        </div>
+      </div>
+    `;
   });
-  list.appendChild(frag);
 }
 
-/* ─── Library ─── */
+window.setQuestionFilter = function(cat) { activeQuestionSubject = cat; renderQuestions(); }
+
 function renderLibrary() {
-  const list = document.getElementById('list-library');
+  const list = document.getElementById('list-library'); list.innerHTML = '';
   const libs = appData.library || [];
-  list.innerHTML = '';
+  if (libs.length === 0) return list.innerHTML = '<div class="text-center text-muted">ยังไม่มีสื่อการสอน</div>';
 
-  if (!libs.length) {
-    list.innerHTML = '<div class="text-center text-muted">ยังไม่มีสื่อการสอน</div>';
-    return;
-  }
-
-  const frag = document.createDocumentFragment();
   libs.forEach(l => {
-    const card   = document.createElement('div');
-    card.className = 'list-card';
-
-    const header = document.createElement('div');
-    header.className = 'list-header';
-
-    const info   = document.createElement('div');
-    const badge  = document.createElement('div');
-    badge.className   = 'badge mb-2';
-    badge.textContent = `${l.type || ''} | ${l.category || ''}`;
-
-    const titleEl = document.createElement('div');
-    titleEl.className   = 'list-title';
-    // [FIX] textContent กัน XSS
-    titleEl.textContent = l.title || '-';
-
-    const urlEl  = document.createElement('div');
-    urlEl.className   = 'list-sub mt-2';
-    urlEl.style.wordBreak = 'break-all';
-    urlEl.textContent = `🔗 ${l.url || ''}`;
-
-    info.append(badge, titleEl, urlEl);
-
-    const actions = document.createElement('div');
-    actions.className = 'flex flex-col gap-2';
-
-    const editBtn = document.createElement('button');
-    editBtn.className   = 'btn btn-secondary btn-sm';
-    editBtn.textContent = 'แก้ไข';
-    editBtn.addEventListener('click', () => editLibrary(l));
-
-    const delBtn  = document.createElement('button');
-    delBtn.className   = 'btn btn-danger btn-sm';
-    delBtn.textContent = 'ลบ';
-    delBtn.addEventListener('click', () => delLibrary(l.id));
-
-    actions.append(editBtn, delBtn);
-    header.append(info, actions);
-    card.appendChild(header);
-    frag.appendChild(card);
+    list.innerHTML += `
+      <div class="list-card">
+        <div class="list-header">
+          <div>
+            <div class="badge mb-2">${l.type} | ${l.category}</div>
+            <div class="list-title">${l.title}</div>
+            <div class="list-sub mt-2" style="word-break: break-all;">🔗 ${l.url}</div>
+          </div>
+          <div class="flex flex-col gap-2">
+            <button class="btn btn-secondary btn-sm" onclick='editLibrary(${JSON.stringify(l).replace(/'/g, "&#39;")})'>แก้ไข</button>
+            <button class="btn btn-danger btn-sm" onclick="delLibrary('${l.id}')">ลบ</button>
+          </div>
+        </div>
+      </div>
+    `;
   });
-  list.appendChild(frag);
 }
 
-/* ─── Store ─── */
 function renderStore() {
-  const rList   = document.getElementById('list-rewards');
-  const dList   = document.getElementById('list-redemptions');
+  const rList = document.getElementById('list-rewards'); const dList = document.getElementById('list-redemptions');
   rList.innerHTML = ''; dList.innerHTML = '';
 
   const rewards = appData.rewards || [];
-  if (!rewards.length) {
-    rList.innerHTML = '<div class="text-muted">ยังไม่มีของรางวัล</div>';
-  } else {
-    const frag = document.createDocumentFragment();
-    rewards.forEach(r => {
-      const card = document.createElement('div');
-      card.className = 'list-card flex';
-      card.style.cssText = 'flex-direction:row; align-items:center;';
+  if(rewards.length === 0) rList.innerHTML = '<div class="text-muted">ยังไม่มีของรางวัล</div>';
+  rewards.forEach(r => {
+    rList.innerHTML += `
+      <div class="list-card flex" style="flex-direction:row; align-items:center;">
+        <img src="${r.image}" style="width:50px;height:50px;object-fit:cover;border-radius:8px;background:#fff;" onerror="this.src='https://cdn-icons-png.flaticon.com/512/10398/10398492.png'">
+        <div style="flex:1;">
+          <div class="list-title">${r.name}</div>
+          <div class="list-sub">ราคา: ${r.price} | เหลือ: <span style="color:var(--primary);font-weight:700;">${r.stock}</span></div>
+        </div>
+        <div class="flex flex-col gap-2">
+          <button class="btn btn-secondary btn-sm" onclick='editReward(${JSON.stringify(r).replace(/'/g, "&#39;")})'>แก้ไข</button>
+          <button class="btn btn-danger btn-sm" onclick="delReward('${r.id}')">ลบ</button>
+        </div>
+      </div>
+    `;
+  });
 
-      const img = document.createElement('img');
-      img.src = r.image || '';
-      img.style.cssText = 'width:50px;height:50px;object-fit:cover;border-radius:8px;background:#fff;margin-right:12px;flex-shrink:0;';
-      img.onerror = () => { img.src = 'https://cdn-icons-png.flaticon.com/512/10398/10398492.png'; };
-
-      const info = document.createElement('div');
-      info.style.flex = '1';
-      const nameEl = document.createElement('div');
-      nameEl.className   = 'list-title';
-      nameEl.textContent = r.name || '-';
-      const subEl  = document.createElement('div');
-      subEl.className = 'list-sub';
-      subEl.innerHTML = `ราคา: ${escHtml(String(r.price || 0))} | เหลือ: <span style="color:var(--primary);font-weight:700;">${escHtml(String(r.stock || 0))}</span>`;
-      info.append(nameEl, subEl);
-
-      const actions = document.createElement('div');
-      actions.className = 'flex flex-col gap-2';
-      const editBtn = document.createElement('button');
-      editBtn.className   = 'btn btn-secondary btn-sm';
-      editBtn.textContent = 'แก้ไข';
-      editBtn.addEventListener('click', () => editReward(r));
-      const delBtn  = document.createElement('button');
-      delBtn.className   = 'btn btn-danger btn-sm';
-      delBtn.textContent = 'ลบ';
-      delBtn.addEventListener('click', () => delReward(r.id));
-      actions.append(editBtn, delBtn);
-
-      card.append(img, info, actions);
-      frag.appendChild(card);
-    });
-    rList.appendChild(frag);
-  }
-
-  const redemps = appData.redemptions || [];
-  const pending = redemps.filter(r => r.status === 'PENDING');
-  if (!pending.length) {
-    dList.innerHTML = '<div class="text-muted">ไม่มีรายการรออนุมัติ</div>';
-  } else {
-    const frag = document.createDocumentFragment();
-    pending.forEach(r => {
-      const card   = document.createElement('div');
-      card.className = 'list-card';
-      const header = document.createElement('div');
-      header.className = 'list-header';
-
-      const info   = document.createElement('div');
-      const nameEl = document.createElement('div');
-      nameEl.className   = 'list-title';
-      nameEl.textContent = r.userName || '-';
-
-      const subEl  = document.createElement('div');
-      subEl.className = 'list-sub';
-      // [FIX] escHtml ทุก field
-      subEl.innerHTML = `แลก: <b>${escHtml(r.rewardName || '-')}</b> (${escHtml(String(r.price || 0))} ${escHtml(appConfig ? appConfig.termCoin : '')})`;
-
-      const dateEl = document.createElement('div');
-      dateEl.className   = 'list-sub mt-2 text-muted';
-      dateEl.textContent = r.timestamp || '';
-
-      info.append(nameEl, subEl, dateEl);
-
-      const actions = document.createElement('div');
-      actions.className = 'flex flex-col gap-2';
-      const apBtn  = document.createElement('button');
-      apBtn.className   = 'btn btn-success btn-sm';
-      apBtn.textContent = '✅ อนุมัติ';
-      apBtn.addEventListener('click', () => updateRedeem(r.id, 'APPROVED'));
-      const rejBtn = document.createElement('button');
-      rejBtn.className   = 'btn btn-danger btn-sm';
-      rejBtn.textContent = '❌ ปฏิเสธ';
-      rejBtn.addEventListener('click', () => updateRedeem(r.id, 'REJECTED'));
-      actions.append(apBtn, rejBtn);
-
-      header.append(info, actions);
-      card.appendChild(header);
-      frag.appendChild(card);
-    });
-    dList.appendChild(frag);
-  }
+  const redemps = appData.redemptions || []; const pending = redemps.filter(r => r.status === 'PENDING');
+  if(pending.length === 0) dList.innerHTML = '<div class="text-muted">ไม่มีรายการรออนุมัติ</div>';
+  pending.forEach(r => {
+    dList.innerHTML += `
+      <div class="list-card">
+        <div class="list-header">
+          <div>
+            <div class="list-title">${r.userName}</div>
+            <div class="list-sub">แลก: <b>${r.rewardName}</b> (${r.price} ${appConfig ? appConfig.termCoin : ''})</div>
+            <div class="list-sub mt-2 text-muted">${r.timestamp}</div>
+          </div>
+          <div class="flex flex-col gap-2">
+            <button class="btn btn-success btn-sm" onclick="updateRedeem('${r.id}', 'APPROVED')">✅ อนุมัติ</button>
+            <button class="btn btn-danger btn-sm" onclick="updateRedeem('${r.id}', 'REJECTED')">❌ ปฏิเสธ</button>
+          </div>
+        </div>
+      </div>
+    `;
+  });
 }
 
-/* ════════════════════════════════════════════════════════
-   MODAL HELPERS (form modals)
-   ════════════════════════════════════════════════════════ */
-function openModal(id) {
-  document.getElementById(id).classList.remove('hidden');
-}
+// ==============================================
+// ACTIONS
+// ==============================================
+function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+function closeModal(e) { if(e.target.classList.contains('modal-ov')) closeAllModal(); }
+function closeAllModal() { document.querySelectorAll('.modal-ov').forEach(m => m.classList.add('hidden')); }
 
-function closeAllModal() {
-  document.querySelectorAll('.modal-ov').forEach(m => m.classList.add('hidden'));
-}
-
-// [FIX] ผูก click-outside ปิด modal ผ่าน delegation แทน onclick="closeModal(event)" inline
-document.addEventListener('click', e => {
-  if (e.target.classList.contains('modal-ov')) closeAllModal();
-});
-
-/* ════════════════════════════════════════════════════════
-   QUESTION ACTIONS
-   ════════════════════════════════════════════════════════ */
 function openQuestionModal() {
-  document.getElementById('mq-title').textContent = 'เพิ่มข้อสอบ';
-  document.getElementById('mq-id').value          = '';
-  document.getElementById('mq-cat').value         = activeQuestionSubject === 'ALL' ? '' : activeQuestionSubject;
-  ['mq-text','mq-a','mq-b','mq-c','mq-d'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('mq-ans').value = 'A';
+  document.getElementById('mq-title').textContent = 'เพิ่มข้อสอบ'; document.getElementById('mq-id').value = '';
+  document.getElementById('mq-cat').value = activeQuestionSubject === 'ALL' ? '' : activeQuestionSubject; 
+  document.getElementById('mq-text').value = ''; document.getElementById('mq-a').value = ''; document.getElementById('mq-b').value = '';
+  document.getElementById('mq-c').value = ''; document.getElementById('mq-d').value = ''; document.getElementById('mq-ans').value = 'A';
   openModal('modal-q');
 }
-
 function editQuestion(q) {
-  document.getElementById('mq-title').textContent = 'แก้ไขข้อสอบ';
-  document.getElementById('mq-id').value          = q.questionId  || '';
-  document.getElementById('mq-cat').value         = q.category    || '';
-  document.getElementById('mq-text').value        = q.questionText || '';
-  document.getElementById('mq-a').value           = q.choiceA     || '';
-  document.getElementById('mq-b').value           = q.choiceB     || '';
-  document.getElementById('mq-c').value           = q.choiceC     || '';
-  document.getElementById('mq-d').value           = q.choiceD     || '';
-  document.getElementById('mq-ans').value         = q.correctAnswer || 'A';
+  document.getElementById('mq-title').textContent = 'แก้ไขข้อสอบ'; document.getElementById('mq-id').value = q.questionId;
+  document.getElementById('mq-cat').value = q.category; document.getElementById('mq-text').value = q.questionText;
+  document.getElementById('mq-a').value = q.choiceA; document.getElementById('mq-b').value = q.choiceB;
+  document.getElementById('mq-c').value = q.choiceC; document.getElementById('mq-d').value = q.choiceD; document.getElementById('mq-ans').value = q.correctAnswer;
   openModal('modal-q');
 }
-
 async function saveQuestion() {
-  const cat     = document.getElementById('mq-cat').value.trim();
-  const qText   = document.getElementById('mq-text').value.trim();
-  if (!qText)   return customAlert('กรุณากรอกโจทย์คำถาม', 'แจ้งเตือน', '⚠️');
-  if (!cat)     return customAlert('กรุณากรอกหมวดหมู่/วิชา', 'แจ้งเตือน', '⚠️');
-
-  const payload = {
-    action:       'save_question',
-    secret:       adminSecret,
-    questionId:   document.getElementById('mq-id').value,
-    category:     cat,
-    questionText: qText,
-    choiceA:      document.getElementById('mq-a').value,
-    choiceB:      document.getElementById('mq-b').value,
-    choiceC:      document.getElementById('mq-c').value,
-    choiceD:      document.getElementById('mq-d').value,
-    correctAnswer: document.getElementById('mq-ans').value,
-  };
-  try {
-    await callAPI('POST', payload);
-    closeAllModal();
-    if (cat) activeQuestionSubject = cat;
-    await loadData();
-    customAlert('บันทึกข้อมูลเรียบร้อย', 'สำเร็จ', '✅');
-  } catch (e) {
-    customAlert(e.message, 'ผิดพลาด', '❌');
-  }
+  const id = document.getElementById('mq-id').value; const cat = document.getElementById('mq-cat').value;
+  const payload = { action: 'save_question', secret: adminSecret, questionId: id, category: cat, questionText: document.getElementById('mq-text').value, choiceA: document.getElementById('mq-a').value, choiceB: document.getElementById('mq-b').value, choiceC: document.getElementById('mq-c').value, choiceD: document.getElementById('mq-d').value, correctAnswer: document.getElementById('mq-ans').value };
+  try { await callAPI('POST', payload); closeAllModal(); if (cat) activeQuestionSubject = cat; await loadData(); customAlert('บันทึกข้อมูลเรียบร้อย', 'สำเร็จ', '✅'); } catch(e) { customAlert(e.message, 'ผิดพลาด', '❌'); }
 }
-
 function delQuestion(id) {
   customConfirm('ยืนยันลบข้อสอบข้อนี้ออกจากระบบ?', async () => {
-    try { await callAPI('POST', { action:'delete_question', secret:adminSecret, questionId:id }); await loadData(); }
-    catch (e) { customAlert(e.message, 'ผิดพลาด', '❌'); }
+    try { await callAPI('POST', {action:'delete_question', secret:adminSecret, questionId:id}); await loadData(); } catch(e) { customAlert(e.message, 'ผิดพลาด', '❌'); }
   }, 'ยืนยันการลบ', '🗑️', 'ca-btn-danger');
 }
-
 function toggleSubject(sub, status) {
-  // [FIX] ใช้ safeHtml=true เฉพาะ msg ที่สร้างจาก code เอง (sub มาจาก categories ที่โหลดมาแล้ว)
-  customConfirm(
-    `ต้องการ <b>${status === 'YES' ? 'เปิด' : 'ปิด'}</b> รายวิชา ${escHtml(sub)} ใช่หรือไม่?`,
-    async () => {
-      try { await callAPI('POST', { action:'toggle_subject_active', secret:adminSecret, subject:sub, activeStatus:status }); await loadData(); }
-      catch (e) { customAlert(e.message, 'ผิดพลาด', '❌'); }
-    },
-    'จัดการวิชา', '❓', 'ca-btn-confirm', true // safeHtml=true เพราะ msg มาจาก code
-  );
+  customConfirm(`ต้องการ <b>${status==='YES'?'เปิด':'ปิด'}</b> รายวิชา ${sub} ใช่หรือไม่?`, async () => {
+    try { await callAPI('POST', {action:'toggle_subject_active', secret:adminSecret, subject:sub, activeStatus:status}); await loadData(); } catch(e) { customAlert(e.message, 'ผิดพลาด', '❌'); }
+  }, 'จัดการวิชา');
 }
-
 async function submitImport() {
-  const text = document.getElementById('inp-import-data').value.trim();
-  if (!text) return customAlert('กรุณาวางข้อมูลในช่องว่าง', 'แจ้งเตือน', '⚠️');
-
-  const lines = text.split('\n');
-  const qs    = [];
-  for (const l of lines) {
-    const cols = l.split('\t');
-    if (cols.length >= 6) {
-      qs.push({ q: cols[0], a: cols[1], b: cols[2], c: cols[3], d: cols[4], ans: cols[5], cat: cols[6] || 'ทั่วไป' });
-    }
-  }
-  if (!qs.length) return customAlert('รูปแบบข้อมูลไม่ถูกต้อง กรุณาตรวจสอบ Excel', 'แจ้งเตือน', '⚠️');
-
+  const text = document.getElementById('inp-import-data').value.trim(); if(!text) return customAlert('กรุณาวางข้อมูลในช่องว่าง', 'แจ้งเตือน', '⚠️');
+  const lines = text.split('\n'); const qs = [];
+  for(let l of lines) { const cols = l.split('\t'); if(cols.length >= 6) { qs.push({ q:cols[0], a:cols[1], b:cols[2], c:cols[3], d:cols[4], ans:cols[5], cat:cols[6]||'ทั่วไป' }); } }
+  if(qs.length === 0) return customAlert('รูปแบบข้อมูลไม่ถูกต้อง กรุณาตรวจสอบ Excel', 'แจ้งเตือน', '⚠️');
   try {
-    await callAPI('POST', { action:'import_questions', secret:adminSecret, questions:qs });
-    closeAllModal();
-    document.getElementById('inp-import-data').value = '';
-    activeQuestionSubject = 'ALL';
-    await loadData();
+    await callAPI('POST', {action:'import_questions', secret:adminSecret, questions:qs});
+    closeAllModal(); document.getElementById('inp-import-data').value = ''; activeQuestionSubject = 'ALL'; await loadData(); 
     customAlert(`นำเข้าสำเร็จ ${qs.length} ข้อ`, 'สำเร็จ', '✅');
-  } catch (e) {
-    customAlert(e.message, 'ผิดพลาด', '❌');
-  }
+  } catch(e) { customAlert(e.message, 'ผิดพลาด', '❌'); }
 }
 
-/* ════════════════════════════════════════════════════════
-   LIBRARY ACTIONS
-   ════════════════════════════════════════════════════════ */
 function openLibraryModal() {
-  document.getElementById('ml-title').textContent = 'เพิ่มสื่อคลังความรู้';
-  ['ml-id','ml-name','ml-cat','ml-url'].forEach(id => document.getElementById(id).value = '');
-  openModal('modal-lib');
+  document.getElementById('ml-title').textContent = 'เพิ่มสื่อคลังความรู้'; document.getElementById('ml-id').value = ''; document.getElementById('ml-name').value = '';
+  document.getElementById('ml-cat').value = ''; document.getElementById('ml-url').value = ''; openModal('modal-lib');
 }
-
 function editLibrary(l) {
-  document.getElementById('ml-title').textContent = 'แก้ไขสื่อคลังความรู้';
-  document.getElementById('ml-id').value          = l.id       || '';
-  document.getElementById('ml-name').value        = l.title    || '';
-  document.getElementById('ml-cat').value         = l.category || '';
-  document.getElementById('ml-type').value        = l.type     || 'PDF';
-  document.getElementById('ml-url').value         = l.url      || '';
-  openModal('modal-lib');
+  document.getElementById('ml-title').textContent = 'แก้ไขสื่อคลังความรู้'; document.getElementById('ml-id').value = l.id; document.getElementById('ml-name').value = l.title;
+  document.getElementById('ml-cat').value = l.category; document.getElementById('ml-type').value = l.type; document.getElementById('ml-url').value = l.url; openModal('modal-lib');
 }
-
 async function saveLibrary() {
-  const title = document.getElementById('ml-name').value.trim();
-  const url   = document.getElementById('ml-url').value.trim();
-  if (!title) return customAlert('กรุณากรอกชื่อสื่อ', 'แจ้งเตือน', '⚠️');
-  if (!url)   return customAlert('กรุณากรอก URL', 'แจ้งเตือน', '⚠️');
-
-  const payload = {
-    action:   'save_library', secret: adminSecret,
-    id:       document.getElementById('ml-id').value,
-    title,    category: document.getElementById('ml-cat').value,
-    type:     document.getElementById('ml-type').value,
-    url,
-  };
-  try { await callAPI('POST', payload); closeAllModal(); await loadData(); customAlert('บันทึกสำเร็จ', 'สำเร็จ', '✅'); }
-  catch (e) { customAlert(e.message, 'ผิดพลาด', '❌'); }
+  const payload = { action: 'save_library', secret: adminSecret, id: document.getElementById('ml-id').value, title: document.getElementById('ml-name').value, category: document.getElementById('ml-cat').value, type: document.getElementById('ml-type').value, url: document.getElementById('ml-url').value };
+  try { await callAPI('POST', payload); closeAllModal(); await loadData(); customAlert('บันทึกสำเร็จ', 'สำเร็จ', '✅'); } catch(e) { customAlert(e.message, 'ผิดพลาด', '❌'); }
 }
-
 function delLibrary(id) {
   customConfirm('ยืนยันลบสื่อการสอนนี้?', async () => {
-    try { await callAPI('POST', { action:'delete_library', secret:adminSecret, id }); await loadData(); }
-    catch (e) { customAlert(e.message, 'ผิดพลาด', '❌'); }
+    try { await callAPI('POST', {action:'delete_library', secret:adminSecret, id}); await loadData(); } catch(e) { customAlert(e.message, 'ผิดพลาด', '❌'); }
   }, 'ยืนยันการลบ', '🗑️', 'ca-btn-danger');
 }
 
-/* ════════════════════════════════════════════════════════
-   BROADCAST ACTIONS
-   ════════════════════════════════════════════════════════ */
 function openBroadcastModal() {
-  document.getElementById('inp-broadcast-target-type').value = 'ALL';
-  document.getElementById('wrap-broadcast-target-val').classList.add('hidden');
-  document.getElementById('inp-broadcast-msg').value = '';
-  updateBroadcastTargetOptions();
-  openModal('modal-broadcast');
+  document.getElementById('inp-broadcast-target-type').value = 'ALL'; document.getElementById('wrap-broadcast-target-val').classList.add('hidden'); document.getElementById('inp-broadcast-msg').value = ''; updateBroadcastTargetOptions(); openModal('modal-broadcast');
 }
-
 function updateBroadcastTargetOptions() {
-  const type   = document.getElementById('inp-broadcast-target-type').value;
-  const wrap   = document.getElementById('wrap-broadcast-target-val');
-  const select = document.getElementById('inp-broadcast-target-val');
-
+  const type = document.getElementById('inp-broadcast-target-type').value; const wrap = document.getElementById('wrap-broadcast-target-val'); const select = document.getElementById('inp-broadcast-target-val');
   if (type === 'ALL') { wrap.classList.add('hidden'); return; }
-  wrap.classList.remove('hidden');
-
-  // [FIX] ใช้ createElement แทน innerHTML += กัน XSS จาก member data
-  select.innerHTML = '';
-  const members  = appData.members || [];
-  const options  = new Set();
-  if (type === 'LEVEL')    members.forEach(m => { if (m.rank)     options.add(m.rank); });
-  if (type === 'POSITION') members.forEach(m => { if (m.position) options.add(m.position); });
-
-  if (!options.size) {
-    select.innerHTML = '<option value="">ไม่มีข้อมูล</option>';
-  } else {
-    [...options].sort().forEach(val => {
-      const opt      = document.createElement('option');
-      opt.value      = val;
-      opt.textContent = val; // [FIX] textContent กัน XSS
-      select.appendChild(opt);
-    });
-  }
+  wrap.classList.remove('hidden'); select.innerHTML = '';
+  const members = appData.members || []; let options = new Set();
+  if (type === 'LEVEL') { members.forEach(m => { if(m.rank) options.add(m.rank); }); } else if (type === 'POSITION') { members.forEach(m => { if(m.position) options.add(m.position); }); }
+  if(options.size === 0) { select.innerHTML = '<option value="">ไม่มีข้อมูล</option>'; } else { [...options].sort().forEach(opt => { select.innerHTML += `<option value="${opt}">${opt}</option>`; }); }
 }
-
 function sendBroadcast() {
-  const msg         = document.getElementById('inp-broadcast-msg').value.trim();
-  const targetType  = document.getElementById('inp-broadcast-target-type').value;
-  const targetValue = document.getElementById('inp-broadcast-target-val').value;
-
-  if (!msg) return customAlert('กรุณาพิมพ์ข้อความที่ต้องการแจ้งเตือน', 'แจ้งเตือน', '⚠️');
-  if (msg.length > 5000) return customAlert('ข้อความยาวเกินไป (สูงสุด 5,000 ตัวอักษร)', 'แจ้งเตือน', '⚠️');
-
-  // confirmMsg สร้างจาก code เอง (targetValue มาจาก dropdown ที่ใช้ textContent แล้ว)
-  let confirmMsg = `ยืนยันส่งข้อความไปยัง <b>"สมาชิกทุกคน"</b> ใช่หรือไม่?`;
-  if (targetType === 'LEVEL')    confirmMsg = `ยืนยันส่งข้อความไปยังระดับชั้น <b>"${escHtml(targetValue)}"</b> ใช่หรือไม่?`;
-  if (targetType === 'POSITION') confirmMsg = `ยืนยันส่งข้อความไปยังสาขา <b>"${escHtml(targetValue)}"</b> ใช่หรือไม่?`;
+  const msg = document.getElementById('inp-broadcast-msg').value.trim(); const targetType = document.getElementById('inp-broadcast-target-type').value; const targetValue = document.getElementById('inp-broadcast-target-val').value;
+  if(!msg) return customAlert('กรุณาพิมพ์ข้อความที่ต้องการแจ้งเตือน', 'แจ้งเตือน', '⚠️');
+  
+  let confirmMsg = 'ยืนยันส่งข้อความไปยัง <b>"สมาชิกทุกคน"</b> ใช่หรือไม่?';
+  if(targetType === 'LEVEL') confirmMsg = `ยืนยันส่งข้อความไปยังระดับชั้น <b>"${targetValue}"</b> ใช่หรือไม่?`;
+  if(targetType === 'POSITION') confirmMsg = `ยืนยันส่งข้อความไปยังสาขา <b>"${targetValue}"</b> ใช่หรือไม่?`;
 
   customConfirm(confirmMsg, async () => {
-    const btn    = document.getElementById('btn-send-broadcast');
-    btn.disabled = true; btn.textContent = 'กำลังส่ง...';
+    const btn = document.getElementById('btn-send-broadcast'); btn.disabled = true; btn.textContent = 'กำลังส่ง...';
     try {
-      const res = await callAPI('POST', { action:'broadcast_message', secret:adminSecret, textMessage:msg, targetType, targetValue });
-      if (res.status === 'ok') { customAlert(res.message, 'ส่งสำเร็จ', '🚀'); closeAllModal(); }
-      else { throw new Error(res.message); }
-    } catch (e) {
-      customAlert(e.message, 'ส่งล้มเหลว', '❌');
-    } finally {
-      btn.disabled    = false;
-      btn.textContent = '🚀 ส่งแจ้งเตือน';
-    }
-  }, 'ส่งประกาศ', '📢', 'ca-btn-confirm', true); // safeHtml=true เพราะ confirmMsg มาจาก code
+      const res = await callAPI('POST', { action: 'broadcast_message', secret: adminSecret, textMessage: msg, targetType: targetType, targetValue: targetValue });
+      if(res.status === 'ok') { customAlert(res.message, 'ส่งสำเร็จ', '🚀'); closeAllModal(); } else { throw new Error(res.message); }
+    } catch(e) { customAlert(e.message, 'ส่งล้มเหลว', '❌'); } finally { btn.disabled = false; btn.textContent = '🚀 ส่งแจ้งเตือน'; }
+  }, 'ส่งประกาศ', '📢');
 }
 
-/* ════════════════════════════════════════════════════════
-   REWARD ACTIONS
-   ════════════════════════════════════════════════════════ */
 function openRewardModal() {
-  document.getElementById('mr-title').textContent = 'เพิ่มของรางวัล';
-  ['mr-id','mr-name','mr-desc','mr-img'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('mr-price').value = '100';
-  document.getElementById('mr-stock').value = '10';
-  openModal('modal-rew');
+  document.getElementById('mr-title').textContent = 'เพิ่มของรางวัล'; document.getElementById('mr-id').value = ''; document.getElementById('mr-name').value = ''; document.getElementById('mr-desc').value = ''; document.getElementById('mr-price').value = '100'; document.getElementById('mr-stock').value = '10'; document.getElementById('mr-img').value = ''; openModal('modal-rew');
 }
-
 function editReward(r) {
-  document.getElementById('mr-title').textContent = 'แก้ไขของรางวัล';
-  document.getElementById('mr-id').value          = r.id    || '';
-  document.getElementById('mr-name').value        = r.name  || '';
-  document.getElementById('mr-desc').value        = r.desc  || '';
-  document.getElementById('mr-price').value       = r.price || 0;
-  document.getElementById('mr-stock').value       = r.stock || 0;
-  document.getElementById('mr-img').value         = r.image || '';
-  openModal('modal-rew');
+  document.getElementById('mr-title').textContent = 'แก้ไขของรางวัล'; document.getElementById('mr-id').value = r.id; document.getElementById('mr-name').value = r.name; document.getElementById('mr-desc').value = r.desc; document.getElementById('mr-price').value = r.price; document.getElementById('mr-stock').value = r.stock; document.getElementById('mr-img').value = r.image; openModal('modal-rew');
 }
-
 async function saveReward() {
-  const name = document.getElementById('mr-name').value.trim();
-  if (!name) return customAlert('กรุณากรอกชื่อของรางวัล', 'แจ้งเตือน', '⚠️');
-
-  const payload = {
-    action: 'save_reward', secret: adminSecret,
-    id:     document.getElementById('mr-id').value,
-    name,
-    desc:   document.getElementById('mr-desc').value,
-    price:  Number(document.getElementById('mr-price').value) || 0,
-    stock:  Number(document.getElementById('mr-stock').value) || 0,
-    image:  document.getElementById('mr-img').value,
-  };
-  try { await callAPI('POST', payload); closeAllModal(); await loadData(); customAlert('บันทึกสำเร็จ', 'สำเร็จ', '✅'); }
-  catch (e) { customAlert(e.message, 'ผิดพลาด', '❌'); }
+  const payload = { action: 'save_reward', secret: adminSecret, id: document.getElementById('mr-id').value, name: document.getElementById('mr-name').value, desc: document.getElementById('mr-desc').value, price: Number(document.getElementById('mr-price').value), stock: Number(document.getElementById('mr-stock').value), image: document.getElementById('mr-img').value };
+  try { await callAPI('POST', payload); closeAllModal(); await loadData(); customAlert('บันทึกสำเร็จ', 'สำเร็จ', '✅'); } catch(e) { customAlert(e.message, 'ผิดพลาด', '❌'); }
 }
-
 function delReward(id) {
   customConfirm('ยืนยันลบของรางวัลนี้?', async () => {
-    try { await callAPI('POST', { action:'delete_reward', secret:adminSecret, id }); await loadData(); }
-    catch (e) { customAlert(e.message, 'ผิดพลาด', '❌'); }
+    try { await callAPI('POST', {action:'delete_reward', secret:adminSecret, id}); await loadData(); } catch(e) { customAlert(e.message, 'ผิดพลาด', '❌'); }
   }, 'ยืนยันการลบ', '🗑️', 'ca-btn-danger');
 }
-
 function updateRedeem(id, status) {
-  const label = status === 'APPROVED' ? 'อนุมัติ' : 'ปฏิเสธ';
-  customConfirm(
-    `ต้องการ <b>${label}</b> คำขอนี้ใช่หรือไม่?`,
-    async () => {
-      try { await callAPI('POST', { action:'update_redemption', secret:adminSecret, id, status }); await loadData(); }
-      catch (e) { customAlert(e.message, 'ผิดพลาด', '❌'); }
-    },
-    'จัดการคำขอแลกรางวัล', '❓', 'ca-btn-confirm', true
-  );
+  customConfirm(`ต้องการ <b>${status==='APPROVED'?'อนุมัติ':'ปฏิเสธ'}</b> คำขอนี้ใช่หรือไม่?`, async () => {
+    try { await callAPI('POST', {action:'update_redemption', secret:adminSecret, id, status}); await loadData(); } catch(e) { customAlert(e.message, 'ผิดพลาด', '❌'); }
+  }, 'จัดการคำขอแลกรางวัล');
 }
 
-/* ════════════════════════════════════════════════════════
-   SETTINGS ACTIONS
-   ════════════════════════════════════════════════════════ */
 async function saveSettings() {
-  const t = parseInt(document.getElementById('inp-exam-time').value);
-  if (!t || t < 1 || t > 180) return customAlert('เวลาต้องอยู่ระหว่าง 1-180 นาที', 'แจ้งเตือน', '⚠️');
-  try { await callAPI('POST', { action:'save_settings', secret:adminSecret, examTimeMinutes:t }); customAlert('บันทึกเวลาทำข้อสอบแล้ว', 'สำเร็จ', '✅'); }
-  catch (e) { customAlert(e.message, 'ผิดพลาด', '❌'); }
+  const t = document.getElementById('inp-exam-time').value;
+  try { await callAPI('POST', {action:'save_settings', secret:adminSecret, examTimeMinutes:Number(t)}); customAlert('บันทึกเวลาทำข้อสอบแล้ว', 'สำเร็จ', '✅'); } catch(e) { customAlert(e.message, 'ผิดพลาด', '❌'); }
 }
-
 function resetUserExam(uid, name) {
-  customConfirm(
-    `ยืนยันการ <b>ล้างผลสอบ</b> ของ ${escHtml(name)} ?<br><span style="font-size:12px; color:var(--muted)">เพื่อให้กลับไปทำข้อสอบใหม่ได้</span>`,
-    async () => {
-      try { await callAPI('POST', { action:'reset_exam', secret:adminSecret, userId:uid }); await loadData(); customAlert('ล้างผลสอบสำเร็จ', 'สำเร็จ', '✅'); }
-      catch (e) { customAlert(e.message, 'ผิดพลาด', '❌'); }
-    },
-    'รีเซ็ตสอบ', '🔄', 'ca-btn-confirm', true
-  );
+  customConfirm(`ยืนยันการ <b>ล้างผลสอบ</b> ของ ${name} ?<br><span style="font-size:12px; color:var(--muted)">เพื่อให้กลับไปทำข้อสอบใหม่ได้</span>`, async () => {
+    try { await callAPI('POST', {action:'reset_exam', secret:adminSecret, userId:uid}); await loadData(); customAlert('ล้างผลสอบสำเร็จ', 'สำเร็จ', '✅'); } catch(e) { customAlert(e.message, 'ผิดพลาด', '❌'); }
+  }, 'รีเซ็ตสอบ', '🔄');
 }
-
 function resetAllExams() {
-  customConfirm(
-    `<span style="color:var(--red);">⚠️ คำเตือน!</span><br>คุณกำลังจะล้างผลสอบของทุกคนในระบบ<br>ยืนยันหรือไม่?`,
-    async () => {
-      try { await callAPI('POST', { action:'reset_exam', secret:adminSecret }); await loadData(); customAlert('ล้างผลสอบของทุกคนในระบบแล้ว', 'ล้างสำเร็จ', '✅'); }
-      catch (e) { customAlert(e.message, 'ผิดพลาด', '❌'); }
-    },
-    'Danger Zone', '⚠️', 'ca-btn-danger', true
-  );
+  customConfirm(`<span style="color:var(--red);">⚠️ คำเตือน!</span><br>คุณกำลังจะล้างผลสอบของทุกคนในระบบ<br>ยืนยันหรือไม่?`, async () => {
+    try { await callAPI('POST', {action:'reset_exam', secret:adminSecret}); await loadData(); customAlert('ล้างผลสอบของทุกคนในระบบแล้ว', 'ล้างสำเร็จ', '✅'); } catch(e) { customAlert(e.message, 'ผิดพลาด', '❌'); }
+  }, 'Danger Zone', '⚠️', 'ca-btn-danger');
 }
 
-/* ════════════════════════════════════════════════════════
-   API HELPER
-   ════════════════════════════════════════════════════════ */
-async function callAPI(method, params, timeoutMs = 30000) {
-  const ctrl = new AbortController();
-  const tid  = setTimeout(() => ctrl.abort(), timeoutMs);
+async function callAPI(method, params, timeoutMs=30000) {
+  const ctrl = new AbortController(); const tid = setTimeout(()=>ctrl.abort(), timeoutMs);
   try {
-    let url  = GAS_URL;
-    let opts = { signal: ctrl.signal, redirect: 'follow' };
-    if (method === 'GET') {
-      url += '?' + new URLSearchParams(params).toString();
-      opts.method = 'GET';
-    } else {
-      opts.method  = 'POST';
-      opts.headers = { 'Content-Type': 'text/plain' };
-      opts.body    = JSON.stringify(params);
-    }
-    const resp = await fetch(url, opts);
-    clearTimeout(tid);
-    if (!resp.ok) throw new Error('HTTP ' + resp.status);
-    return await resp.json();
-  } catch (e) {
-    clearTimeout(tid);
-    if (e.name === 'AbortError') throw new Error('หมดเวลาเชื่อมต่อ (timeout)');
-    throw e;
-  }
+    let url = GAS_URL, opts = { signal:ctrl.signal, redirect:'follow' };
+    if (method === 'GET') { url += '?' + new URLSearchParams(params).toString(); opts.method = 'GET'; }
+    else { opts.method = 'POST'; opts.headers = {'Content-Type':'text/plain'}; opts.body = JSON.stringify(params); }
+    const resp = await fetch(url, opts); clearTimeout(tid);
+    if (!resp.ok) throw new Error('HTTP ' + resp.status); return await resp.json();
+  } catch(e) { clearTimeout(tid); throw e; }
 }
-
-/* ════════════════════════════════════════════════════════
-   BOOTSTRAP
-   ════════════════════════════════════════════════════════ */
-// ผูก search input ด้วย addEventListener + debounce แทน onkeyup inline
-let _searchTimer = null;
-document.getElementById('search-member').addEventListener('input', () => {
-  clearTimeout(_searchTimer);
-  _searchTimer = setTimeout(renderMembers, 250);
-});
 
 init();
 </script>

@@ -8,54 +8,58 @@
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --primary: #4a5568;
+  --primary: #4a5568; 
   --secondary: #a0aec0;
-  --bg: #f7fafc; --surface: #ffffff;
-  --text: #2d3748; --green: #00c853; --red: #ff5252;
+  --bg: #f7fafc;
+  --surface: #ffffff;
+  --text: #2d3748;
+  --green: #00c853; --red: #ff5252;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--text); padding: 20px; display: flex; flex-direction: column; min-height: 100vh; }
 
+/* Header & Profile */
 .header { text-align: center; margin-bottom: 30px; padding-top: 10px; }
 .profile-img { width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--primary); margin: 0 auto 15px; display: block; object-fit: cover; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-.org-name { font-size: 14px; color: var(--secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+.org-name { font-size: 14px; color: var(--secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 1px;}
 .app-name { font-size: 28px; font-weight: 700; color: var(--primary); margin-top: 5px; line-height: 1.2; }
 
+/* Cards */
 .form-card, .registered-card { background: var(--surface); border-radius: 16px; padding: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
 .form-card { border-top: 5px solid var(--primary); }
 .registered-card { border-top: 5px solid var(--green); text-align: center; }
 
+/* Form Elements */
 .form-group { margin-bottom: 20px; text-align: left; }
 .form-label { display: block; font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
 .form-control { width: 100%; padding: 14px; border: 1px solid #e2e8f0; border-radius: 10px; font-family: 'Sarabun'; font-size: 16px; transition: 0.3s; background: #f8fafc; }
 .form-control:focus { border-color: var(--primary); outline: none; background: #fff; box-shadow: 0 0 0 3px rgba(0,0,0,0.05); }
 
-/* [FIX] เพิ่ม error state บน input */
-.form-control.error { border-color: var(--red); background: #fff5f5; }
-
-.info-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f1f5f9; font-size: 15px; text-align: left; }
+/* Registered Info */
+.info-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f1f5f9; font-size: 15px; text-align: left;}
 .info-row:last-child { border-bottom: none; }
 .info-label { color: var(--secondary); font-weight: 600; }
-.info-value { color: var(--text); font-weight: 700; text-align: right; }
+.info-value { color: var(--text); font-weight: 700; text-align: right;}
 
-.btn { width: 100%; padding: 16px; background: var(--primary); color: #fff; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; font-family: 'Sarabun'; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-top: 10px; touch-action: manipulation; user-select: none; }
-.btn:active:not(:disabled) { transform: scale(0.98); }
-.btn:disabled { opacity: 0.6; cursor: not-allowed; }
-.btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); box-shadow: none; margin-top: 15px; padding: 14px; }
+/* Buttons */
+.btn { width: 100%; padding: 16px; background: var(--primary); color: #fff; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; font-family: 'Sarabun'; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-top: 10px;}
+.btn:active { transform: scale(0.98); }
+.btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); box-shadow: none; margin-top: 15px; padding: 14px;}
 
+/* Loading */
 .loader { border: 3px solid #f3f3f3; border-top: 3px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 20px; }
 @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 #loading-screen { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 99; }
 .hidden { display: none !important; }
 
-/* Custom Modal */
-.ca-ov { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.2s; backdrop-filter: blur(3px); }
+/* 🌟 NEW: Custom Modal CSS (Light Theme for Registration) */
+.ca-ov { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.2s; backdrop-filter: blur(3px);}
 .ca-ov.active { opacity: 1; pointer-events: auto; }
 .ca-box { background: var(--surface); border-radius: 20px; padding: 32px 24px; width: 100%; max-width: 320px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.2); transform: scale(0.9); transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
 .ca-ov.active .ca-box { transform: scale(1); }
-.ca-icon  { font-size: 60px; margin-bottom: 15px; line-height: 1; }
+.ca-icon { font-size: 60px; margin-bottom: 15px; line-height: 1; }
 .ca-title { font-size: 20px; font-weight: 800; color: var(--text); margin-bottom: 10px; }
-.ca-msg   { font-size: 14px; color: #4a5568; margin-bottom: 24px; line-height: 1.6; }
+.ca-msg { font-size: 14px; color: #4a5568; margin-bottom: 24px; line-height: 1.6; }
 .ca-btn-group { display: flex; gap: 12px; justify-content: center; }
 .ca-btn { flex: 1; padding: 12px 0; border-radius: 10px; font-size: 15px; font-weight: 800; font-family: 'Sarabun'; cursor: pointer; transition: 0.2s; border: none; }
 .ca-btn-confirm { background: var(--primary); color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
@@ -64,35 +68,36 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
 </head>
 <body>
 
+<!-- หน้าจอโหลด -->
 <div id="loading-screen">
   <div class="loader"></div>
-  <div style="font-weight:600; color:var(--text);" id="load-text">กำลังตรวจสอบข้อมูล...</div>
+  <div style="font-weight: 600; color: var(--text);" id="load-text">กำลังตรวจสอบข้อมูล...</div>
 </div>
 
-<!-- Custom Modal -->
-<div id="custom-alert" class="ca-ov" role="dialog" aria-modal="true">
+<!-- 🌟 NEW: Custom Modal HTML -->
+<div id="custom-alert" class="ca-ov">
   <div class="ca-box">
-    <div id="ca-icon"  class="ca-icon">⚠️</div>
+    <div id="ca-icon" class="ca-icon">⚠️</div>
     <div id="ca-title" class="ca-title">แจ้งเตือน</div>
-    <div id="ca-msg"   class="ca-msg">ข้อความ</div>
+    <div id="ca-msg" class="ca-msg">ข้อความ</div>
     <div id="ca-btn-group" class="ca-btn-group"></div>
   </div>
 </div>
 
-<!-- Header -->
+<!-- ส่วนหัว และ รูปโปรไฟล์ LINE -->
 <div class="header hidden" id="ui-header">
   <img src="" id="ui-profile-img" class="profile-img hidden" alt="LINE Profile">
   <div class="org-name" id="ui-org-name">Organization</div>
   <div class="app-name" id="ui-app-name">App Name</div>
 </div>
 
-<!-- Already Registered Card -->
+<!-- การ์ดแจ้งเตือนกรณีลงทะเบียนแล้ว -->
 <div class="registered-card hidden" id="ui-already-registered">
-  <div style="font-size:50px; margin-bottom:10px;">✅</div>
-  <h2 style="font-size:20px; margin-bottom:5px; color:var(--green);">ท่านลงทะเบียนเรียบร้อยแล้ว</h2>
-  <p style="color:var(--secondary); margin-bottom:20px; font-size:14px;">ข้อมูลปัจจุบันในระบบของท่าน</p>
-
-  <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:10px 16px; margin-bottom:20px;">
+  <div style="font-size: 50px; margin-bottom: 10px;">✅</div>
+  <h2 style="font-size: 20px; margin-bottom: 5px; color: var(--green);">ท่านลงทะเบียนเรียบร้อยแล้ว</h2>
+  <p style="color: var(--secondary); margin-bottom: 20px; font-size: 14px;">ข้อมูลปัจจุบันในระบบของท่าน</p>
+  
+  <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px 16px; margin-bottom: 20px;">
     <div class="info-row"><span class="info-label" id="lbl-info-level">ระดับชั้น</span><span class="info-value" id="info-level">-</span></div>
     <div class="info-row"><span class="info-label" id="lbl-info-fullname">ชื่อ-นามสกุล</span><span class="info-value" id="info-fullname">-</span></div>
     <div class="info-row"><span class="info-label">ชื่อเล่น</span><span class="info-value" id="info-nickname">-</span></div>
@@ -103,42 +108,37 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
   <button class="btn btn-outline" onclick="showEditForm()">✏️ แก้ไขข้อมูลใหม่</button>
 </div>
 
-<!-- Registration / Edit Form -->
+<!-- การ์ดฟอร์มลงทะเบียน (และแก้ไข) -->
 <div class="form-card hidden" id="ui-form">
-  <h2 id="form-title" style="font-size:20px; margin-bottom:20px; text-align:center; border-bottom:1px solid #eee; padding-bottom:15px;">ลงทะเบียนเข้าสู่ระบบ</h2>
-
+  <h2 id="form-title" style="font-size: 20px; margin-bottom: 20px; text-align: center; border-bottom: 1px solid #eee; padding-bottom: 15px;">ลงทะเบียนเข้าสู่ระบบ</h2>
+  
   <div class="form-group">
     <label class="form-label" id="lbl-level">เลือกระดับชั้น</label>
     <select class="form-control" id="inp-level">
       <option value="" disabled selected>-- เลือก --</option>
       <optgroup label="มัธยมศึกษาตอนต้น">
-        <option value="ม.1">ม.1</option>
-        <option value="ม.2">ม.2</option>
-        <option value="ม.3">ม.3</option>
+        <option value="ม.1">ม.1</option><option value="ม.2">ม.2</option><option value="ม.3">ม.3</option>
       </optgroup>
       <optgroup label="มัธยมศึกษาตอนปลาย">
-        <option value="ม.4">ม.4</option>
-        <option value="ม.5">ม.5</option>
-        <option value="ม.6">ม.6</option>
+        <option value="ม.4">ม.4</option><option value="ม.5">ม.5</option><option value="ม.6">ม.6</option>
       </optgroup>
       <optgroup label="บุคคลทั่วไป">
         <option value="บุคคลทั่วไป">บุคคลทั่วไป</option>
       </optgroup>
     </select>
   </div>
-
+  
   <div class="form-group">
     <label class="form-label" id="lbl-fullname">ชื่อ-นามสกุล</label>
-    <!-- [FIX] เพิ่ม maxlength กัน input ยาวเกิน -->
-    <input type="text" class="form-control" id="inp-fullname" placeholder="กรอกชื่อ-นามสกุล" maxlength="100" autocomplete="name">
+    <input type="text" class="form-control" id="inp-fullname" placeholder="กรอกชื่อ-นามสกุล">
   </div>
   <div class="form-group">
     <label class="form-label">ชื่อเล่น</label>
-    <input type="text" class="form-control" id="inp-nickname" placeholder="กรอกชื่อเล่นสั้นๆ" maxlength="30">
+    <input type="text" class="form-control" id="inp-nickname" placeholder="กรอกชื่อเล่นสั้นๆ">
   </div>
   <div class="form-group">
     <label class="form-label" id="lbl-position">สาขา / กลุ่มเรียน</label>
-    <input type="text" class="form-control" id="inp-position" placeholder="เช่น สาขาพญาไท, ห้อง 1" maxlength="100">
+    <input type="text" class="form-control" id="inp-position" placeholder="เช่น สาขาพญาไท, ห้อง 1">
   </div>
 
   <button class="btn" id="btn-submit" onclick="submitData()">บันทึกข้อมูล</button>
@@ -146,70 +146,46 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
 </div>
 
 <script>
-/* ════════════════════════════════════════════════════════
-   CONFIG
-   ════════════════════════════════════════════════════════ */
-const LIFF_ID = '2009896605-DDyxB4Wy';
+const LIFF_ID = '2009896605-DDyxB4Wy'; 
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbwo_kB4DZSVmYqkztnf8n_-sjVvAFUxIH9dZAqby_SUvV5H8gH5hXhILHkzZJ59S2j6/exec';
-
-/* ════════════════════════════════════════════════════════
-   STATE
-   ════════════════════════════════════════════════════════ */
-let profile        = null;
+  
+let profile = null;
 let existingMember = null;
-let isSubmitting   = false; // [FIX] guard double-submit
+let appConfig = null;
 
-/* ════════════════════════════════════════════════════════
-   MODAL
-   ════════════════════════════════════════════════════════ */
-function customAlert(msg, title = 'แจ้งเตือน', icon = '⚠️', onOk = null) {
-  document.getElementById('ca-icon').textContent  = icon;
+// 🌟 NEW: Custom Modal Functions
+let alertCallback = null;
+function customAlert(msg, title="แจ้งเตือน", icon="⚠️", callback=null) {
+  document.getElementById('ca-icon').textContent = icon;
   document.getElementById('ca-title').textContent = title;
-  // [FIX] ใช้ textContent แทน innerHTML กัน XSS
-  document.getElementById('ca-msg').textContent   = msg;
-  document.getElementById('ca-btn-group').innerHTML = '';
-
-  const btn = document.createElement('button');
-  btn.className   = 'ca-btn ca-btn-confirm';
-  btn.textContent = 'ตกลง';
-  // [FIX] ใช้ addEventListener + once:true แทน global callback
-  btn.addEventListener('click', () => {
-    closeCustomAlert();
-    if (onOk) onOk();
-  }, { once: true });
-
-  document.getElementById('ca-btn-group').appendChild(btn);
+  document.getElementById('ca-msg').innerHTML = msg;
+  alertCallback = callback;
+  document.getElementById('ca-btn-group').innerHTML = `<button class="ca-btn ca-btn-confirm" id="btn-ca-ok">ตกลง</button>`;
+  document.getElementById('btn-ca-ok').onclick = () => { closeCustomAlert(); if(alertCallback) alertCallback(); };
   document.getElementById('custom-alert').classList.add('active');
 }
+function closeCustomAlert() { document.getElementById('custom-alert').classList.remove('active'); }
 
-function closeCustomAlert() {
-  document.getElementById('custom-alert').classList.remove('active');
-}
-
-/* ════════════════════════════════════════════════════════
-   INIT
-   ════════════════════════════════════════════════════════ */
 async function init() {
   try {
     await liff.init({ liffId: LIFF_ID });
     if (!liff.isLoggedIn()) { liff.login(); return; }
-
+    
     profile = await liff.getProfile();
-
+    
     if (profile.pictureUrl) {
       const img = document.getElementById('ui-profile-img');
       img.src = profile.pictureUrl;
       img.classList.remove('hidden');
     }
 
-    // [FIX] โหลด config + member พร้อมกัน
     const [configRes, memberRes] = await Promise.all([
       callAPI('GET', { action: 'get_config' }),
-      callAPI('GET', { action: 'get_member', userId: profile.userId }),
+      callAPI('GET', { action: 'get_member', userId: profile.userId })
     ]);
-
-    if (configRes.status === 'ok') applyTemplate(configRes.config);
-
+    
+    if (configRes.status === 'ok') { appConfig = configRes.config; applyTemplate(appConfig); }
+    
     document.getElementById('loading-screen').classList.add('hidden');
     document.getElementById('ui-header').classList.remove('hidden');
 
@@ -219,179 +195,104 @@ async function init() {
     } else {
       document.getElementById('ui-form').classList.remove('hidden');
     }
-  } catch (e) {
-    const el = document.getElementById('load-text');
-    el.textContent  = 'เกิดข้อผิดพลาด: ' + e.message;
-    el.style.color  = 'red';
+
+  } catch(e) {
+    document.getElementById('load-text').textContent = "เกิดข้อผิดพลาด: " + e.message;
+    document.getElementById('load-text').style.color = "red";
   }
 }
 
-/* ════════════════════════════════════════════════════════
-   TEMPLATE
-   ════════════════════════════════════════════════════════ */
 function applyTemplate(config) {
-  if (!config) return;
-  if (config.colorPrimary)   document.documentElement.style.setProperty('--primary',   config.colorPrimary);
-  if (config.colorSecondary) document.documentElement.style.setProperty('--secondary', config.colorSecondary);
+  document.documentElement.style.setProperty('--primary', config.colorPrimary || '#4a5568');
+  document.documentElement.style.setProperty('--secondary', config.colorSecondary || '#a0aec0');
 
-  document.title = (config.appName || 'System') + ' - ลงทะเบียน';
-  document.getElementById('ui-app-name').textContent = config.appName  || '';
-  document.getElementById('ui-org-name').textContent = config.orgName  || '';
-
-  document.getElementById('lbl-level').textContent        = `ระบุ${config.termLevel || 'ระดับชั้น'}ปัจจุบัน`;
-  document.getElementById('lbl-fullname').textContent     = `ชื่อ-นามสกุล${config.termUser || ''}`;
-  document.getElementById('lbl-position').textContent     = `ระบุ${config.termPosition || 'สาขา'}`;
-  document.getElementById('lbl-info-level').textContent   = config.termLevel    || 'ระดับชั้น';
-  document.getElementById('lbl-info-fullname').textContent = `ชื่อ-นามสกุล${config.termUser || ''}`;
-  document.getElementById('lbl-info-pos').textContent     = config.termPosition || 'สาขา';
+  document.title = config.appName + " - ลงทะเบียน";
+  document.getElementById('ui-app-name').textContent = config.appName;
+  document.getElementById('ui-org-name').textContent = config.orgName;
+  
+  document.getElementById('lbl-level').textContent = `ระบุ${config.termLevel}ปัจจุบัน`;
+  document.getElementById('lbl-fullname').textContent = `ชื่อ-นามสกุล${config.termUser}`;
+  document.getElementById('lbl-position').textContent = `ระบุ${config.termPosition}`;
+  document.getElementById('lbl-info-level').textContent = config.termLevel;
+  document.getElementById('lbl-info-fullname').textContent = `ชื่อ-นามสกุล${config.termUser}`;
+  document.getElementById('lbl-info-pos').textContent = config.termPosition;
 }
 
-/* ════════════════════════════════════════════════════════
-   SHOW / HIDE VIEWS
-   ════════════════════════════════════════════════════════ */
 function showRegisteredInfo() {
   document.getElementById('ui-form').classList.add('hidden');
   document.getElementById('ui-already-registered').classList.remove('hidden');
-
-  // [FIX] ใช้ textContent ทุก field ป้องกัน XSS
-  document.getElementById('info-level').textContent    = existingMember.rank     || '-';
+  
+  document.getElementById('info-level').textContent = existingMember.rank || '-';
   document.getElementById('info-fullname').textContent = existingMember.fullName || '-';
   document.getElementById('info-nickname').textContent = existingMember.nickname || '-';
-  document.getElementById('info-pos').textContent      = existingMember.position || '-';
+  document.getElementById('info-pos').textContent = existingMember.position || '-';
 }
 
 function showEditForm() {
   document.getElementById('ui-already-registered').classList.add('hidden');
   document.getElementById('ui-form').classList.remove('hidden');
-
-  document.getElementById('form-title').textContent   = 'แก้ไขข้อมูลส่วนตัว';
-  document.getElementById('btn-submit').textContent   = 'อัปเดตข้อมูล';
+  
+  document.getElementById('form-title').textContent = "แก้ไขข้อมูลส่วนตัว";
+  document.getElementById('btn-submit').textContent = "อัปเดตข้อมูล";
   document.getElementById('btn-cancel-edit').classList.remove('hidden');
-
+  
   if (existingMember) {
-    document.getElementById('inp-level').value    = existingMember.rank     || '';
-    document.getElementById('inp-fullname').value = existingMember.fullName || '';
+    document.getElementById('inp-level').value = existingMember.rank;
+    document.getElementById('inp-fullname').value = existingMember.fullName;
     document.getElementById('inp-nickname').value = existingMember.nickname || '';
-    document.getElementById('inp-position').value = existingMember.position || '';
+    document.getElementById('inp-position').value = existingMember.position;
   }
 }
 
-function cancelEdit() {
-  // ล้าง error states
-  document.querySelectorAll('.form-control.error').forEach(el => el.classList.remove('error'));
-  showRegisteredInfo();
-}
+function cancelEdit() { showRegisteredInfo(); }
 
-/* ════════════════════════════════════════════════════════
-   SUBMIT
-   ════════════════════════════════════════════════════════ */
 async function submitData() {
-  // [FIX] double-submit guard
-  if (isSubmitting) return;
+  const level = document.getElementById('inp-level').value;
+  const fullname = document.getElementById('inp-fullname').value.trim();
+  const nickname = document.getElementById('inp-nickname').value.trim();
+  const position = document.getElementById('inp-position').value.trim();
 
-  const levelEl    = document.getElementById('inp-level');
-  const fullnameEl = document.getElementById('inp-fullname');
-  const nicknameEl = document.getElementById('inp-nickname');
-  const positionEl = document.getElementById('inp-position');
-
-  const level    = levelEl.value;
-  const fullname = fullnameEl.value.trim();
-  const nickname = nicknameEl.value.trim();
-  const position = positionEl.value.trim();
-
-  // [FIX] ล้าง error state ก่อน validate ใหม่
-  [levelEl, fullnameEl, nicknameEl].forEach(el => el.classList.remove('error'));
-
-  // Validation
-  if (!level) {
-    levelEl.classList.add('error');
-    return customAlert('กรุณาเลือกระดับชั้นให้ถูกต้อง', 'ข้อมูลไม่ครบ', '⚠️');
-  }
-  if (!fullname) {
-    fullnameEl.classList.add('error');
-    return customAlert('กรุณากรอกชื่อ-นามสกุลให้ครบถ้วน', 'ข้อมูลไม่ครบ', '⚠️');
-  }
-  // [FIX] เพิ่ม validate ความยาว fullname
-  if (fullname.length < 3) {
-    fullnameEl.classList.add('error');
-    return customAlert('ชื่อ-นามสกุลสั้นเกินไป (อย่างน้อย 3 ตัวอักษร)', 'ข้อมูลไม่ถูกต้อง', '⚠️');
-  }
-  if (!nickname) {
-    nicknameEl.classList.add('error');
-    return customAlert('กรุณากรอกชื่อเล่น', 'ข้อมูลไม่ครบ', '⚠️');
+  if(!level || !fullname || !nickname) {
+    // 🌟 ใช้ Custom Alert แทน
+    return customAlert('กรุณากรอกข้อมูลระดับชั้น ชื่อ-นามสกุล และชื่อเล่นให้ครบถ้วนครับ', 'ข้อมูลไม่ครบ', '⚠️');
   }
 
-  const btn       = document.getElementById('btn-submit');
+  const btn = document.getElementById('btn-submit');
   const isEditing = !!existingMember;
-
-  isSubmitting        = true;
-  btn.textContent     = 'กำลังบันทึก...';
-  btn.disabled        = true;
+  btn.textContent = 'กำลังบันทึก...'; btn.disabled = true;
 
   try {
     const res = await callAPI('POST', {
-      action:      'liff_register',
-      userId:      profile.userId,
-      displayName: profile.displayName || '',
-      pictureUrl:  profile.pictureUrl  || '',
-      rank:        level,
-      fullName:    fullname,
-      nickname:    nickname,
-      position:    position,
+      action: 'liff_register',
+      userId: profile.userId,
+      displayName: profile.displayName,
+      pictureUrl: profile.pictureUrl,
+      rank: level,
+      fullName: fullname,
+      nickname: nickname,
+      position: position
     });
-
-    if (res.status === 'ok') {
-      customAlert(
-        isEditing ? 'อัปเดตข้อมูลของท่านเรียบร้อยแล้ว' : 'ยินดีต้อนรับเข้าสู่ระบบครับ',
-        'บันทึกสำเร็จ!',
-        '✅',
-        () => liff.closeWindow()
-      );
-    } else {
-      throw new Error(res.message || 'บันทึกไม่สำเร็จ');
-    }
-  } catch (e) {
+    
+    if(res.status === 'ok') {
+      // 🌟 ใช้ Custom Alert และสั่งปิดหน้าต่างเมื่อกด "ตกลง"
+      customAlert(isEditing ? 'อัปเดตข้อมูลของท่านเรียบร้อยแล้ว' : 'ยินดีต้อนรับเข้าสู่ระบบครับ', 'บันทึกสำเร็จ!', '✅', () => {
+        liff.closeWindow();
+      });
+    } else { throw new Error(res.message); }
+  } catch(e) {
     customAlert(e.message, 'เกิดข้อผิดพลาด', '❌');
-    btn.textContent = isEditing ? 'อัปเดตข้อมูล' : 'บันทึกข้อมูล';
-    btn.disabled    = false;
-  } finally {
-    isSubmitting = false;
+    btn.textContent = isEditing ? 'อัปเดตข้อมูล' : 'บันทึกข้อมูล'; 
+    btn.disabled = false;
   }
 }
 
-/* ════════════════════════════════════════════════════════
-   API HELPER
-   ════════════════════════════════════════════════════════ */
-async function callAPI(method, params, timeoutMs = 20000) {
-  const ctrl = new AbortController();
-  const tid  = setTimeout(() => ctrl.abort(), timeoutMs);
-  try {
-    let url  = GAS_URL;
-    let opts = { signal: ctrl.signal, redirect: 'follow' };
-
-    if (method === 'GET') {
-      url += '?' + new URLSearchParams(params).toString();
-      opts.method = 'GET';
-    } else {
-      opts.method  = 'POST';
-      opts.headers = { 'Content-Type': 'text/plain' };
-      opts.body    = JSON.stringify(params);
-    }
-
-    const resp = await fetch(url, opts);
-    clearTimeout(tid);
-    if (!resp.ok) throw new Error('HTTP ' + resp.status);
-    return await resp.json();
-  } catch (e) {
-    clearTimeout(tid);
-    if (e.name === 'AbortError') throw new Error('หมดเวลาเชื่อมต่อ (timeout)');
-    throw e;
-  }
+async function callAPI(method, params) {
+  let url = GAS_URL, opts = { method: 'POST', headers: {'Content-Type':'text/plain'}, body: JSON.stringify(params) };
+  if(method === 'GET') { url += '?' + new URLSearchParams(params).toString(); opts = {method:'GET'}; }
+  const resp = await fetch(url, opts);
+  return await resp.json();
 }
 
-/* ════════════════════════════════════════════════════════
-   BOOTSTRAP
-   ════════════════════════════════════════════════════════ */
 init();
 </script>
 </body>

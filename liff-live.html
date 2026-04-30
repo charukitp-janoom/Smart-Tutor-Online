@@ -10,568 +10,272 @@
 :root {
   --config-primary: #46178f;
   --config-secondary: #ffd700;
+
   --bg: #f2f2f2;
-  --shape-red:    #e21b3c;
-  --shape-blue:   #1368ce;
+  /* ปุ่ม 4 สี (สไตล์ Kahoot) */
+  --shape-red: #e21b3c;
+  --shape-blue: #1368ce;
   --shape-yellow: #d89e00;
-  --shape-green:  #26890c;
+  --shape-green: #26890c;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 body { font-family: 'Sarabun', sans-serif; background: var(--bg); overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
 
-/* ─── Screens ─── */
-.screen { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; position: absolute; inset: 0; z-index: 10; text-align: center; padding: 20px; }
+/* Screens */
+.screen { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; position: absolute; inset: 0; z-index: 10; text-align: center; padding: 20px;}
 .hidden { display: none !important; }
 
-/* ─── Status Screens ─── */
+/* Status Screens */
 .status-screen { background: var(--config-primary); color: #fff; }
 .status-title { font-size: 28px; font-weight: 800; margin-bottom: 10px; }
 .status-sub { font-size: 16px; opacity: 0.8; }
-.spinner { width: 50px; height: 50px; border: 4px solid rgba(255,255,255,0.2); border-top: 4px solid #fff; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
+.spinner { width: 50px; height: 50px; border: 4px solid rgba(255,255,255,0.2); border-top: 4px solid #fff; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px;}
 @keyframes spin { to { transform: rotate(360deg); } }
 @keyframes pulse-opacity { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
 .pulse-anim { animation: pulse-opacity 1.5s infinite; }
 
-/* ─── Joystick Buttons ─── */
+/* Joystick Buttons */
 .game-screen { background: #f2f2f2; padding: 10px; }
 .btn-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 10px; width: 100%; height: 100%; }
-.btn-shape {
-  border-radius: 12px; display: flex; align-items: center;
-  justify-content: center; box-shadow: 0 6px 0 rgba(0,0,0,0.2);
-  cursor: pointer; transition: 0.1s;
-  /* [FIX] กัน double-tap บน iOS */
-  touch-action: manipulation;
-  user-select: none;
-}
+.btn-shape { border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 0 rgba(0,0,0,0.2); cursor: pointer; transition: 0.1s;}
 .btn-shape:active { transform: translateY(6px); box-shadow: none; }
-/* [FIX] เพิ่ม disabled state ที่ชัดเจน */
-.btn-shape.disabled { opacity: 0.35; pointer-events: none; cursor: not-allowed; }
-
-.shape-icon { width: 60px; height: 60px; background: #fff; pointer-events: none; }
-.bg-red    { background: var(--shape-red); }
-.bg-blue   { background: var(--shape-blue); }
+.shape-icon { width: 60px; height: 60px; background: #fff; pointer-events: none;}
+.bg-red { background: var(--shape-red); }
+.bg-blue { background: var(--shape-blue); }
 .bg-yellow { background: var(--shape-yellow); }
-.bg-green  { background: var(--shape-green); }
+.bg-green { background: var(--shape-green); }
 
-.s-red    { clip-path: polygon(50% 0%, 0% 100%, 100% 100%); }
-.s-blue   { clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); }
+.s-red { clip-path: polygon(50% 0%, 0% 100%, 100% 100%); }
+.s-blue { clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); }
 .s-yellow { border-radius: 50%; }
-.s-green  { border-radius: 8px; }
+.s-green { border-radius: 8px; }
 
-/* ─── Reveal Screens ─── */
+/* Reveal */
 .reveal-correct { background: #66bf39; color: #fff; }
-.reveal-wrong   { background: #ff3355; color: #fff; }
-.points-text { font-size: 20px; font-weight: 800; margin-top: 10px; background: rgba(0,0,0,0.2); padding: 5px 15px; border-radius: 20px; }
-
-/* ─── Error Screen ─── */
-.error-screen { background: #1a1a2e; color: #fff; }
-.error-btn { margin-top: 20px; padding: 12px 28px; border-radius: 10px; border: none; font-size: 16px; font-weight: 800; font-family: 'Sarabun'; cursor: pointer; }
+.reveal-wrong { background: #ff3355; color: #fff; }
+.points-text { font-size: 20px; font-weight: 800; margin-top: 10px; background: rgba(0,0,0,0.2); padding: 5px 15px; border-radius: 20px;}
 </style>
 </head>
 <body>
 
-<!-- Loading -->
 <div id="screen-loading" class="screen status-screen">
   <div class="spinner"></div>
   <div class="status-title">กำลังเชื่อมต่อ...</div>
 </div>
 
-<!-- Lobby -->
 <div id="screen-lobby" class="screen status-screen hidden">
-  <div style="font-size:50px; margin-bottom:10px;">🎮</div>
-  <div class="status-title" style="font-size:26px; margin-bottom:10px;">คุณอยู่ในห้องสอบแล้ว!</div>
-  <div class="status-sub" style="margin-bottom:20px;">
-    รหัสประจำตัว:
-    <span id="u-name" style="font-weight:800; color:var(--config-secondary);">-</span>
-  </div>
-
-  <div style="background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.2); border-radius:16px; padding:20px; text-align:left; width:100%; max-width:400px; margin-top:10px;">
-    <div style="font-size:16px; font-weight:800; color:var(--config-secondary); margin-bottom:12px; text-align:center;">📖 กติกาและวิธีการเล่น</div>
-    <div style="font-size:14px; line-height:1.6; display:flex; flex-direction:column; gap:8px; color:#ddd;">
+  <div style="font-size: 50px; margin-bottom: 10px;">🎮</div>
+  <div class="status-title" style="font-size: 26px; margin-bottom: 10px;">คุณอยู่ในห้องสอบแล้ว!</div>
+  <div class="status-sub" style="margin-bottom:20px;">รหัสประจำตัว: <span id="u-name" style="font-weight:800; color:var(--config-secondary);">-</span></div>
+  
+  <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 16px; padding: 20px; text-align: left; width: 100%; max-width: 400px; margin-top: 10px;">
+    <div style="font-size: 16px; font-weight: 800; color: var(--config-secondary); margin-bottom: 12px; text-align: center;">📖 กติกาและวิธีการเล่น</div>
+    <div style="font-size: 14px; line-height: 1.6; display: flex; flex-direction: column; gap: 8px; color: #ddd;">
       <div>1️⃣ <b style="color:#fff;">อ่านคำถามและตัวเลือก</b> ที่หน้าจอโปรเจคเตอร์ด้านหน้าห้องเรียน</div>
       <div>2️⃣ <b style="color:#fff;">กดปุ่มสีบนมือถือ</b> ให้ตรงกับคำตอบที่คุณคิดว่าถูกต้อง</div>
-      <div>3️⃣ <b style="color:#fff;">ตอบให้ไวที่สุด!</b> ยิ่งตอบเร็ว ยิ่งได้คะแนนโบนัสเยอะ</div>
+      <div>3️⃣ <b style="color:#fff;">ตอบให้ไวที่สุด!</b> ยิ่งตอบเร็ว ยิ่งได้คะแนนโบนัสเยอะ (คะแนนลดหลั่นตามเวลา)</div>
     </div>
   </div>
 
   <div class="status-sub pulse-anim" style="margin-top:30px; font-size:16px;">⏳ รออาจารย์กดเริ่มข้อสอบ...</div>
 </div>
 
-<!-- Game (Joystick) -->
 <div id="screen-game" class="screen game-screen hidden">
-  <!--
-    [FIX] เพิ่ม id="btn-grid" เพื่อ disable/enable ทั้ง grid พร้อมกัน
-    กัน double-tap ส่งคำตอบ 2 ครั้ง
-  -->
-  <div class="btn-grid" id="btn-grid">
-    <div class="btn-shape bg-red"    id="btn-0" onclick="submitAnswer(0)"><div class="shape-icon s-red"></div></div>
-    <div class="btn-shape bg-blue"   id="btn-1" onclick="submitAnswer(1)"><div class="shape-icon s-blue"></div></div>
-    <div class="btn-shape bg-yellow" id="btn-2" onclick="submitAnswer(2)"><div class="shape-icon s-yellow"></div></div>
-    <div class="btn-shape bg-green"  id="btn-3" onclick="submitAnswer(3)"><div class="shape-icon s-green"></div></div>
+  <div class="btn-grid">
+    <div class="btn-shape bg-red" onclick="submitAnswer(0)"><div class="shape-icon s-red"></div></div>
+    <div class="btn-shape bg-blue" onclick="submitAnswer(1)"><div class="shape-icon s-blue"></div></div>
+    <div class="btn-shape bg-yellow" onclick="submitAnswer(2)"><div class="shape-icon s-yellow"></div></div>
+    <div class="btn-shape bg-green" onclick="submitAnswer(3)"><div class="shape-icon s-green"></div></div>
   </div>
 </div>
 
-<!-- Wait after answer -->
 <div id="screen-wait" class="screen status-screen hidden" style="background:#e5e5e5; color:#333;">
-  <div class="spinner" style="border-color:#ccc; border-top-color:#666;"></div>
+  <div class="spinner" style="border-color: #ccc; border-top-color: #666;"></div>
   <div class="status-title">ส่งคำตอบแล้ว!</div>
   <div class="status-sub">รอเพื่อนๆ ตอบให้ครบ...</div>
 </div>
 
-<!-- Reveal -->
 <div id="screen-reveal" class="screen hidden">
-  <div style="font-size:80px; margin-bottom:10px;" id="r-icon">✔️</div>
+  <div style="font-size: 80px; margin-bottom:10px;" id="r-icon">✔️</div>
   <div class="status-title" id="r-title">ถูกต้อง!</div>
   <div class="points-text hidden" id="r-points">+0</div>
   <div class="status-sub" style="margin-top:40px;">มองที่หน้าจอหลักเพื่อดูอันดับ</div>
 </div>
 
-<!-- Error -->
-<div id="screen-error" class="screen error-screen hidden">
-  <div style="font-size:50px; margin-bottom:15px;">⚠️</div>
-  <div class="status-title" id="err-title">เกิดข้อผิดพลาด</div>
-  <div class="status-sub" id="err-msg" style="margin-bottom:10px;"></div>
-  <button class="error-btn" style="background:#fff; color:#1a1a2e;" onclick="retryInit()">🔄 ลองใหม่</button>
-  <button class="error-btn" style="background:transparent; border:1px solid rgba(255,255,255,0.4); color:#fff; margin-top:8px;" onclick="liff.closeWindow()">ปิดหน้าต่าง</button>
-</div>
-
 <script>
-/* ════════════════════════════════════════════════════════
-   CONFIG
-   ════════════════════════════════════════════════════════ */
-const LIFF_ID = '2009896605-pO6vx1RZ';
+const LIFF_ID = '2009896605-pO6vx1RZ'; // << [ใส่ LIFF ID สำหรับจอยสติ๊กผู้เล่น]
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbwo_kB4DZSVmYqkztnf8n_-sjVvAFUxIH9dZAqby_SUvV5H8gH5hXhILHkzZJ59S2j6/exec';
 
-/* ════════════════════════════════════════════════════════
-   STATE
-   ════════════════════════════════════════════════════════ */
-let userId   = '';
+let userId = '';
 let userName = '';
+let currentState = null;
+let pollInterval = null;
+let isAnswered = false;
+let currentQIndex = -1;
+let questionStartTime = 0;
 
-// Game state tracking
-let currentQIndex     = -1;   // index ข้อปัจจุบัน
-let isAnswered        = false; // ผู้เล่นตอบแล้วหรือยัง
-let isSubmitting      = false; // กำลังส่งคำตอบอยู่ (กัน double submit)
-let lastCorrect       = false;
-let lastScore         = 0;
-let questionStartTime = 0;     // timestamp เริ่มข้อ (client-side)
+let lastScore = 0;
+let lastCorrect = false;
+let hasJoinedRoom = false; 
+let appConfig = null;
 
-// Room join tracking
-// [FIX] แยก track ด้วย lastJoinedStatus แทน boolean
-// เพื่อรองรับกรณีที่ host reset แล้วเปิด LOBBY ใหม่
-let lastJoinedStatus = '';
-
-// Polling
-let pollInterval   = null;
-let isFetching     = false;   // [FIX] guard ป้องกัน request pile-up
-let pollAbortCtrl  = null;    // [FIX] AbortController สำหรับ cancel request ค้าง
-
-// State hash เพื่อลด re-render เมื่อ state ไม่เปลี่ยน
-let lastStateHash = '';
-
-/* ════════════════════════════════════════════════════════
-   INIT
-   ════════════════════════════════════════════════════════ */
 async function init() {
-  showScreen('screen-loading');
   try {
     await liff.init({ liffId: LIFF_ID });
     if (!liff.isLoggedIn()) { liff.login(); return; }
-
+    
+    // โหลด Config แค่ครั้งเดียว
+    callAPI('GET', { action: 'get_config' }).then(configRes => {
+      if(configRes.status === 'ok') { 
+        appConfig = configRes.config; 
+        applyTemplate(appConfig); 
+      }
+    }).catch(e => console.log(e));
+    
     const profile = await liff.getProfile();
-    userId   = profile.userId;
+    userId = profile.userId;
     userName = profile.displayName;
     document.getElementById('u-name').textContent = userName;
-
-    // โหลด config (ไม่ block การทำงานหลัก)
-    loadConfig().catch(e => console.warn('[Config]', e.message));
-
-    // [FIX] เริ่ม polling เพียงจุดเดียว ไม่มี fetchStateOnce แยก
-    // ป้องกัน race condition ที่เกิดจากการเรียก 2 ครั้งพร้อมกัน
+    
+    // เริ่มดึงข้อมูลทันที ไม่ต้องรอ Config เสร็จ
+    fetchStateOnce(); 
     startPolling();
-
-    // [FIX] หยุด/ต่อ polling เมื่อ tab ซ่อน/แสดง (ลด server load)
-    document.addEventListener('visibilitychange', onVisibilityChange);
-
-  } catch (e) {
-    showError('เริ่มต้นระบบล้มเหลว', e.message);
-  }
-}
-
-function retryInit() {
-  stopPolling();
-  lastStateHash    = '';
-  lastJoinedStatus = '';
-  currentQIndex    = -1;
-  isAnswered       = false;
-  init();
-}
-
-/* ════════════════════════════════════════════════════════
-   CONFIG
-   ════════════════════════════════════════════════════════ */
-async function loadConfig() {
-  const res = await callAPI('GET', { action: 'get_config' });
-  if (res.status === 'ok' && res.config) {
-    applyTemplate(res.config);
+  } catch(e) {
+    document.getElementById('screen-loading').innerHTML = `<h2 style="color:#ff3355">ผิดพลาด</h2><p>${e.message}</p>`;
   }
 }
 
 function applyTemplate(c) {
-  if (!c) return;
-  if (c.colorPrimary)   document.documentElement.style.setProperty('--config-primary',   c.colorPrimary);
-  if (c.colorSecondary) document.documentElement.style.setProperty('--config-secondary', c.colorSecondary);
-  if (c.appName)        document.title = 'Live Quiz — ' + c.appName;
+  if(!c) return;
+  document.documentElement.style.setProperty('--config-primary', c.colorPrimary);
+  document.documentElement.style.setProperty('--config-secondary', c.colorSecondary);
+  document.title = "Live Quiz - " + c.appName;
 }
 
-/* ════════════════════════════════════════════════════════
-   POLLING
-   ════════════════════════════════════════════════════════ */
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+}
+
+// ดึงครั้งแรกเพื่อความไว
+async function fetchStateOnce() {
+  try {
+    const res = await callAPI('GET', { action:'live_get_state', isHost:'false' });
+    if(res.status === 'ok') handleStateUpdate(res.state);
+  } catch(e) {}
+}
+
 function startPolling() {
-  if (pollInterval) return; // ป้องกัน start ซ้ำ
-
-  // ดึงทันทีรอบแรก แล้วค่อย interval
-  doPoll();
-  pollInterval = setInterval(doPoll, 1500);
-}
-
-function stopPolling() {
-  if (pollInterval) { clearInterval(pollInterval); pollInterval = null; }
-  // [FIX] ยกเลิก request ที่ค้างอยู่ด้วย
-  if (pollAbortCtrl) { pollAbortCtrl.abort(); pollAbortCtrl = null; }
-  isFetching = false;
-}
-
-/*
- * [FIX] ใช้ isFetching guard ป้องกัน request pile-up
- * ถ้า request ก่อนหน้ายังไม่เสร็จ ให้ข้ามรอบนี้ไป
- */
-async function doPoll() {
-  if (isFetching) return;
-  isFetching    = true;
-  pollAbortCtrl = new AbortController();
-
-  try {
-    const res = await callAPI('GET', { action: 'live_get_state', isHost: 'false' }, 8000, pollAbortCtrl.signal);
-
-    if (res.status === 'ok' && res.state) {
-      // [FIX] เปรียบเทียบ hash ก่อน render เพื่อลด DOM update ที่ไม่จำเป็น
-      const hash = buildStateHash(res.state);
-      if (hash !== lastStateHash) {
-        lastStateHash = hash;
+  // ⚡ ลดความถี่จาก 2000ms เป็น 1000ms (1 วินาที) เพื่อให้ตอบสนองอาจารย์ได้ไวขึ้น
+  pollInterval = setInterval(async () => {
+    try {
+      const res = await callAPI('GET', { action:'live_get_state', isHost:'false' });
+      if(res.status === 'ok') {
         handleStateUpdate(res.state);
+      } else {
+        document.getElementById('screen-loading').innerHTML = `<h2 style="color:#ff3355; margin-bottom:20px;">อาจารย์ยังไม่เปิดห้อง</h2><button onclick="liff.closeWindow()" style="padding:10px 20px; border-radius:8px; border:none; background:#fff; color:#333; font-weight:800; font-family:'Sarabun'">ปิดหน้าต่าง</button>`;
+        showScreen('screen-loading');
       }
-    } else {
-      // Host ยังไม่เปิดห้อง หรือ session หมด
-      showNoRoom();
-    }
-  } catch (e) {
-    // AbortError คือเราสั่ง cancel เอง → ไม่ต้องแสดง error
-    if (e.name !== 'AbortError') {
-      console.warn('[Poll error]', e.message);
-      // ไม่หยุด polling — ให้ retry รอบถัดไปเอง
-    }
-  } finally {
-    isFetching    = false;
-    pollAbortCtrl = null;
-  }
+    } catch(e) {}
+  }, 1000); 
 }
 
-/*
- * สร้าง hash สั้นๆ จาก state เพื่อเช็กว่า state เปลี่ยนหรือไม่
- * ใช้ JSON.stringify แบบ selective field แทน full stringify เพื่อความเร็ว
- */
-function buildStateHash(state) {
-  return `${state.status}|${state.currentQIndex ?? -1}|${state.answerCount ?? 0}`;
-}
-
-/* ════════════════════════════════════════════════════════
-   PAGE VISIBILITY
-   ════════════════════════════════════════════════════════ */
-function onVisibilityChange() {
-  if (document.hidden) {
-    // [FIX] หยุด polling เมื่อ tab ถูกซ่อน ลด battery + server load
-    stopPolling();
-  } else {
-    // กลับมาแสดง: reset hash เพื่อ force re-render และเริ่ม poll ใหม่
-    lastStateHash = '';
-    startPolling();
-  }
-}
-
-/* ════════════════════════════════════════════════════════
-   STATE HANDLER
-   ════════════════════════════════════════════════════════ */
 function handleStateUpdate(state) {
-  switch (state.status) {
-
-    case 'LOBBY':
-      isAnswered   = false;
-      isSubmitting = false;
-      showScreen('screen-lobby');
-
-      // [FIX] Join room เมื่อ status เป็น LOBBY และยังไม่เคย join session นี้
-      // ใช้ lastJoinedStatus แทน boolean flag เพื่อรองรับ host reset
-      if (lastJoinedStatus !== 'LOBBY') {
-        lastJoinedStatus = 'LOBBY';
-        joinRoom();
-      }
-      break;
-
-    case 'SCOREBOARD':
-      isAnswered       = false;
-      isSubmitting     = false;
-      lastJoinedStatus = 'SCOREBOARD'; // พร้อม join รอบใหม่เมื่อ LOBBY กลับมา
-      showScreen('screen-lobby');
-      break;
-
-    case 'QUESTION':
-      // [FIX] ตรวจสอบว่าข้อเปลี่ยนหรือไม่ (ไม่ใช่แค่ state เปลี่ยน)
-      if (currentQIndex !== state.currentQIndex) {
-        currentQIndex     = state.currentQIndex;
-        isAnswered        = false;
-        isSubmitting      = false;
-        questionStartTime = Date.now();
-        enableButtons(); // [FIX] เปิดปุ่มสำหรับข้อใหม่
-      }
-
-      showScreen(isAnswered ? 'screen-wait' : 'screen-game');
-      break;
-
-    case 'REVEAL':
-      renderReveal();
-      showScreen('screen-reveal');
-      break;
-
-    default:
-      console.warn('[State] Unknown status:', state.status);
+  currentState = state;
+  
+  if(state.status === 'LOBBY' || state.status === 'SCOREBOARD') {
+    isAnswered = false;
+    showScreen('screen-lobby');
+    
+    if(state.status === 'LOBBY' && !hasJoinedRoom) {
+       hasJoinedRoom = true;
+       callAPI('POST', { action: 'live_join_room', userId: userId }).catch(e => hasJoinedRoom = false);
+    } else if (state.status === 'SCOREBOARD') {
+       hasJoinedRoom = false; 
+    }
+  } 
+  else if(state.status === 'QUESTION') {
+    if(currentQIndex !== state.currentQIndex) {
+       currentQIndex = state.currentQIndex;
+       isAnswered = false;
+       questionStartTime = Date.now();
+    }
+    
+    if(!isAnswered) {
+      showScreen('screen-game');
+    } else {
+      showScreen('screen-wait');
+    }
+  }
+  else if(state.status === 'REVEAL') {
+    const scr = document.getElementById('screen-reveal');
+    if(!isAnswered) {
+       scr.className = 'screen reveal-wrong';
+       document.getElementById('r-icon').textContent = '⏰';
+       document.getElementById('r-title').textContent = 'หมดเวลา!';
+       document.getElementById('r-points').classList.add('hidden');
+    } else {
+       scr.className = `screen ${lastCorrect ? 'reveal-correct' : 'reveal-wrong'}`;
+       document.getElementById('r-icon').textContent = lastCorrect ? '✔️' : '❌';
+       document.getElementById('r-title').textContent = lastCorrect ? 'อัจฉริยะ!' : 'ตอบผิด!';
+       if(lastCorrect) {
+         document.getElementById('r-points').textContent = `+${lastScore}`;
+         document.getElementById('r-points').classList.remove('hidden');
+       } else {
+         document.getElementById('r-points').classList.add('hidden');
+       }
+    }
+    showScreen('screen-reveal');
   }
 }
 
-/* ════════════════════════════════════════════════════════
-   ROOM JOIN
-   ════════════════════════════════════════════════════════ */
-async function joinRoom() {
-  try {
-    await callAPI('POST', { action: 'live_join_room', userId });
-  } catch (e) {
-    // join ล้มเหลวให้ reset flag เพื่อลองใหม่รอบถัดไป
-    lastJoinedStatus = '';
-    console.warn('[JoinRoom]', e.message);
-  }
-}
-
-/* ════════════════════════════════════════════════════════
-   SUBMIT ANSWER
-   ════════════════════════════════════════════════════════ */
 async function submitAnswer(colorIndex) {
-  // [FIX] Double-guard: isAnswered กัน re-submit, isSubmitting กัน double-tap
-  if (isAnswered || isSubmitting) return;
-
-  isSubmitting = true;
-  isAnswered   = true;
-
-  // [FIX] Disable ปุ่มทั้งหมดทันที ก่อน await ใดๆ
-  disableButtons();
-
-  // แสดง wait screen ทันที (optimistic UI)
-  showScreen('screen-wait');
-
+  if(isAnswered) return;
+  isAnswered = true;
+  // ⚡ สลับไปหน้า "ส่งคำตอบแล้ว" ทันทีที่นิ้วแตะ เพื่อให้ผู้ใช้รู้สึกว่าระบบตอบสนองทันที
+  showScreen('screen-wait'); 
+  
   const timeTaken = Date.now() - questionStartTime;
-
-  // คำนวณ selectedKey จาก shuffledKeys หรือ fallback
-  const state = await getCurrentState();
-  if (!state) {
-    // ดึง state ไม่ได้ → ยกเลิกการส่ง
-    isAnswered   = false;
-    isSubmitting = false;
-    enableButtons();
-    showScreen('screen-game');
-    return;
-  }
-
-  const q = state.question;
+  const q = currentState.question;
   let selectedKey = '';
-
+  
   if (q.shuffledKeys && q.shuffledKeys.length > colorIndex) {
     selectedKey = q.shuffledKeys[colorIndex];
   } else {
-    const choiceKeys = Object.keys(q.choices || {});
-    selectedKey = choiceKeys[colorIndex] || '';
+    const choiceKeys = Object.keys(q.choices);
+    selectedKey = choiceKeys[colorIndex];
   }
-
-  if (!selectedKey) {
-    console.warn('[Submit] ไม่พบ selectedKey สำหรับ colorIndex:', colorIndex);
-    isAnswered   = false;
-    isSubmitting = false;
-    enableButtons();
-    showScreen('screen-game');
-    return;
-  }
-
+  
   try {
     const res = await callAPI('POST', {
-      action:    'live_submit_answer',
-      userId,
-      qIndex:    state.currentQIndex,
-      answer:    selectedKey,
-      timeTaken,
+       action: 'live_submit_answer',
+       userId: userId,
+       qIndex: currentState.currentQIndex,
+       answer: selectedKey,
+       timeTaken: timeTaken
     });
-
-    if (res.status === 'ok') {
-      lastCorrect = res.isCorrect;
-      lastScore   = res.score ?? 0;
+    
+    if(res.status === 'ok') {
+       lastCorrect = res.isCorrect;
+       lastScore = res.score;
     } else {
-      // Server reject (เช่น ตอบซ้ำ, ข้อเปลี่ยนแล้ว)
-      console.warn('[Submit] Rejected:', res.message);
-      isAnswered   = false;
-      isSubmitting = false;
-      enableButtons();
-      showScreen('screen-game');
+       isAnswered = false;
+       showScreen('screen-game');
+       alert(res.message);
     }
-  } catch (e) {
-    console.error('[Submit] Error:', e.message);
-    isAnswered   = false;
-    isSubmitting = false;
-    enableButtons();
+  } catch(e) {
+    isAnswered = false;
     showScreen('screen-game');
-  } finally {
-    isSubmitting = false;
   }
 }
 
-/* ════════════════════════════════════════════════════════
-   REVEAL RENDER
-   ════════════════════════════════════════════════════════ */
-function renderReveal() {
-  const scr    = document.getElementById('screen-reveal');
-  const icon   = document.getElementById('r-icon');
-  const title  = document.getElementById('r-title');
-  const points = document.getElementById('r-points');
-
-  if (!isAnswered) {
-    // หมดเวลา ไม่ได้ตอบ
-    scr.className = 'screen reveal-wrong';
-    icon.textContent  = '⏰';
-    title.textContent = 'หมดเวลา!';
-    points.classList.add('hidden');
-  } else if (lastCorrect) {
-    scr.className = 'screen reveal-correct';
-    icon.textContent  = '✔️';
-    title.textContent = 'อัจฉริยะ!';
-    points.textContent = `+${lastScore}`;
-    points.classList.remove('hidden');
-  } else {
-    scr.className = 'screen reveal-wrong';
-    icon.textContent  = '❌';
-    title.textContent = 'ตอบผิด!';
-    points.classList.add('hidden');
-  }
+async function callAPI(method, params) {
+  let url = GAS_URL, opts = { method: 'POST', headers: {'Content-Type':'text/plain'}, body: JSON.stringify(params) };
+  if(method === 'GET') { url += '?' + new URLSearchParams(params).toString(); opts = {method:'GET'}; }
+  const resp = await fetch(url, opts);
+  return await resp.json();
 }
 
-/* ════════════════════════════════════════════════════════
-   BUTTON HELPERS
-   ════════════════════════════════════════════════════════ */
-/** [FIX] Disable ปุ่มทั้ง grid เพื่อป้องกัน double-tap */
-function disableButtons() {
-  document.getElementById('btn-grid').querySelectorAll('.btn-shape').forEach(btn => {
-    btn.classList.add('disabled');
-  });
-}
-
-/** เปิดปุ่มกลับมาเมื่อข้อใหม่เริ่ม */
-function enableButtons() {
-  document.getElementById('btn-grid').querySelectorAll('.btn-shape').forEach(btn => {
-    btn.classList.remove('disabled');
-  });
-}
-
-/* ════════════════════════════════════════════════════════
-   SCREEN HELPERS
-   ════════════════════════════════════════════════════════ */
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
-  const el = document.getElementById(id);
-  if (el) el.classList.remove('hidden');
-}
-
-function showNoRoom() {
-  const el = document.getElementById('screen-loading');
-  el.classList.remove('hidden');
-  document.querySelectorAll('.screen:not(#screen-loading)').forEach(s => s.classList.add('hidden'));
-  el.innerHTML = `
-    <h2 style="color:#ffd700; margin-bottom:10px; font-size:22px;">อาจารย์ยังไม่เปิดห้อง</h2>
-    <p style="color:rgba(255,255,255,0.7); font-size:14px; margin-bottom:20px;">กรุณารอสักครู่ ระบบจะตรวจสอบอัตโนมัติ...</p>
-    <button onclick="liff.closeWindow()" style="padding:10px 20px; border-radius:8px; border:none; background:#fff; color:#333; font-weight:800; font-family:'Sarabun';">ปิดหน้าต่าง</button>
-  `;
-}
-
-function showError(title, msg) {
-  stopPolling();
-  document.getElementById('err-title').textContent = title;
-  document.getElementById('err-msg').textContent   = msg || '';
-  showScreen('screen-error');
-}
-
-/* ════════════════════════════════════════════════════════
-   API HELPER
-   ════════════════════════════════════════════════════════ */
-/**
- * ดึง current state ล่าสุด (ใช้ใน submitAnswer เพื่อให้ได้ข้อมูลใหม่สุด)
- * @returns {Object|null}
- */
-async function getCurrentState() {
-  try {
-    const res = await callAPI('GET', { action: 'live_get_state', isHost: 'false' }, 8000);
-    return res.status === 'ok' ? res.state : null;
-  } catch {
-    return null;
-  }
-}
-
-/**
- * Generic API caller พร้อม timeout + optional AbortSignal
- * @param {'GET'|'POST'} method
- * @param {Object} params
- * @param {number} timeoutMs
- * @param {AbortSignal|null} externalSignal
- */
-async function callAPI(method, params, timeoutMs = 12000, externalSignal = null) {
-  const ctrl = new AbortController();
-  const tid  = setTimeout(() => ctrl.abort(), timeoutMs);
-
-  // [FIX] รองรับ external signal (จาก poll loop) ด้วย
-  if (externalSignal) {
-    externalSignal.addEventListener('abort', () => ctrl.abort(), { once: true });
-  }
-
-  try {
-    let url  = GAS_URL;
-    let opts = { signal: ctrl.signal, redirect: 'follow' };
-
-    if (method === 'GET') {
-      url += '?' + new URLSearchParams(params).toString();
-      opts.method = 'GET';
-    } else {
-      opts.method  = 'POST';
-      opts.headers = { 'Content-Type': 'text/plain' };
-      opts.body    = JSON.stringify(params);
-    }
-
-    const resp = await fetch(url, opts);
-    clearTimeout(tid);
-    if (!resp.ok) throw new Error('HTTP ' + resp.status);
-    return await resp.json();
-  } catch (e) {
-    clearTimeout(tid);
-    if (e.name === 'AbortError') throw e; // re-throw เพื่อให้ caller จัดการ
-    throw new Error(e.message || 'Network error');
-  }
-}
-
-/* ════════════════════════════════════════════════════════
-   BOOTSTRAP
-   ════════════════════════════════════════════════════════ */
 init();
 </script>
 </body>

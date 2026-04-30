@@ -16,471 +16,245 @@
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
 
-/* ─── Overlays ─── */
+/* Overlays */
 .ov { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; padding: 20px; text-align: center; }
 .hidden { display: none !important; }
 .spinner { width: 50px; height: 50px; border: 3px solid rgba(79,195,247,0.1); border-top: 3px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ─── Header ─── */
+/* Header */
 .header { background: linear-gradient(135deg, #0d47a1, #1565c0); padding: 20px; text-align: center; border-bottom: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
 .header-title { font-size: 24px; font-weight: 800; color: #fff; margin-bottom: 5px; }
 .header-sub { font-size: 13px; color: rgba(255,255,255,0.7); }
 
-/* ─── Search & Filter ─── */
+/* Search & Filter */
 .toolbar { padding: 16px; background: var(--surface); position: sticky; top: 0; z-index: 10; border-bottom: 1px solid var(--border); }
-.search-box {
-  width: 100%; background: var(--bg); border: 1px solid var(--border);
-  border-radius: 12px; padding: 12px 16px; color: var(--text);
-  font-family: 'Sarabun', sans-serif; font-size: 15px; outline: none;
-  margin-bottom: 12px; transition: border-color 0.2s;
-}
+.search-box { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; color: var(--text); font-family: 'Sarabun', sans-serif; font-size: 15px; outline: none; margin-bottom: 12px; transition: border-color 0.2s; }
 .search-box:focus { border-color: var(--primary); }
 
 .tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
 .tabs::-webkit-scrollbar { display: none; }
-.tab {
-  flex: 0 0 auto; padding: 8px 16px; background: var(--bg);
-  border: 1px solid var(--border); border-radius: 20px;
-  font-size: 13px; font-weight: 700; color: var(--muted);
-  cursor: pointer; transition: 0.2s; user-select: none;
-}
+.tab { flex: 0 0 auto; padding: 8px 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 20px; font-size: 13px; font-weight: 700; color: var(--muted); cursor: pointer; transition: 0.2s; }
 .tab.active { background: rgba(79,195,247,0.15); border-color: var(--primary); color: var(--primary); }
 
-/* ─── Content List ─── */
+/* Content List */
 .content-area { padding: 16px; display: flex; flex-direction: column; gap: 12px; flex: 1; }
-.card {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: 12px; padding: 16px; display: flex; gap: 14px;
-  align-items: center; cursor: pointer; transition: 0.2s;
-  /* [FIX] เพิ่ม user-select:none กัน text highlight เมื่อกดเร็ว */
-  user-select: none;
-}
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; display: flex; gap: 14px; align-items: center; cursor: pointer; transition: 0.2s; }
 .card:active { transform: scale(0.98); background: rgba(255,255,255,0.05); }
 
 .card-icon { width: 48px; height: 48px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
-.card.t-pdf   .card-icon { background: rgba(248,81,73,0.15);  color: var(--pdf); }
-.card.t-video .card-icon { background: rgba(255,152,0,0.15);  color: var(--video); }
-.card.t-link  .card-icon { background: rgba(46,160,67,0.15);  color: var(--link); }
+.card.t-pdf .card-icon { background: rgba(248,81,73,0.15); color: var(--pdf); }
+.card.t-video .card-icon { background: rgba(255,152,0,0.15); color: var(--video); }
+.card.t-link .card-icon { background: rgba(46,160,67,0.15); color: var(--link); }
 
 .card-info { flex: 1; overflow: hidden; }
 .card-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.card-meta  { font-size: 12px; color: var(--muted); display: flex; gap: 8px; align-items: center; }
+.card-meta { font-size: 12px; color: var(--muted); display: flex; gap: 8px; align-items: center; }
 .badge { padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 800; background: var(--bg); border: 1px solid var(--border); }
 
 .empty-state { text-align: center; padding: 40px 20px; color: var(--muted); }
 
-/* ─── Video Modal ─── */
-/*
- * [FIX] แก้ event detection ของ overlay
- * ใช้ pointer-events + data attribute แทนการเช็ก className
- */
-.modal-video-bg {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.9);
-  z-index: 1000; display: flex; align-items: center;
-  justify-content: center; padding: 20px;
-  /* [FIX] เพิ่ม cursor เพื่อบอก user ว่าคลิกที่นี่เพื่อปิด */
-  cursor: pointer;
-}
-.modal-video-container {
-  width: 100%; max-width: 600px;
-  display: flex; flex-direction: column; gap: 10px;
-  /* [FIX] กันการ bubble event จาก container ไป overlay */
-  cursor: default;
-}
-.close-btn { align-self: flex-end; background: transparent; border: none; color: #fff; font-size: 36px; cursor: pointer; line-height: 1; padding: 4px 8px; }
-.video-wrapper {
-  position: relative; width: 100%; padding-bottom: 56.25%; height: 0;
-  border-radius: 12px; overflow: hidden;
-  background: #000; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-}
+/* Video Modal */
+.modal-video-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.modal-video-container { width: 100%; max-width: 600px; display: flex; flex-direction: column; gap: 10px; }
+.close-btn { align-self: flex-end; background: transparent; border: none; color: #fff; font-size: 36px; cursor: pointer; line-height: 1; }
+.video-wrapper { position: relative; width: 100%; padding-bottom: 56.25%; height: 0; border-radius: 12px; overflow: hidden; background: #000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
 .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
-
-/* ─── Error State ─── */
-.error-box { background: rgba(248,81,73,0.1); border: 1px solid rgba(248,81,73,0.3); border-radius: 12px; padding: 20px; text-align: center; margin: 20px; }
-.retry-btn { margin-top: 12px; padding: 10px 24px; background: var(--primary); color: #000; border: none; border-radius: 8px; font-size: 15px; font-weight: 800; font-family: 'Sarabun'; cursor: pointer; }
 </style>
 </head>
 <body>
 
-<!-- Loading Overlay -->
 <div id="ov-load" class="ov">
   <div class="spinner"></div>
   <div style="font-weight:800; color:var(--text);">กำลังดึงคลังความรู้...</div>
 </div>
 
-<!-- Main Header -->
 <div class="header">
   <div class="header-title">📚 คลังความรู้ดิจิทัล</div>
   <div class="header-sub">Unit School — ศูนย์รวมคู่มือ วิดีโอ และสื่อการสอน</div>
 </div>
 
-<!-- Search & Category Filter -->
 <div class="toolbar">
-  <!-- [FIX] เอา onkeyup inline ออก ใช้ addEventListener แทน + debounce -->
-  <input type="text" class="search-box" id="search-inp" placeholder="🔍 ค้นหาหัวข้อ หรือ รายวิชา...">
+  <input type="text" class="search-box" id="search-inp" placeholder="🔍 ค้นหาหัวข้อ หรือ รายวิชา..." onkeyup="filterData()">
   <div class="tabs" id="category-tabs">
-    <!-- Categories inserted by JS -->
+    <!-- Categories inserted here -->
   </div>
 </div>
 
-<!-- Material List -->
 <div class="content-area" id="material-list">
-  <!-- Items inserted by JS -->
+  <!-- Items inserted here -->
 </div>
 
 <!-- Video Player Modal -->
-<!--
-  [FIX] เพิ่ม data-overlay="true" บน overlay ไว้เช็กว่าคลิกที่ตัว overlay เอง
-  แทนการเช็ก className ซึ่งมีโอกาสผิดพลาด
--->
-<div id="modal-video" class="modal-video-bg hidden" data-overlay="true">
-  <div class="modal-video-container">
-    <button class="close-btn" id="close-video-btn" aria-label="ปิดวิดีโอ">&times;</button>
+<div id="modal-video" class="modal-video-bg hidden" onclick="closeVideoModal(event)">
+  <div class="modal-video-container" onclick="event.stopPropagation()">
+    <button class="close-btn" onclick="closeVideoModal()">&times;</button>
     <div class="video-wrapper">
-      <iframe id="video-frame" allowfullscreen allow="autoplay; encrypted-media" title="วิดีโอสื่อการสอน"></iframe>
+      <iframe id="video-frame" allowfullscreen allow="autoplay; encrypted-media"></iframe>
     </div>
   </div>
 </div>
 
 <script>
-/* ════════════════════════════════════════════════════════
-   CONFIG — เปลี่ยนเฉพาะ 2 บรรทัดนี้
-   ════════════════════════════════════════════════════════ */
-const LIFF_ID = '2009896605-Zj1tRcSm';
+// >>> อย่าลืมเปลี่ยน 2 บรรทัดนี้ให้ตรงกับระบบของคุณนะครับ <<<
+const LIFF_ID = '2009896605-Zj1tRcSm'; 
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbwo_kB4DZSVmYqkztnf8n_-sjVvAFUxIH9dZAqby_SUvV5H8gH5hXhILHkzZJ59S2j6/exec';
 
-/* ════════════════════════════════════════════════════════
-   STATE
-   ════════════════════════════════════════════════════════ */
-/** @type {Array<{id:string, title:string, category:string, type:string, url:string}>} */
-let allMaterials  = [];
+let allMaterials = [];
 let activeCategory = 'ALL';
+const _mMap = {}; 
 
-/*
- * [FIX] เปลี่ยน _mMap จาก index→object เป็น Map<id→object>
- * เดิม: ถ้า filter เปลี่ยน index ใหม่อาจชนกับ onclick ที่ DOM bind ไว้
- * ใหม่: ผูก data-id กับ card แล้ว lookup จาก Map เสมอ (ปลอดภัยกว่า)
- */
-const materialMap = new Map();
-
-/* debounce timer สำหรับ search */
-let searchDebounceTimer = null;
-
-/* ════════════════════════════════════════════════════════
-   INIT
-   ════════════════════════════════════════════════════════ */
 async function init() {
   try {
     await liff.init({ liffId: LIFF_ID });
     if (!liff.isLoggedIn()) { liff.login(); return; }
+    
     await fetchData();
-  } catch (e) {
-    showError('เริ่มต้นระบบล้มเหลว: ' + e.message);
+  } catch(e) {
+    showError(e.message);
   }
 }
 
-/* ════════════════════════════════════════════════════════
-   DATA FETCHING
-   ════════════════════════════════════════════════════════ */
 async function fetchData() {
-  // แสดง loading overlay
-  const ovLoad = document.getElementById('ov-load');
-  ovLoad.classList.remove('hidden');
-
   try {
     const data = await callAPI('GET', { action: 'get_library_data' });
     if (data.status === 'error') throw new Error(data.message);
-
-    allMaterials = (data.materials || []).map((m, i) => ({
-      // [FIX] สร้าง stable id จาก index ถ้า backend ไม่ส่ง id มา
-      id: m.id ?? `mat-${i}`,
-      title:    m.title    || '(ไม่มีชื่อ)',
-      category: m.category || 'ทั่วไป',
-      type:     m.type     || 'link',
-      url:      m.url      || '',
-    }));
-
+    
+    allMaterials = data.materials || [];
     renderCategories();
     filterData();
-    ovLoad.classList.add('hidden');
-  } catch (e) {
-    showError('ไม่สามารถเชื่อมต่อฐานข้อมูลได้: ' + e.message, true);
+    document.getElementById('ov-load').classList.add('hidden');
+  } catch(e) {
+    showError('ไม่สามารถเชื่อมต่อฐานข้อมูลได้: ' + e.message);
   }
 }
 
-/* ════════════════════════════════════════════════════════
-   RENDER CATEGORIES
-   ════════════════════════════════════════════════════════ */
 function renderCategories() {
   const tabsContainer = document.getElementById('category-tabs');
-  // ดึง unique categories ตามลำดับที่ปรากฏ
   const categories = [...new Set(allMaterials.map(m => m.category))];
-
-  let html = `<div class="tab active" data-cat="ALL">🏷️ ทั้งหมด</div>`;
+  
+  let html = `<div class="tab active" onclick="setCategory('ALL', this)">🏷️ ทั้งหมด</div>`;
   categories.forEach(cat => {
-    html += `<div class="tab" data-cat="${escapeAttr(cat)}">${escapeHtml(cat)}</div>`;
+    html += `<div class="tab" onclick="setCategory('${cat}', this)">${cat}</div>`;
   });
   tabsContainer.innerHTML = html;
-
-  // [FIX] ผูก event listener ผ่าน delegation แทน onclick inline
-  tabsContainer.addEventListener('click', e => {
-    const tab = e.target.closest('.tab');
-    if (!tab) return;
-    tabsContainer.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    activeCategory = tab.dataset.cat;
-    filterData();
-  });
 }
 
-/* ════════════════════════════════════════════════════════
-   FILTER & RENDER LIST
-   ════════════════════════════════════════════════════════ */
-function filterData() {
-  const query = (document.getElementById('search-inp').value || '').toLowerCase().trim();
-  const listContainer = document.getElementById('material-list');
+function setCategory(cat, el) {
+  activeCategory = cat;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  filterData();
+}
 
+function filterData() {
+  const query = document.getElementById('search-inp').value.toLowerCase();
+  const listContainer = document.getElementById('material-list');
+  
   const filtered = allMaterials.filter(m => {
-    const matchCat    = activeCategory === 'ALL' || m.category === activeCategory;
-    const matchSearch = !query
-      || m.title.toLowerCase().includes(query)
-      || m.category.toLowerCase().includes(query);
+    const matchCat = activeCategory === 'ALL' || m.category === activeCategory;
+    const matchSearch = m.title.toLowerCase().includes(query) || m.category.toLowerCase().includes(query);
     return matchCat && matchSearch;
   });
-
-  // [FIX] ล้าง materialMap ทุกครั้งที่ re-render
-  materialMap.clear();
 
   if (filtered.length === 0) {
     listContainer.innerHTML = `<div class="empty-state">❌ ไม่พบข้อมูลที่ค้นหา</div>`;
     return;
   }
 
-  // สร้าง HTML และ populate map พร้อมกัน
-  listContainer.innerHTML = filtered.map(m => {
-    materialMap.set(m.id, m);
+  Object.keys(_mMap).forEach(k => delete _mMap[k]);
 
-    const typeUpper = m.type.toUpperCase();
-    const typeClass = typeUpper === 'PDF' ? 't-pdf' : typeUpper === 'VIDEO' ? 't-video' : 't-link';
-    const icon      = typeUpper === 'PDF' ? '📄' : typeUpper === 'VIDEO' ? '🎥' : '🔗';
-
-    // [FIX] ใช้ data-id แทน closure index เพื่อความปลอดภัย
+  listContainer.innerHTML = filtered.map((m, idx) => {
+    _mMap[idx] = m; 
+    const typeClass = m.type.toUpperCase() === 'PDF' ? 't-pdf' : m.type.toUpperCase() === 'VIDEO' ? 't-video' : 't-link';
+    const icon = m.type.toUpperCase() === 'PDF' ? '📄' : m.type.toUpperCase() === 'VIDEO' ? '🎥' : '🔗';
+    
+    // สังเกตว่ามีการส่ง m.type ไปด้วยเพื่อเช็กว่าเป็นวิดีโอหรือไม่
     return `
-      <div class="card ${typeClass}" data-id="${escapeAttr(m.id)}" role="button" tabindex="0" aria-label="${escapeAttr(m.title)}">
+      <div class="card ${typeClass}" onclick="openMaterial(_mMap[${idx}].url, '${m.type.toUpperCase()}')">
         <div class="card-icon">${icon}</div>
         <div class="card-info">
           <div class="card-title">${escapeHtml(m.title)}</div>
           <div class="card-meta">
-            <span class="badge">${escapeHtml(typeUpper)}</span>
+            <span class="badge">${escapeHtml(m.type.toUpperCase())}</span>
             <span>${escapeHtml(m.category)}</span>
           </div>
         </div>
-        <div style="color:var(--muted); font-size:18px;" aria-hidden="true">›</div>
+        <div style="color:var(--muted); font-size:18px;">›</div>
       </div>
     `;
   }).join('');
-
-  // [FIX] ผูก click ผ่าน event delegation บน container
-  // (ปลอดภัยกว่า onclick inline และไม่เกิด memory leak)
-  listContainer.onclick = null; // reset ก่อน
-  listContainer.addEventListener('click', handleCardClick, { once: false });
 }
 
-function handleCardClick(e) {
-  const card = e.target.closest('.card[data-id]');
-  if (!card) return;
-
-  const mat = materialMap.get(card.dataset.id);
-  if (!mat) return;
-
-  openMaterial(mat.url, mat.type.toUpperCase());
-}
-
-/* ════════════════════════════════════════════════════════
-   OPEN MATERIAL
-   ════════════════════════════════════════════════════════ */
-function openMaterial(url, type) {
-  // [FIX] ตรวจสอบ URL เบื้องต้นก่อนเปิด
-  if (!url || !isValidUrl(url)) {
-    alert('ลิงก์นี้ไม่ถูกต้อง กรุณาแจ้งแอดมิน');
-    return;
-  }
-
-  if (type === 'VIDEO') {
-    const embedUrl = toEmbedUrl(url);
-    if (!embedUrl) {
-      // ถ้าแปลง embed ไม่ได้ (ไม่ใช่ YouTube) ให้เปิดเบราว์เซอร์ปกติ
-      liff.openWindow({ url, external: true });
-      return;
-    }
-    document.getElementById('video-frame').src = embedUrl;
-    document.getElementById('modal-video').classList.remove('hidden');
-  } else {
-    liff.openWindow({ url, external: true });
-  }
-}
-
-/**
- * [FIX] แปลง YouTube URL หลายรูปแบบ → embed URL
- * รองรับ: watch?v=, youtu.be/, /shorts/, /live/, /embed/
- * @param {string} url
- * @returns {string|null} embed URL หรือ null ถ้าไม่ใช่ YouTube
- */
-function toEmbedUrl(url) {
-  try {
-    const u = new URL(url);
-    let videoId = null;
-
-    if (u.hostname.includes('youtube.com')) {
-      videoId = u.searchParams.get('v')                          // watch?v=
-        || (u.pathname.match(/\/(?:embed|shorts|live)\/([^/?#]+)/) || [])[1] // /embed/ /shorts/ /live/
-        || null;
-    } else if (u.hostname === 'youtu.be') {
-      videoId = u.pathname.slice(1).split('?')[0];               // youtu.be/ID
-    }
-
-    if (!videoId) return null;
-    return `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
-  } catch {
-    return null;
-  }
-}
-
-/* ════════════════════════════════════════════════════════
-   VIDEO MODAL
-   ════════════════════════════════════════════════════════ */
-/*
- * [FIX] แก้ logic ปิด modal ทั้งหมด
- * เดิม: เช็ก e.target.id และ className แบบ blacklist → ปิดไม่ได้เมื่อคลิก overlay
- * ใหม่: เช็ก data-overlay="true" บน element ที่ถูกคลิก (whitelist ชัดเจน)
- */
-function setupVideoModal() {
-  const overlay   = document.getElementById('modal-video');
-  const closeBtn  = document.getElementById('close-video-btn');
-  const frame     = document.getElementById('video-frame');
-
-  // คลิกที่ overlay (พื้นหลังสีดำ)
-  overlay.addEventListener('click', e => {
-    // [FIX] ตรวจสอบว่าคลิกที่ overlay ตรงๆ ไม่ใช่ child element
-    if (e.target === overlay) {
-      closeVideoModal(frame, overlay);
-    }
-  });
-
-  // คลิกปุ่ม ×
-  closeBtn.addEventListener('click', () => closeVideoModal(frame, overlay));
-
-  // [FIX] กด Escape เพื่อปิด (UX เพิ่มเติม)
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && !overlay.classList.contains('hidden')) {
-      closeVideoModal(frame, overlay);
-    }
-  });
-}
-
-function closeVideoModal(frame, overlay) {
-  // [FIX] ล้าง src iframe เพื่อหยุดวิดีโอทันที (กัน autoplay ค้าง)
-  frame   = frame   || document.getElementById('video-frame');
-  overlay = overlay || document.getElementById('modal-video');
-  frame.src = '';
-  overlay.classList.add('hidden');
-}
-
-/* ════════════════════════════════════════════════════════
-   UTILITIES
-   ════════════════════════════════════════════════════════ */
-/** Escape HTML entities กัน XSS */
 function escapeHtml(str) {
-  if (str == null) return '';
+  if (!str) return '';
   return String(str).replace(/[&<>"']/g, c => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
   }[c]));
 }
 
-/** Escape สำหรับใส่ใน HTML attribute */
-function escapeAttr(str) {
-  if (str == null) return '';
-  return String(str).replace(/[&"'<>]/g, c => ({
-    '&': '&amp;', '"': '&quot;', "'": '&#39;', '<': '&lt;', '>': '&gt;'
-  }[c]));
-}
-
-/** ตรวจสอบ URL ว่าถูกรูปแบบ และเป็น http/https */
-function isValidUrl(url) {
-  try {
-    const u = new URL(url);
-    return u.protocol === 'http:' || u.protocol === 'https:';
-  } catch {
-    return false;
+function openMaterial(url, type) {
+  if (type === 'VIDEO') {
+    // ถ้าระบุว่าเป็นวิดีโอ ให้แปลงลิงก์เพื่อฝังลงใน iframe
+    let embedUrl = url;
+    
+    // แปลงลิงก์ YouTube ให้เป็นแบบ Embed อัตโนมัติ
+    const ytMatch = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i);
+    if (ytMatch && ytMatch[1]) {
+      embedUrl = `https://www.youtube.com/embed/${ytMatch[1]}?autoplay=1`;
+    }
+    
+    document.getElementById('video-frame').src = embedUrl;
+    document.getElementById('modal-video').classList.remove('hidden');
+  } else {
+    // ถ้าเป็น PDF หรือ Link ให้เปิดเบราว์เซอร์ใหม่ตามปกติ
+    liff.openWindow({
+      url: url,
+      external: true
+    });
   }
 }
 
-/** แสดง error state บน loading overlay */
-function showError(msg, canRetry = false) {
-  const el = document.getElementById('ov-load');
-  el.classList.remove('hidden');
-  el.innerHTML = `
-    <div style="font-size:40px; margin-bottom:10px;">⚠️</div>
-    <p style="color:#f85149; margin-bottom:16px;">${escapeHtml(msg)}</p>
-    ${canRetry ? `<button onclick="fetchData()" style="padding:10px 20px; background:var(--primary); color:#000; border:none; border-radius:8px; font-size:15px; font-weight:800; font-family:'Sarabun'; cursor:pointer; margin-bottom:10px;">🔄 ลองใหม่</button><br>` : ''}
-    <button onclick="liff.closeWindow()" style="padding:10px 20px; background:var(--surface); border:1px solid var(--border); color:#fff; border-radius:8px; font-family:'Sarabun'; cursor:pointer;">ปิดหน้าต่าง</button>
-  `;
+function closeVideoModal(e) {
+  // เช็กว่าถ้ามี event (คลิกที่พื้นที่ดำๆ นอกวิดีโอ) ให้ปิดด้วย
+  if (e && e.target.id !== 'modal-video' && e.target.className !== 'close-btn') return;
+  
+  // ล้าง src ของ iframe ทิ้ง เพื่อให้วิดีโอหยุดเล่นทันที
+  document.getElementById('video-frame').src = ''; 
+  document.getElementById('modal-video').classList.add('hidden');
 }
 
-/* ════════════════════════════════════════════════════════
-   API HELPER
-   ════════════════════════════════════════════════════════ */
-/**
- * เรียก GAS API พร้อม timeout และ AbortController
- * @param {'GET'|'POST'} method
- * @param {Object} params
- * @param {number} timeoutMs
- */
-async function callAPI(method, params, timeoutMs = 20000) {
+function showError(msg) {
+  const el = document.getElementById('ov-load');
+  el.innerHTML = `<div style="font-size:40px; margin-bottom:10px;">⚠️</div><p style="color:#f85149;">${msg}</p><button onclick="liff.closeWindow()" style="margin-top:20px; padding:10px 20px; background:#1f2833; border:1px solid #30363d; color:#fff; border-radius:8px;">ปิดหน้าต่าง</button>`;
+}
+
+async function callAPI(method, params, timeoutMs=20000) {
   const ctrl = new AbortController();
   const tid  = setTimeout(() => ctrl.abort(), timeoutMs);
-
   try {
-    let url  = GAS_URL;
-    let opts = { signal: ctrl.signal, redirect: 'follow' };
-
+    let url = GAS_URL, opts = { signal:ctrl.signal, redirect:'follow' };
+    
     if (method === 'GET') {
       url += '?' + new URLSearchParams(params).toString();
       opts.method = 'GET';
     } else {
       opts.method  = 'POST';
-      opts.headers = { 'Content-Type': 'text/plain' };
+      opts.headers = { 'Content-Type':'text/plain' };
       opts.body    = JSON.stringify(params);
     }
-
+    
     const resp = await fetch(url, opts);
     clearTimeout(tid);
-
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
     return await resp.json();
-  } catch (e) {
+  } catch(e) {
     clearTimeout(tid);
-    if (e.name === 'AbortError') throw new Error('หมดเวลาเชื่อมต่อ (timeout)');
+    if (e.name === 'AbortError') throw new Error('หมดเวลาเชื่อมต่อ');
     throw e;
   }
 }
 
-/* ════════════════════════════════════════════════════════
-   BOOTSTRAP
-   ════════════════════════════════════════════════════════ */
-
-// [FIX] ผูก debounce บน search input แทน onkeyup inline
-document.getElementById('search-inp').addEventListener('input', () => {
-  clearTimeout(searchDebounceTimer);
-  // รอ 300ms หลังผู้ใช้หยุดพิมพ์ค่อย filter
-  searchDebounceTimer = setTimeout(filterData, 300);
-});
-
-// ตั้ง event ของ Video Modal
-setupVideoModal();
-
-// เริ่มต้นแอป
 init();
 </script>
 </body>

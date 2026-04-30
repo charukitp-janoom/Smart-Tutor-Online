@@ -241,12 +241,6 @@ select { cursor: pointer; appearance: none; background-image: url("data:image/sv
 const LIFF_ID = '2009896605-YBaQW9Fu'; // << [ใส่ LIFF ID สำหรับ Host]
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbwo_kB4DZSVmYqkztnf8n_-sjVvAFUxIH9dZAqby_SUvV5H8gH5hXhILHkzZJ59S2j6/exec'; 
 
-
-function escHtml(s) {
-  if (s == null) return '';
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
 let adminSecret = '';
 let pollInterval = null;
 let countdownInterval = null;
@@ -261,31 +255,21 @@ let qTimeLeft = 20;
 
 // --- Modal Functions ---
 function showModal(icon, title, msg, isConfirm = false, onConfirm = null) {
-  document.getElementById('modal-icon').textContent  = icon;
+  document.getElementById('modal-icon').textContent = icon;
   document.getElementById('modal-title').textContent = title;
-  document.getElementById('modal-msg').textContent   = msg;
-
+  document.getElementById('modal-msg').innerHTML = msg;
+  
   const btnGroup = document.getElementById('modal-btn-group');
-  btnGroup.innerHTML = '';
-
   if (isConfirm) {
-    const cancelBtn = document.createElement('button');
-    cancelBtn.className   = 'modal-btn modal-btn-cancel';
-    cancelBtn.textContent = 'ยกเลิก';
-    cancelBtn.addEventListener('click', closeModal, { once: true });
-
-    const okBtn = document.createElement('button');
-    okBtn.className   = 'modal-btn modal-btn-confirm';
-    okBtn.textContent = 'ตกลง';
-    // [FIX] once:true กัน double-confirm
-    okBtn.addEventListener('click', () => { closeModal(); if (onConfirm) onConfirm(); }, { once: true });
-    btnGroup.append(cancelBtn, okBtn);
+    btnGroup.innerHTML = `
+      <button class="modal-btn modal-btn-cancel" onclick="closeModal()">ยกเลิก</button>
+      <button class="modal-btn modal-btn-confirm" id="btn-modal-ok">ตกลง</button>
+    `;
+    document.getElementById('btn-modal-ok').onclick = () => { closeModal(); if(onConfirm) onConfirm(); };
   } else {
-    const okBtn = document.createElement('button');
-    okBtn.className   = 'modal-btn modal-btn-confirm';
-    okBtn.textContent = 'ตกลง';
-    okBtn.addEventListener('click', closeModal, { once: true });
-    btnGroup.appendChild(okBtn);
+    btnGroup.innerHTML = `
+      <button class="modal-btn modal-btn-confirm" onclick="closeModal()">ตกลง</button>
+    `;
   }
   document.getElementById('custom-modal').classList.add('active');
 }
@@ -379,23 +363,19 @@ async function startRoom() {
   finally { btn.textContent = 'เปิดห้องเรียน'; btn.disabled = false; }
 }
 
-let _isFetchingState = false; // [FIX] กัน request pile-up ใน polling
 function startPolling() {
   if(pollInterval) clearInterval(pollInterval);
   pollInterval = setInterval(async () => {
-    if (_isFetchingState) return; // [FIX] skip ถ้ายังรอ response อยู่
-    _isFetchingState = true;
     try {
-      const res = await callAPI('GET', { action:'live_get_state', isHost:'true' }, 8000);
+      const res = await callAPI('GET', { action:'live_get_state', isHost:'true' });
       if(res.status === 'ok') {
-        currentState    = res.state;
-        currentAnswers  = res.answers  || [];
-        currentPlayers  = res.players  || res.participants || [];
+        currentState = res.state;
+        currentAnswers = res.answers || [];
+        currentPlayers = res.players || res.participants || []; 
         updateHostUI();
       }
-    } catch(e) { console.warn('[Poll]', e.message); }
-    finally { _isFetchingState = false; }
-  }, 1500);
+    } catch(e) {}
+  }, 1500); 
 }
 
 function updateHostUI() {
@@ -405,7 +385,7 @@ function updateHostUI() {
     const newHtml = currentPlayers.map(p => `
       <div class="player-pill">
         <img src="${getPicUrl(p.userId)}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/847/847969.png'"> 
-        ${escHtml(getDisplayName(p.userId, p.fullName))}
+        ${getDisplayName(p.userId, p.fullName)}
       </div>`).join('');
     if(listEl.innerHTML !== newHtml) { listEl.innerHTML = newHtml; }
   }
@@ -518,7 +498,7 @@ function renderState() {
               <div class="pod-avatar-wrap">
                 <img src="${getPicUrl(p.userId)}" class="pod-avatar" onerror="this.src='https://cdn-icons-png.flaticon.com/512/847/847969.png'">
               </div>
-              <div class="p-name">${escHtml(p.name)}</div>
+              <div class="p-name">${p.name}</div>
               <div class="p-score">${p.score}</div>
               <div class="p-block">${idx+1}</div>
             </div>
@@ -552,18 +532,11 @@ function closeRoom() {
   });
 }
 
-async function callAPI(method, params, timeoutMs = 15000) {
-  const ctrl = new AbortController();
-  const tid  = setTimeout(() => ctrl.abort(), timeoutMs);
-  try {
-    let url = GAS_URL, opts = { signal: ctrl.signal, redirect: 'follow' };
-    if (method === 'GET') { url += '?' + new URLSearchParams(params).toString(); opts.method = 'GET'; }
-    else { opts.method = 'POST'; opts.headers = { 'Content-Type': 'text/plain' }; opts.body = JSON.stringify(params); }
-    const resp = await fetch(url, opts);
-    clearTimeout(tid);
-    if (!resp.ok) throw new Error('HTTP ' + resp.status);
-    return await resp.json();
-  } catch(e) { clearTimeout(tid); if (e.name === 'AbortError') throw new Error('หมดเวลาเชื่อมต่อ'); throw e; }
+async function callAPI(method, params) {
+  let url = GAS_URL, opts = { method: 'POST', headers: {'Content-Type':'text/plain'}, body: JSON.stringify(params) };
+  if(method === 'GET') { url += '?' + new URLSearchParams(params).toString(); opts = {method:'GET'}; }
+  const resp = await fetch(url, opts);
+  return await resp.json();
 }
 
 init();

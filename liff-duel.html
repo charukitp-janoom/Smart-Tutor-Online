@@ -150,43 +150,25 @@ let qStartTime = 0, totalTimeMs = 0, isAnswerLocked = false, gameTimerInterval =
 
 // --- Modal Functions ---
 function showModal(icon, title, msg, isConfirm = false, onConfirm = null) {
-  document.getElementById('modal-icon').textContent  = icon;
+  document.getElementById('modal-icon').textContent = icon;
   document.getElementById('modal-title').textContent = title;
-  // [FIX] ใช้ textContent กัน XSS — msg ที่ส่งมาจาก code เอง (ไม่ใช่ API/user)
-  // ยกเว้นกรณีที่ต้องการ HTML จริงๆ จะ set innerHTML หลัง escapeHtml
-  document.getElementById('modal-msg').textContent = msg;
-
+  document.getElementById('modal-msg').innerHTML = msg;
+  
   const btnGroup = document.getElementById('modal-btn-group');
-  btnGroup.innerHTML = '';
-
   if (isConfirm) {
-    const cancelBtn = document.createElement('button');
-    cancelBtn.className   = 'modal-btn modal-btn-cancel';
-    cancelBtn.textContent = 'ยกเลิก';
-    cancelBtn.addEventListener('click', closeModal, { once: true });
-
-    const okBtn = document.createElement('button');
-    okBtn.className   = 'modal-btn modal-btn-confirm';
-    okBtn.textContent = 'ตกลง';
-    // [FIX] once:true กัน double-confirm
-    okBtn.addEventListener('click', () => { closeModal(); if (onConfirm) onConfirm(); }, { once: true });
-    btnGroup.append(cancelBtn, okBtn);
+    btnGroup.innerHTML = `
+      <button class="modal-btn modal-btn-cancel" onclick="closeModal()">ยกเลิก</button>
+      <button class="modal-btn modal-btn-confirm" id="btn-modal-ok">ตกลง</button>
+    `;
+    document.getElementById('btn-modal-ok').onclick = () => { closeModal(); if(onConfirm) onConfirm(); };
   } else {
-    const okBtn = document.createElement('button');
-    okBtn.className   = 'modal-btn modal-btn-confirm';
-    okBtn.textContent = 'ตกลง';
-    okBtn.addEventListener('click', closeModal, { once: true });
-    btnGroup.appendChild(okBtn);
+    btnGroup.innerHTML = `
+      <button class="modal-btn modal-btn-confirm" onclick="closeModal()">ตกลง</button>
+    `;
   }
   document.getElementById('custom-modal').classList.add('active');
 }
 function closeModal() { document.getElementById('custom-modal').classList.remove('active'); }
-
-
-function escHtml(s) {
-  if (s == null) return '';
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
 
 async function init() {
   try {
@@ -264,7 +246,7 @@ function renderLobby() {
   chWrap.innerHTML = '';
   if (challengeMembers.length === 0) chWrap.innerHTML = '<div style="color:var(--muted); padding: 40px 0;">ไม่มีรายชื่อในระบบ</div>';
   else {
-    challengeMembers.forEach(m => { chWrap.innerHTML += `<div class="card" style="flex-direction:row; align-items:center; justify-content:space-between; padding: 12px 16px;"><div><div class="card-name">${escHtml(m.fullName)}</div><div class="card-pos">${escHtml(m.rank)} ${escHtml(m.position)}</div></div><button class="btn btn-outline" style="width:auto; padding: 6px 16px; margin:0;" onclick="initChallenge('${m.userId}', '${escHtml(m.fullName)}')">ท้าดวล</button></div>`; });
+    challengeMembers.forEach(m => { chWrap.innerHTML += `<div class="card" style="flex-direction:row; align-items:center; justify-content:space-between; padding: 12px 16px;"><div><div class="card-name">${m.fullName}</div><div class="card-pos">${m.rank} ${m.position}</div></div><button class="btn btn-outline" style="width:auto; padding: 6px 16px; margin:0;" onclick="initChallenge('${m.userId}', '${m.fullName}')">ท้าดวล</button></div>`; });
   }
 }
 
