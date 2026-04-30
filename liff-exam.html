@@ -8,8 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700;800&family=IBM+Plex+Mono:wght@600;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --primary: #2563eb; 
-  --secondary: #f59e0b;
+  --primary: #2563eb; --secondary: #f59e0b;
   --bg: #0f1322; --surface: #161c36; --surf2: #1e2647;
   --border: #2a3558; --text: #e8ecf8; --muted: #6e7aa0;
   --gold: #ffc107; --danger: #ff5252; --success: #00e676;
@@ -17,104 +16,97 @@
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
 
-/* Header & Timer */
-.top-bar { background: var(--surface); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10; box-shadow: 0 4px 15px rgba(0,0,0,0.2);}
+/* ─── Header & Timer ─── */
+.top-bar { background: var(--surface); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
 .top-info { display: flex; flex-direction: column; }
-.t-app { font-weight: 800; font-size: 16px; color: var(--gold); display: flex; align-items: center; gap: 6px; }
+.t-app  { font-weight: 800; font-size: 16px; color: var(--gold); display: flex; align-items: center; gap: 6px; }
 .t-subj { font-size: 12px; color: var(--muted); }
 .timer { font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-weight: 700; color: var(--gold); border: 1px solid var(--border); padding: 6px 12px; border-radius: 8px; background: rgba(255,193,7,0.05); }
 .timer.danger { color: var(--danger); border-color: var(--danger); background: rgba(255,82,82,0.1); animation: blink 1s infinite; }
 @keyframes blink { 50% { opacity: 0.5; } }
 
-/* Main Area */
+/* ─── Main Area ─── */
 .main-area { flex: 1; padding: 20px; display: flex; flex-direction: column; overflow-y: auto; }
 
-/* Setup & Selection */
-.setup-box { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; text-align: center; margin-top: 20vh; box-shadow: 0 10px 30px rgba(0,0,0,0.3);}
+/* ─── Setup ─── */
+.setup-box { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; text-align: center; margin-top: 20vh; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
 .select-subj { width: 100%; padding: 14px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-family: 'Sarabun'; font-size: 16px; margin: 20px 0; outline: none; }
-.btn { width: 100%; padding: 14px; border-radius: 10px; font-size: 16px; font-weight: 800; font-family: 'Sarabun'; cursor: pointer; transition: 0.2s; border: none; }
+.btn { width: 100%; padding: 14px; border-radius: 10px; font-size: 16px; font-weight: 800; font-family: 'Sarabun'; cursor: pointer; transition: 0.2s; border: none; touch-action: manipulation; user-select: none; }
 .btn-primary { background: var(--primary); color: #fff; }
-.btn-gold { background: var(--gold); color: #000; }
-.btn:active { transform: scale(0.96); }
+.btn-gold    { background: var(--gold); color: #000; }
+.btn:active  { transform: scale(0.96); }
 
-/* Question Area */
+/* ─── Question Area ─── */
 .q-progress { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
-.q-dot { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; border: 1px solid var(--border); color: var(--muted); background: var(--surface); cursor: pointer; transition: 0.2s;}
-.q-dot.active { border-color: var(--primary); color: var(--primary); border-width: 2px; }
+.q-dot { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; border: 1px solid var(--border); color: var(--muted); background: var(--surface); cursor: pointer; transition: 0.2s; }
+.q-dot.active   { border-color: var(--primary); color: var(--primary); border-width: 2px; }
 .q-dot.answered { background: rgba(37,99,235,0.1); border-color: var(--primary); color: var(--text); }
 
-.q-box { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 20px; }
-.q-num { font-size: 12px; color: var(--muted); font-weight: 700; margin-bottom: 8px; }
-.q-text { font-size: 18px; font-weight: 600; line-height: 1.5; color: var(--text); }
+.q-box    { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 20px; }
+.q-num    { font-size: 12px; color: var(--muted); font-weight: 700; margin-bottom: 8px; }
+.q-text   { font-size: 18px; font-weight: 600; line-height: 1.5; color: var(--text); }
 
-.choices { display: flex; flex-direction: column; gap: 12px; }
-.choice-btn { background: var(--surface); border: 2px solid var(--border); border-radius: 12px; padding: 16px; display: flex; gap: 15px; align-items: center; cursor: pointer; transition: 0.2s; color: var(--text); text-align: left;}
+.choices    { display: flex; flex-direction: column; gap: 12px; }
+.choice-btn { background: var(--surface); border: 2px solid var(--border); border-radius: 12px; padding: 16px; display: flex; gap: 15px; align-items: center; cursor: pointer; transition: 0.2s; color: var(--text); text-align: left; }
 .choice-btn.selected { border-color: var(--gold); background: rgba(255,193,7,0.1); }
-.c-label { font-family: 'IBM Plex Mono'; font-weight: 800; background: var(--surf2); width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 6px; flex-shrink: 0; }
+.c-label  { font-family: 'IBM Plex Mono'; font-weight: 800; background: var(--surf2); width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 6px; flex-shrink: 0; }
 .choice-btn.selected .c-label { background: var(--gold); color: #000; }
-.c-text { font-family: 'Sarabun'; font-size: 15px; line-height: 1.4; }
+.c-text   { font-family: 'Sarabun'; font-size: 15px; line-height: 1.4; }
 
-.controls { display: flex; justify-content: space-between; margin-top: auto; gap: 10px; padding: 20px; background: var(--bg); position: sticky; bottom: 0; border-top: 1px solid var(--border);}
+.controls { display: flex; justify-content: space-between; margin-top: auto; gap: 10px; padding: 20px; background: var(--bg); position: sticky; bottom: 0; border-top: 1px solid var(--border); }
 
-/* Loaders & Overlays */
+/* ─── Overlays ─── */
 .ov { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; }
 .spinner { width: 50px; height: 50px; border: 4px solid var(--border); border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .hidden { display: none !important; }
 
-/* Custom Modal CSS (Native Look) */
-.ca-ov { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.2s; backdrop-filter: blur(3px);}
+/* ─── Custom Modal ─── */
+.ca-ov { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.2s; backdrop-filter: blur(3px); }
 .ca-ov.active { opacity: 1; pointer-events: auto; }
 .ca-box { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 32px 24px; width: 100%; max-width: 320px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.5); transform: scale(0.9); transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
 .ca-ov.active .ca-box { transform: scale(1); }
-.ca-icon { font-size: 60px; margin-bottom: 15px; line-height: 1; }
+.ca-icon  { font-size: 60px; margin-bottom: 15px; line-height: 1; }
 .ca-title { font-size: 20px; font-weight: 800; color: var(--text); margin-bottom: 10px; }
-.ca-msg { font-size: 14px; color: var(--muted); margin-bottom: 24px; line-height: 1.6; }
+.ca-msg   { font-size: 14px; color: var(--muted); margin-bottom: 24px; line-height: 1.6; }
 .ca-btn-group { display: flex; gap: 12px; justify-content: center; }
 .ca-btn { flex: 1; padding: 12px 0; border-radius: 10px; font-size: 15px; font-weight: 800; font-family: 'Sarabun'; cursor: pointer; transition: 0.2s; border: none; }
-.ca-btn-cancel { background: var(--surf2); border: 1px solid var(--border); color: var(--text); }
-.ca-btn-confirm { background: var(--primary); color: #fff; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3); }
-.ca-btn-danger { background: var(--danger); color: #fff; box-shadow: 0 4px 15px rgba(255, 82, 82, 0.3); }
-.ca-btn:active { transform: scale(0.96); }
+.ca-btn-cancel  { background: var(--surf2); border: 1px solid var(--border); color: var(--text); }
+.ca-btn-confirm { background: var(--primary); color: #fff; box-shadow: 0 4px 15px rgba(37,99,235,0.3); }
+.ca-btn-danger  { background: var(--danger);  color: #fff; box-shadow: 0 4px 15px rgba(255,82,82,0.3); }
+.ca-btn:active  { transform: scale(0.96); }
 
-/* 🌟 NEW: Premium Result Page Styles */
+/* ─── Result Page ─── */
 .res-header-card { background: linear-gradient(135deg, #1e3a8a 0%, #172554 100%); border-radius: 24px; padding: 30px 20px 24px; text-align: center; margin-bottom: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
 .score-circle-wrap { display: flex; justify-content: center; margin-bottom: 20px; }
 .score-circle { width: 130px; height: 130px; border-radius: 50%; border: 6px solid var(--gold); display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(255,193,7,0.3); }
-.score-circle .sc-val { font-size: 46px; font-weight: 800; font-family: 'IBM Plex Mono', monospace; color: var(--gold); line-height: 1; margin-bottom: -5px;}
+.score-circle .sc-val { font-size: 46px; font-weight: 800; font-family: 'IBM Plex Mono', monospace; color: var(--gold); line-height: 1; margin-bottom: -5px; }
 .score-circle .sc-max { font-size: 16px; color: rgba(255,255,255,0.7); font-family: 'IBM Plex Mono', monospace; }
-
-.badge-status { display: inline-flex; align-items: center; gap: 8px; padding: 6px 18px; border-radius: 20px; font-weight: 700; font-size: 15px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);}
+.badge-status { display: inline-flex; align-items: center; gap: 8px; padding: 6px 18px; border-radius: 20px; font-weight: 700; font-size: 15px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
 .badge-status.pass { background: rgba(0,230,118,0.15); color: var(--success); border: 1px solid rgba(0,230,118,0.3); }
-.badge-status.fail { background: rgba(255,82,82,0.15); color: var(--danger); border: 1px solid rgba(255,82,82,0.3); }
-
-.res-user-name { font-size: 20px; font-weight: 800; margin-bottom: 4px; color: #fff;}
-.res-user-sub { font-size: 13px; color: rgba(255,255,255,0.6); }
-
+.badge-status.fail { background: rgba(255,82,82,0.15);  color: var(--danger);  border: 1px solid rgba(255,82,82,0.3); }
+.res-user-name { font-size: 20px; font-weight: 800; margin-bottom: 4px; color: #fff; }
+.res-user-sub  { font-size: 13px; color: rgba(255,255,255,0.6); }
 .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 12px; }
-.stat-box-small { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 16px 8px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.15);}
+.stat-box-small { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 16px 8px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
 .stat-box-small .st-val { font-size: 26px; font-weight: 800; color: var(--gold); font-family: 'IBM Plex Mono', monospace; line-height: 1; margin-bottom: 6px; }
 .stat-box-small .st-lbl { font-size: 12px; color: var(--muted); }
-
-.rank-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; text-align: center; margin-bottom: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);}
+.rank-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; text-align: center; margin-bottom: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
 .rank-val { font-size: 44px; font-weight: 800; color: var(--gold); font-family: 'IBM Plex Mono', monospace; line-height: 1; text-shadow: 0 0 15px rgba(255,193,7,0.2); margin-bottom: 8px; }
 .rank-lbl { font-size: 13px; color: var(--muted); }
-
-.ans-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin-bottom: 12px; text-align: left; box-shadow: 0 4px 12px rgba(0,0,0,0.1);}
+.ans-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin-bottom: 12px; text-align: left; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
 .ans-card.correct { border-left: 6px solid var(--success); }
-.ans-card.wrong { border-left: 6px solid var(--danger); }
-
+.ans-card.wrong   { border-left: 6px solid var(--danger);  }
 .ans-header { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.05); }
 .ans-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
 .ans-card.correct .ans-icon { background: rgba(0,230,118,0.15); color: var(--success); }
-.ans-card.wrong .ans-icon { background: rgba(255,82,82,0.15); color: var(--danger); }
-.ans-q-text { font-size: 15px; font-weight: 600; color: var(--text); line-height: 1.5; padding-top: 4px;}
-
-.ans-row { display: flex; gap: 10px; font-size: 14px; margin-bottom: 8px; align-items: flex-start;}
-.ans-lbl { color: var(--muted); width: 45px; flex-shrink: 0; text-align: right;}
-.ans-val { font-weight: 600; line-height: 1.5; flex: 1; }
+.ans-card.wrong   .ans-icon { background: rgba(255,82,82,0.15);  color: var(--danger);  }
+.ans-q-text { font-size: 15px; font-weight: 600; color: var(--text); line-height: 1.5; padding-top: 4px; }
+.ans-row    { display: flex; gap: 10px; font-size: 14px; margin-bottom: 8px; align-items: flex-start; }
+.ans-lbl    { color: var(--muted); width: 45px; flex-shrink: 0; text-align: right; }
+.ans-val    { font-weight: 600; line-height: 1.5; flex: 1; }
 .val-correct { color: var(--success); }
-.val-wrong { color: var(--danger); }
+.val-wrong   { color: var(--danger);  }
 </style>
 </head>
 <body>
@@ -124,12 +116,12 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
   <div style="font-weight:700; color:var(--text);">กำลังเตรียมระบบสอบ...</div>
 </div>
 
-<!-- Custom Modal HTML -->
-<div id="custom-alert" class="ca-ov">
+<!-- Custom Modal -->
+<div id="custom-alert" class="ca-ov" role="dialog" aria-modal="true">
   <div class="ca-box">
-    <div id="ca-icon" class="ca-icon">⚠️</div>
-    <div id="ca-title" class="ca-title">แจ้งเตือน</div>
-    <div id="ca-msg" class="ca-msg">ข้อความ</div>
+    <div id="ca-icon"      class="ca-icon">⚠️</div>
+    <div id="ca-title"     class="ca-title">แจ้งเตือน</div>
+    <div id="ca-msg"       class="ca-msg">ข้อความ</div>
     <div id="ca-btn-group" class="ca-btn-group"></div>
   </div>
 </div>
@@ -137,21 +129,19 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
 <!-- Setup Screen -->
 <div id="ui-setup" class="main-area hidden">
   <div class="setup-box">
-    <div style="font-size: 50px; margin-bottom: 10px;">📋</div>
-    <h2 style="color:var(--text); margin-bottom: 5px;">เลือกวิชาที่ต้องการสอบ</h2>
+    <div style="font-size:50px; margin-bottom:10px;">📋</div>
+    <h2 style="color:var(--text); margin-bottom:5px;">เลือกวิชาที่ต้องการสอบ</h2>
     <div style="font-size:13px; color:var(--muted);">โปรดอ่านคำถามให้ละเอียดก่อนตอบ</div>
-    
     <select id="inp-subject" class="select-subj">
       <option value="">กำลังโหลดวิชา...</option>
     </select>
-    
     <button class="btn btn-primary" onclick="startExam()">เริ่มทำแบบทดสอบ</button>
     <button class="btn" style="background:transparent; border:1px solid var(--border); color:var(--muted); margin-top:15px;" onclick="liff.closeWindow()">กลับสู่หน้าหลัก</button>
   </div>
 </div>
 
 <!-- Exam Screen -->
-<div id="ui-exam" class="hidden" style="display: flex; flex-direction: column; height: 100vh;">
+<div id="ui-exam" class="hidden" style="display:flex; flex-direction:column; height:100vh;">
   <div class="top-bar">
     <div class="top-info">
       <div class="t-app">📋 <span class="dynamic-app-name">System</span></div>
@@ -159,11 +149,10 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
     </div>
     <div class="timer" id="timer">--:--</div>
   </div>
-  
   <div class="main-area">
     <div class="q-progress" id="q-dots"></div>
     <div class="q-box">
-      <div class="q-num" id="q-label">ข้อ 1 จาก 10</div>
+      <div class="q-num"  id="q-label">ข้อ 1 จาก 10</div>
       <div class="q-text" id="q-text">โหลดคำถาม...</div>
     </div>
     <div class="choices">
@@ -173,17 +162,15 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
       <div class="choice-btn" id="c-D" onclick="selectChoice('D')"><div class="c-label">D</div><div class="c-text" id="t-D">-</div></div>
     </div>
   </div>
-  
   <div class="controls">
-    <button class="btn" style="background:var(--surface); border:1px solid var(--border); color:var(--text); width: 60px;" onclick="prevQ()">←</button>
+    <button class="btn" style="background:var(--surface); border:1px solid var(--border); color:var(--text); width:60px;" onclick="prevQ()">←</button>
     <button class="btn btn-gold" style="flex:1;" onclick="confirmSubmit()">📤 ส่งข้อสอบ</button>
-    <button class="btn" style="background:var(--surface); border:1px solid var(--border); color:var(--text); width: 60px;" onclick="nextQ()">→</button>
+    <button class="btn" style="background:var(--surface); border:1px solid var(--border); color:var(--text); width:60px;" onclick="nextQ()">→</button>
   </div>
 </div>
 
-<!-- 🌟 NEW: Premium Result Screen -->
-<div id="ui-result" class="main-area hidden" style="padding: 15px;">
-  
+<!-- Result Screen -->
+<div id="ui-result" class="main-area hidden" style="padding:15px;">
   <div class="res-header-card">
     <div class="score-circle-wrap">
       <div class="score-circle">
@@ -193,200 +180,339 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
     </div>
     <div class="badge-status" id="r-badge">✅ สอบผ่าน</div>
     <div class="res-user-name" id="r-name">ชื่อ-นามสกุล</div>
-    <div class="res-user-sub" id="r-sub">ระดับชั้น · สาขาวิชา</div>
+    <div class="res-user-sub"  id="r-sub">ระดับชั้น · สาขาวิชา</div>
   </div>
-  
   <div class="stats-grid">
-    <div class="stat-box-small">
-      <div class="st-val" id="r-pct">0%</div>
-      <div class="st-lbl">คะแนนเปอร์เซ็นต์</div>
-    </div>
-    <div class="stat-box-small">
-      <div class="st-val" id="r-correct">0</div>
-      <div class="st-lbl">ตอบถูก</div>
-    </div>
-    <div class="stat-box-small">
-      <div class="st-val" id="r-wrong">0</div>
-      <div class="st-lbl">ตอบผิด</div>
-    </div>
+    <div class="stat-box-small"><div class="st-val" id="r-pct">0%</div><div class="st-lbl">คะแนนเปอร์เซ็นต์</div></div>
+    <div class="stat-box-small"><div class="st-val" id="r-correct">0</div><div class="st-lbl">ตอบถูก</div></div>
+    <div class="stat-box-small"><div class="st-val" id="r-wrong">0</div><div class="st-lbl">ตอบผิด</div></div>
   </div>
-
   <div class="rank-card">
     <div class="rank-val" id="r-rank">#1</div>
     <div class="rank-lbl" id="r-rank-total">อันดับปัจจุบัน จากผู้เข้าสอบทั้งหมด 1 นาย</div>
   </div>
-  
-  <div style="display:flex; align-items:center; gap:8px; margin: 10px 5px 15px; font-weight:700; font-size:15px; color:var(--text);">
-    📝 เฉลยข้อสอบ
-  </div>
-  
+  <div style="display:flex; align-items:center; gap:8px; margin:10px 5px 15px; font-weight:700; font-size:15px; color:var(--text);">📝 เฉลยข้อสอบ</div>
   <div id="r-list"></div>
-  
   <button class="btn btn-primary" style="margin-top:20px; font-size:18px;" onclick="liff.closeWindow()">กลับสู่หน้าแชท</button>
 </div>
 
 <script>
-const LIFF_ID = '2009896605-Wd1uqyvU';   
+/* ════════════════════════════════════════════════════════
+   CONFIG
+   ════════════════════════════════════════════════════════ */
+const LIFF_ID = '2009896605-Wd1uqyvU';
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbwo_kB4DZSVmYqkztnf8n_-sjVvAFUxIH9dZAqby_SUvV5H8gH5hXhILHkzZJ59S2j6/exec';
 
-let userId = '';
-let allSubjects = [];
-let questions = [];
-let answers = {};
-let currentQ = 0;
-let timeLeft = 0;
-let timerInt = null;
-let submitted = false;
+/* ════════════════════════════════════════════════════════
+   STATE
+   ════════════════════════════════════════════════════════ */
+let userId          = '';
+let allSubjects     = [];
+let questions       = [];
+let answers         = {};
+let currentQ        = 0;
+let timeLeft        = 0;
+let timerInt        = null;
+let submitted       = false;
 let selectedSubject = '';
-let alerted5Min = false;
-let memberInfo = null; // เก็บข้อมูลผู้ใช้สำหรับแสดงในหน้าผลสอบ
+let alerted5Min     = false;
+let memberInfo      = null;
 
-// ฟังก์ชันสร้างเสียงแจ้งเตือน (Web Audio API)
+// [FIX] localStorage TTL: เก็บ exam state ไม่เกิน 24 ชั่วโมง
+const EXAM_STATE_TTL_MS = 24 * 60 * 60 * 1000;
+
+/* ════════════════════════════════════════════════════════
+   MODAL HELPERS
+   ════════════════════════════════════════════════════════ */
+function customAlert(msg, title = 'แจ้งเตือน', icon = '⚠️') {
+  document.getElementById('ca-icon').textContent  = icon;
+  document.getElementById('ca-title').textContent = title;
+  // [FIX] ใช้ textContent กัน XSS
+  document.getElementById('ca-msg').textContent   = msg;
+  document.getElementById('ca-btn-group').innerHTML = '';
+
+  const btn = document.createElement('button');
+  btn.className   = 'ca-btn ca-btn-confirm';
+  btn.textContent = 'ตกลง';
+  btn.addEventListener('click', closeCustomAlert, { once: true });
+  document.getElementById('ca-btn-group').appendChild(btn);
+  document.getElementById('custom-alert').classList.add('active');
+}
+
+/**
+ * [FIX] customConfirm เปลี่ยนเป็น closure + once:true
+ * ไม่มี global confirmCallback แล้ว
+ */
+function customConfirm(msg, onConfirm, title = 'ยืนยัน', icon = '❓', btnClass = 'ca-btn-confirm') {
+  document.getElementById('ca-icon').textContent  = icon;
+  document.getElementById('ca-title').textContent = title;
+  // msg สำหรับ confirm อาจมี HTML (แสดงจำนวนข้อที่ยังไม่ตอบ)
+  // [FIX] ใช้ innerHTML เฉพาะกรณีที่ msg มาจาก code เอง (ไม่ใช่ API/user input)
+  document.getElementById('ca-msg').innerHTML = msg;
+  document.getElementById('ca-btn-group').innerHTML = '';
+
+  const cancelBtn = document.createElement('button');
+  cancelBtn.className   = 'ca-btn ca-btn-cancel';
+  cancelBtn.textContent = 'ยกเลิก';
+  cancelBtn.addEventListener('click', closeCustomAlert, { once: true });
+
+  const okBtn = document.createElement('button');
+  okBtn.className   = `ca-btn ${btnClass}`;
+  okBtn.textContent = 'ตกลง';
+  // [FIX] once:true กัน double-confirm
+  okBtn.addEventListener('click', () => { closeCustomAlert(); onConfirm(); }, { once: true });
+
+  document.getElementById('ca-btn-group').append(cancelBtn, okBtn);
+  document.getElementById('custom-alert').classList.add('active');
+}
+
+function closeCustomAlert() {
+  document.getElementById('custom-alert').classList.remove('active');
+}
+
+/* ════════════════════════════════════════════════════════
+   AUDIO
+   ════════════════════════════════════════════════════════ */
 function playNotificationSound() {
   try {
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    const ctx = new AudioContext();
-    function playTone(freq, startTime) {
-      const osc = ctx.createOscillator();
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    const ctx      = new AudioCtx();
+    const tones    = [880, 1108.73];
+    tones.forEach((freq, i) => {
+      const osc  = ctx.createOscillator();
       const gain = ctx.createGain();
+      const t    = ctx.currentTime + i * 0.15;
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, startTime);
-      gain.gain.setValueAtTime(0.3, startTime); 
-      gain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.5);
+      osc.frequency.setValueAtTime(freq, t);
+      gain.gain.setValueAtTime(0.3, t);
+      gain.gain.exponentialRampToValueAtTime(0.01, t + 0.5);
       osc.connect(gain);
       gain.connect(ctx.destination);
-      osc.start(startTime);
-      osc.stop(startTime + 0.5);
-    }
-    playTone(880, ctx.currentTime);
-    playTone(1108.73, ctx.currentTime + 0.15);
-  } catch (e) { console.log("Audio not supported"); }
+      osc.start(t);
+      osc.stop(t + 0.5);
+    });
+  } catch (e) { console.log('Audio not supported'); }
 }
 
-// Custom Modal Functions
-function customAlert(msg, title="แจ้งเตือน", icon="⚠️") {
-  document.getElementById('ca-icon').textContent = icon;
-  document.getElementById('ca-title').textContent = title;
-  document.getElementById('ca-msg').innerHTML = msg;
-  document.getElementById('ca-btn-group').innerHTML = `<button class="ca-btn ca-btn-confirm" onclick="closeCustomAlert()">ตกลง</button>`;
-  document.getElementById('custom-alert').classList.add('active');
-}
-function closeCustomAlert() { document.getElementById('custom-alert').classList.remove('active'); }
-
-let confirmCallback = null;
-function customConfirm(msg, callback, title="ยืนยัน", icon="❓", btnClass="ca-btn-confirm") {
-  document.getElementById('ca-icon').textContent = icon;
-  document.getElementById('ca-title').textContent = title;
-  document.getElementById('ca-msg').innerHTML = msg;
-  document.getElementById('ca-btn-group').innerHTML = `
-    <button class="ca-btn ca-btn-cancel" onclick="closeCustomAlert()">ยกเลิก</button>
-    <button class="ca-btn ${btnClass}" id="btn-ca-ok">ตกลง</button>
-  `;
-  confirmCallback = callback;
-  document.getElementById('btn-ca-ok').onclick = () => { closeCustomAlert(); if(confirmCallback) confirmCallback(); };
-  document.getElementById('custom-alert').classList.add('active');
-}
-
+/* ════════════════════════════════════════════════════════
+   INIT
+   ════════════════════════════════════════════════════════ */
 async function init() {
   try {
     await liff.init({ liffId: LIFF_ID });
     if (!liff.isLoggedIn()) { liff.login(); return; }
-    
+
     userId = (await liff.getProfile()).userId;
-    
-    const res = await callAPI('GET', { action: 'get_subjects', userId: userId });
-    if(res.status === 'ok') {
-      if(res.config) { document.querySelectorAll('.dynamic-app-name').forEach(el => el.textContent = res.config.appName); }
-      
-      memberInfo = res.member; // เก็บข้อมูลตำแหน่ง/ชื่อ
-      allSubjects = res.subjects || [];
-      const completed = res.completedSubjects || [];
-      const sel = document.getElementById('inp-subject');
-      sel.innerHTML = '<option value="">-- เลือกวิชา --</option>';
-      
-      let hasAvailable = false;
-      allSubjects.forEach(s => {
-        if(completed.includes(s.name)) {
-          sel.innerHTML += `<option value="${s.name}" disabled>✅ ${s.name} (สอบผ่านแล้ว)</option>`;
-        } else {
-          sel.innerHTML += `<option value="${s.name}">${s.name} (${s.count} ข้อ)</option>`;
-          hasAvailable = true;
-        }
-      });
-      
-      if(!hasAvailable) sel.innerHTML = '<option value="">🎉 คุณสอบครบทุกวิชาแล้ว</option>';
-      
-      timeLeft = (res.examTimeMinutes || 20) * 60;
-      document.getElementById('ov-load').classList.add('hidden');
-      document.getElementById('ui-setup').classList.remove('hidden');
-    } else {
-      customAlert(res.message, 'เกิดข้อผิดพลาด', '❌');
+
+    const res = await callAPI('GET', { action: 'get_subjects', userId });
+    if (res.status !== 'ok') throw new Error(res.message || 'โหลดข้อมูลล้มเหลว');
+
+    if (res.config) {
+      document.querySelectorAll('.dynamic-app-name').forEach(el => el.textContent = res.config.appName || '');
     }
-  } catch(e) {
-    customAlert(e.message, 'Init Error', '❌');
+
+    memberInfo  = res.member || null;
+    allSubjects = res.subjects || [];
+    const completed = res.completedSubjects || [];
+
+    const sel = document.getElementById('inp-subject');
+    sel.innerHTML = '<option value="">-- เลือกวิชา --</option>';
+
+    let hasAvailable = false;
+    allSubjects.forEach(s => {
+      const opt      = document.createElement('option');
+      opt.value      = s.name;
+      // [FIX] ใช้ textContent แทนการ concat string ใน innerHTML กัน XSS
+      opt.textContent = completed.includes(s.name)
+        ? `✅ ${s.name} (สอบผ่านแล้ว)`
+        : `${s.name} (${s.count} ข้อ)`;
+      opt.disabled    = completed.includes(s.name);
+      sel.appendChild(opt);
+      if (!opt.disabled) hasAvailable = true;
+    });
+
+    if (!hasAvailable) {
+      sel.innerHTML = '<option value="">🎉 คุณสอบครบทุกวิชาแล้ว</option>';
+    }
+
+    timeLeft = (res.examTimeMinutes || 20) * 60;
+    document.getElementById('ov-load').classList.add('hidden');
+    document.getElementById('ui-setup').classList.remove('hidden');
+
+  } catch (e) {
+    document.getElementById('ov-load').innerHTML =
+      `<div style="font-size:40px; margin-bottom:15px;">⚠️</div>
+       <p style="color:#f85149; text-align:center;">${escapeHtml(e.message)}</p>
+       <button onclick="liff.closeWindow()" style="margin-top:20px; padding:10px 20px; border-radius:8px; border:none; background:var(--surface); color:var(--text); font-family:'Sarabun'; cursor:pointer;">ปิดหน้าต่าง</button>`;
   }
 }
 
+/* ════════════════════════════════════════════════════════
+   START EXAM
+   ════════════════════════════════════════════════════════ */
 async function startExam() {
   selectedSubject = document.getElementById('inp-subject').value;
-  if(!selectedSubject) return customAlert('กรุณาเลือกวิชาที่จะสอบก่อนครับ', 'แจ้งเตือน', '⚠️');
-  
+  if (!selectedSubject) return customAlert('กรุณาเลือกวิชาที่จะสอบก่อนครับ', 'แจ้งเตือน', '⚠️');
+
   document.getElementById('ov-load').classList.remove('hidden');
   try {
-    const res = await callAPI('GET', { action: 'get_questions', userId: userId, subject: selectedSubject });
-    if(res.status === 'ok') {
-      questions = res.questions || [];
-      if(questions.length === 0) throw new Error('ไม่พบข้อสอบในวิชานี้');
-      
-      const saved = localStorage.getItem(`exam_${userId}_${selectedSubject}`);
-      if(saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          answers = parsed.ans || {};
-          timeLeft = parsed.time || timeLeft;
-        } catch(e){}
-      }
+    const res = await callAPI('GET', { action: 'get_questions', userId, subject: selectedSubject });
+    if (res.status !== 'ok') throw new Error(res.message);
 
-      if (timeLeft <= 300) alerted5Min = true; 
-      
-      document.getElementById('t-subj-name').textContent = `วิชา: ${selectedSubject}`;
-      document.getElementById('ov-load').classList.add('hidden');
-      document.getElementById('ui-setup').classList.add('hidden');
-      document.getElementById('ui-exam').classList.remove('hidden');
-      
-      renderDots();
-      renderQuestion(0);
-      startTimer();
-    } else { throw new Error(res.message); }
-  } catch(e) {
+    questions = res.questions || [];
+    if (!questions.length) throw new Error('ไม่พบข้อสอบในวิชานี้');
+
+    // [FIX] โหลด saved state พร้อมตรวจสอบ TTL
+    const saved = loadExamState(userId, selectedSubject);
+    if (saved) {
+      answers  = saved.ans  || {};
+      timeLeft = saved.time || timeLeft;
+      // ถ้า timeLeft <= 0 อาจหมดเวลาแล้ว ให้ reset
+      if (timeLeft <= 0) { answers = {}; timeLeft = (res.examTimeMinutes || 20) * 60; }
+    }
+
+    if (timeLeft <= 300) alerted5Min = true;
+
+    document.getElementById('t-subj-name').textContent = `วิชา: ${selectedSubject}`;
+    document.getElementById('ov-load').classList.add('hidden');
+    document.getElementById('ui-setup').classList.add('hidden');
+    document.getElementById('ui-exam').classList.remove('hidden');
+
+    renderDots();
+    renderQuestion(0);
+    startTimer();
+
+    // [FIX] หยุด/ต่อ timer เมื่อ tab ซ่อน/แสดง
+    document.addEventListener('visibilitychange', onVisibilityChange);
+
+  } catch (e) {
     document.getElementById('ov-load').classList.add('hidden');
     customAlert(e.message, 'ผิดพลาด', '❌');
   }
 }
 
-function renderDots() {
-  let html = '';
-  for(let i=0; i<questions.length; i++) {
-    const isAns = answers[questions[i].questionId] ? 'answered' : '';
-    const isAct = i === currentQ ? 'active' : '';
-    html += `<div class="q-dot ${isAns} ${isAct}" onclick="goToQ(${i})">${i+1}</div>`;
+/* ════════════════════════════════════════════════════════
+   TIMER
+   ════════════════════════════════════════════════════════ */
+function startTimer() {
+  if (timerInt) clearInterval(timerInt);
+  timerInt = setInterval(() => {
+    timeLeft--;
+    // บันทึก state ทุก 5 วินาที
+    if (timeLeft % 5 === 0) saveExamState();
+
+    updateTimerDisplay();
+
+    if (timeLeft === 300 && !alerted5Min) {
+      alerted5Min = true;
+      playNotificationSound();
+      customAlert('เหลือเวลาทำข้อสอบอีก 5 นาทีสุดท้าย กรุณาตรวจสอบคำตอบนะครับ!', 'แจ้งเตือนเวลา', '⏳');
+    }
+
+    if (timeLeft <= 60) document.getElementById('timer').classList.add('danger');
+
+    if (timeLeft <= 0) {
+      clearInterval(timerInt);
+      timerInt = null;
+      playNotificationSound();
+      customAlert('หมดเวลาทำข้อสอบ ระบบกำลังส่งคำตอบอัตโนมัติ', 'หมดเวลา!', '⏰');
+      // [FIX] ใช้ setTimeout แทน การรอ modal ปิด เพื่อให้ผู้ใช้เห็น alert ก่อน
+      setTimeout(() => submitExam(true), 2500);
+    }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const m  = Math.floor(timeLeft / 60);
+  const s  = timeLeft % 60;
+  const el = document.getElementById('timer');
+  if (el) el.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+}
+
+/* ─── Page Visibility ─── */
+function onVisibilityChange() {
+  if (!timerInt && !submitted) return;
+  if (document.hidden) {
+    // [FIX] หยุด timer และ save state เมื่อ tab ซ่อน
+    clearInterval(timerInt);
+    timerInt = null;
+    saveExamState();
+  } else if (!submitted) {
+    // กลับมาแสดง: ต่อ timer
+    startTimer();
   }
-  document.getElementById('q-dots').innerHTML = html;
+}
+
+/* ════════════════════════════════════════════════════════
+   LOCAL STORAGE — EXAM STATE พร้อม TTL
+   ════════════════════════════════════════════════════════ */
+function saveExamState() {
+  try {
+    const key = `exam_${userId}_${selectedSubject}`;
+    localStorage.setItem(key, JSON.stringify({
+      ans:       answers,
+      time:      timeLeft,
+      savedAt:   Date.now(), // [FIX] บันทึก timestamp
+    }));
+  } catch (_) { /* localStorage full หรือ private mode */ }
+}
+
+/**
+ * โหลด saved state พร้อมตรวจ TTL
+ * @returns {Object|null}
+ */
+function loadExamState(userId, subject) {
+  try {
+    const key    = `exam_${userId}_${subject}`;
+    const raw    = localStorage.getItem(key);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    // [FIX] ถ้า save เก่ากว่า TTL ให้ลบทิ้งและ return null
+    if (parsed.savedAt && (Date.now() - parsed.savedAt) > EXAM_STATE_TTL_MS) {
+      localStorage.removeItem(key);
+      return null;
+    }
+    return parsed;
+  } catch (_) { return null; }
+}
+
+function clearExamState() {
+  try {
+    localStorage.removeItem(`exam_${userId}_${selectedSubject}`);
+  } catch (_) {}
+}
+
+/* ════════════════════════════════════════════════════════
+   RENDER
+   ════════════════════════════════════════════════════════ */
+function renderDots() {
+  const container = document.getElementById('q-dots');
+  container.innerHTML = '';
+  questions.forEach((q, i) => {
+    const dot       = document.createElement('div');
+    dot.className   = `q-dot${answers[q.questionId] ? ' answered' : ''}${i === currentQ ? ' active' : ''}`;
+    dot.textContent = i + 1;
+    dot.addEventListener('click', () => goToQ(i));
+    container.appendChild(dot);
+  });
 }
 
 function renderQuestion(idx) {
-  currentQ = idx;
-  const q = questions[idx];
-  document.getElementById('q-label').textContent = `วิชา: ${selectedSubject} • ข้อ ${idx+1} จาก ${questions.length}`;
-  document.getElementById('q-text').textContent = q.questionText;
-  
-  const savedAns = answers[q.questionId];
+  currentQ    = idx;
+  const q     = questions[idx];
+  const saved = answers[q.questionId];
+
+  document.getElementById('q-label').textContent = `วิชา: ${selectedSubject} • ข้อ ${idx + 1} จาก ${questions.length}`;
+  // [FIX] ใช้ textContent กัน XSS จากข้อสอบ
+  document.getElementById('q-text').textContent  = q.questionText;
+
   ['A','B','C','D'].forEach(k => {
-    const btn = document.getElementById(`c-${k}`);
-    document.getElementById(`t-${k}`).textContent = q.choices[k] || '-';
-    if(q.choices[k]) {
+    const btn  = document.getElementById(`c-${k}`);
+    const text = document.getElementById(`t-${k}`);
+    if (q.choices[k]) {
+      text.textContent = q.choices[k];
       btn.style.display = 'flex';
-      btn.className = `choice-btn ${savedAns === k ? 'selected' : ''}`;
+      btn.className     = `choice-btn${saved === k ? ' selected' : ''}`;
     } else {
       btn.style.display = 'none';
     }
@@ -396,148 +522,197 @@ function renderQuestion(idx) {
 
 function selectChoice(ans) {
   answers[questions[currentQ].questionId] = ans;
-  saveState();
+  saveExamState();
   renderQuestion(currentQ);
-  setTimeout(() => { if(currentQ < questions.length - 1) nextQ(); }, 300);
+  // เลื่อนไปข้อถัดไปอัตโนมัติ
+  setTimeout(() => { if (currentQ < questions.length - 1) nextQ(); }, 300);
 }
 
-function prevQ() { if(currentQ > 0) renderQuestion(currentQ - 1); }
-function nextQ() { if(currentQ < questions.length - 1) renderQuestion(currentQ + 1); }
+function prevQ() { if (currentQ > 0) renderQuestion(currentQ - 1); }
+function nextQ() { if (currentQ < questions.length - 1) renderQuestion(currentQ + 1); }
 function goToQ(i) { renderQuestion(i); }
 
-function saveState() {
-  localStorage.setItem(`exam_${userId}_${selectedSubject}`, JSON.stringify({ ans: answers, time: timeLeft }));
-}
-
-function startTimer() {
-  timerInt = setInterval(() => {
-    timeLeft--;
-    if(timeLeft % 5 === 0) saveState();
-    
-    const m = Math.floor(timeLeft / 60);
-    const s = timeLeft % 60;
-    const el = document.getElementById('timer');
-    el.textContent = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
-    
-    if(timeLeft === 300 && !alerted5Min) {
-      alerted5Min = true;
-      playNotificationSound(); 
-      customAlert('เหลือเวลาทำข้อสอบอีก 5 นาทีสุดท้าย กรุณาตรวจสอบคำตอบนะครับ!', 'แจ้งเตือนเวลา', '⏳');
-    }
-    
-    if(timeLeft <= 60) el.classList.add('danger');
-    
-    if(timeLeft <= 0) {
-      clearInterval(timerInt);
-      playNotificationSound(); 
-      customAlert('หมดเวลาทำข้อสอบ ระบบกำลังส่งคำตอบอัตโนมัติ', 'หมดเวลา!', '⏰');
-      setTimeout(() => { submitExam(true); }, 2000);
-    }
-  }, 1000);
-}
-
+/* ════════════════════════════════════════════════════════
+   SUBMIT
+   ════════════════════════════════════════════════════════ */
 function confirmSubmit() {
   const unanswered = questions.length - Object.keys(answers).length;
-  if(unanswered > 0) {
-    customConfirm(`ยังมีข้อที่ไม่ได้ตอบอีก <strong style="color:var(--danger)">${unanswered} ข้อ</strong><br>ยืนยันการส่งข้อสอบหรือไม่?`, () => {
-      submitExam(false);
-    }, 'แจ้งเตือน', '⚠️', 'ca-btn-danger');
+  if (unanswered > 0) {
+    // [FIX] msg นี้มาจาก code เอง (ไม่ใช่ user/API) จึงใช้ innerHTML ได้
+    customConfirm(
+      `ยังมีข้อที่ไม่ได้ตอบอีก <strong style="color:var(--danger)">${unanswered} ข้อ</strong><br>ยืนยันการส่งข้อสอบหรือไม่?`,
+      () => submitExam(false),
+      'แจ้งเตือน', '⚠️', 'ca-btn-danger'
+    );
   } else {
-    customConfirm(`ท่านทำข้อสอบครบแล้ว<br>ยืนยันการส่งข้อสอบใช่หรือไม่?`, () => {
-      submitExam(false);
-    }, 'ส่งข้อสอบ', '📤');
+    customConfirm(
+      'ท่านทำข้อสอบครบแล้ว<br>ยืนยันการส่งข้อสอบใช่หรือไม่?',
+      () => submitExam(false),
+      'ส่งข้อสอบ', '📤'
+    );
   }
 }
 
 async function submitExam(isTimeout) {
-  if(submitted) return; submitted = true;
+  // [FIX] Double-submit guard — submitted flag ไม่ reset หลัง error ถ้าเป็น timeout
+  if (submitted) return;
+  submitted = true;
+
+  // หยุด timer และ visibility listener
   clearInterval(timerInt);
+  timerInt = null;
+  document.removeEventListener('visibilitychange', onVisibilityChange);
+
   document.getElementById('ov-load').classList.remove('hidden');
-  
+
   try {
-    const res = await callAPI('POST', { action: 'submit_exam', userId: userId, subject: selectedSubject, answers: answers });
-    if(res.status === 'ok') {
-      localStorage.removeItem(`exam_${userId}_${selectedSubject}`);
-      
-      // 🌟 นำข้อมูลไปใส่ใน UI แบบใหม่
-      document.getElementById('r-score').textContent = res.totalScore;
-      document.getElementById('r-max').textContent = res.maxScore;
-      
-      const pct = res.percentage;
-      const isPass = pct >= 60; // กำหนดเกณฑ์ผ่านที่ 60%
-      
-      const badgeEl = document.getElementById('r-badge');
-      badgeEl.className = `badge-status ${isPass ? 'pass' : 'fail'}`;
-      badgeEl.innerHTML = isPass ? '✅ ผ่านเกณฑ์' : '❌ ยังไม่ผ่าน';
-      
-      if(memberInfo) {
-        document.getElementById('r-name').textContent = memberInfo.fullName || '-';
-        document.getElementById('r-sub').textContent = `${memberInfo.rank || ''} ${memberInfo.position ? '· ' + memberInfo.position : ''}`;
-      } else {
-        liff.getProfile().then(p => document.getElementById('r-name').textContent = p.displayName);
-        document.getElementById('r-sub').textContent = 'ผู้เข้าสอบ';
-      }
+    const res = await callAPI('POST', {
+      action:  'submit_exam',
+      userId,
+      subject: selectedSubject,
+      answers,
+    });
 
-      document.getElementById('r-pct').textContent = res.percentage + '%';
-      document.getElementById('r-correct').textContent = res.totalScore;
-      document.getElementById('r-wrong').textContent = res.maxScore - res.totalScore;
-      
-      document.getElementById('r-rank').textContent = '#' + (res.rank || 1);
-      document.getElementById('r-rank-total').textContent = `อันดับปัจจุบัน จากผู้เข้าสอบทั้งหมด ${res.total || 1} นาย`;
-      
-      let resHtml = '';
-      res.results.forEach((r, i) => {
-        const q = questions.find(q => q.questionId === r.qid);
-        const qText = q?.questionText || '-';
-        
-        const userAnsLetter = r.userAnswer || '-';
-        const userAnsText = (q && q.choices && q.choices[userAnsLetter]) ? q.choices[userAnsLetter] : '';
-        const userAnsFull = userAnsLetter !== '-' ? `${userAnsLetter} ${userAnsText}` : 'ไม่ได้ตอบ';
-        
-        const correctLetter = r.correct || '-';
-        const correctText = (q && q.choices && q.choices[correctLetter]) ? q.choices[correctLetter] : '';
-        const correctFull = `${correctLetter} ${correctText}`;
-        
-        const icon = r.isCorrect ? '✅' : '❌';
-        const userValClass = r.isCorrect ? 'val-correct' : 'val-wrong';
+    if (res.status !== 'ok') throw new Error(res.message);
 
-        resHtml += `
-          <div class="ans-card ${r.isCorrect ? 'correct' : 'wrong'}">
-            <div class="ans-header">
-              <div class="ans-icon">${icon}</div>
-              <div class="ans-q-text">ข้อ ${i+1}: ${qText}</div>
-            </div>
-            <div class="ans-row">
-              <div class="ans-lbl">คุณตอบ:</div>
-              <div class="ans-val ${userValClass}">${userAnsFull}</div>
-            </div>
-            <div class="ans-row">
-              <div class="ans-lbl">เฉลย:</div>
-              <div class="ans-val val-correct">${correctFull}</div>
-            </div>
-          </div>
-        `;
-      });
-      document.getElementById('r-list').innerHTML = resHtml;
-      
-      document.getElementById('ov-load').classList.add('hidden');
-      document.getElementById('ui-exam').style.display = 'none';
-      document.getElementById('ui-result').classList.remove('hidden');
-    } else { throw new Error(res.message); }
-  } catch(e) {
-    submitted = false;
+    // ลบ saved state
+    clearExamState();
+
+    // ─── Render Result ───
+    document.getElementById('r-score').textContent = res.totalScore;
+    document.getElementById('r-max').textContent   = res.maxScore;
+
+    const pct    = res.percentage;
+    const isPass = pct >= 60;
+    const badge  = document.getElementById('r-badge');
+    badge.className   = `badge-status ${isPass ? 'pass' : 'fail'}`;
+    badge.textContent = isPass ? '✅ ผ่านเกณฑ์' : '❌ ยังไม่ผ่าน';
+
+    // [FIX] ใช้ textContent ป้องกัน XSS
+    if (memberInfo) {
+      document.getElementById('r-name').textContent = memberInfo.fullName || '-';
+      document.getElementById('r-sub').textContent  =
+        `${memberInfo.rank || ''} ${memberInfo.position ? '· ' + memberInfo.position : ''}`.trim();
+    } else {
+      try {
+        const p = await liff.getProfile();
+        document.getElementById('r-name').textContent = p.displayName;
+      } catch (_) {}
+      document.getElementById('r-sub').textContent = 'ผู้เข้าสอบ';
+    }
+
+    document.getElementById('r-pct').textContent        = pct + '%';
+    document.getElementById('r-correct').textContent    = res.totalScore;
+    document.getElementById('r-wrong').textContent      = res.maxScore - res.totalScore;
+    document.getElementById('r-rank').textContent       = '#' + (res.rank  || 1);
+    document.getElementById('r-rank-total').textContent =
+      `อันดับปัจจุบัน จากผู้เข้าสอบทั้งหมด ${res.total || 1} นาย`;
+
+    // [FIX] render result ด้วย DOM API แทน innerHTML concatenation กัน XSS
+    const rList = document.getElementById('r-list');
+    rList.innerHTML = '';
+    (res.results || []).forEach((r, i) => {
+      const q           = questions.find(q => q.questionId === r.qid);
+      const qText       = q?.questionText || '-';
+      const userLetter  = r.userAnswer   || '-';
+      const userText    = (q?.choices?.[userLetter]) ? q.choices[userLetter] : '';
+      const userFull    = userLetter !== '-' ? `${userLetter} ${userText}` : 'ไม่ได้ตอบ';
+      const correctLetter = r.correct    || '-';
+      const correctText   = (q?.choices?.[correctLetter]) ? q.choices[correctLetter] : '';
+      const correctFull   = `${correctLetter} ${correctText}`;
+
+      const card  = document.createElement('div');
+      card.className = `ans-card ${r.isCorrect ? 'correct' : 'wrong'}`;
+
+      // Header
+      const header = document.createElement('div');
+      header.className = 'ans-header';
+      const iconEl = document.createElement('div');
+      iconEl.className   = 'ans-icon';
+      iconEl.textContent = r.isCorrect ? '✅' : '❌';
+      const qEl = document.createElement('div');
+      qEl.className   = 'ans-q-text';
+      // [FIX] textContent ป้องกัน XSS จาก questionText
+      qEl.textContent = `ข้อ ${i + 1}: ${qText}`;
+      header.append(iconEl, qEl);
+
+      // Answer rows
+      const makeRow = (label, value, valClass) => {
+        const row = document.createElement('div');
+        row.className = 'ans-row';
+        const lbl = document.createElement('div');
+        lbl.className   = 'ans-lbl';
+        lbl.textContent = label;
+        const val = document.createElement('div');
+        val.className   = `ans-val${valClass ? ' ' + valClass : ''}`;
+        val.textContent = value;
+        row.append(lbl, val);
+        return row;
+      };
+
+      card.append(
+        header,
+        makeRow('คุณตอบ:', userFull,    r.isCorrect ? 'val-correct' : 'val-wrong'),
+        makeRow('เฉลย:',   correctFull, 'val-correct')
+      );
+      rList.appendChild(card);
+    });
+
+    document.getElementById('ov-load').classList.add('hidden');
+    document.getElementById('ui-exam').style.display = 'none';
+    document.getElementById('ui-result').classList.remove('hidden');
+
+  } catch (e) {
+    // [FIX] ถ้าเป็น timeout ไม่ให้ reset submitted (ป้องกันส่งซ้ำ)
+    if (!isTimeout) submitted = false;
     document.getElementById('ov-load').classList.add('hidden');
     customAlert(e.message, 'ส่งข้อสอบไม่สำเร็จ', '❌');
   }
 }
 
-async function callAPI(method, params) {
-  let url = GAS_URL, opts = { method: 'POST', headers: {'Content-Type':'text/plain'}, body: JSON.stringify(params) };
-  if(method === 'GET') { url += '?' + new URLSearchParams(params).toString(); opts = {method:'GET'}; }
-  const resp = await fetch(url, opts);
-  return await resp.json();
+/* ════════════════════════════════════════════════════════
+   UTILITIES
+   ════════════════════════════════════════════════════════ */
+function escapeHtml(str) {
+  if (str == null) return '';
+  return String(str).replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
 }
 
+/* ════════════════════════════════════════════════════════
+   API HELPER
+   ════════════════════════════════════════════════════════ */
+async function callAPI(method, params, timeoutMs = 25000) {
+  const ctrl = new AbortController();
+  const tid  = setTimeout(() => ctrl.abort(), timeoutMs);
+  try {
+    let url  = GAS_URL;
+    let opts = { signal: ctrl.signal, redirect: 'follow' };
+
+    if (method === 'GET') {
+      url += '?' + new URLSearchParams(params).toString();
+      opts.method = 'GET';
+    } else {
+      opts.method  = 'POST';
+      opts.headers = { 'Content-Type': 'text/plain' };
+      opts.body    = JSON.stringify(params);
+    }
+
+    const resp = await fetch(url, opts);
+    clearTimeout(tid);
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    return await resp.json();
+  } catch (e) {
+    clearTimeout(tid);
+    if (e.name === 'AbortError') throw new Error('หมดเวลาเชื่อมต่อ (timeout)');
+    throw e;
+  }
+}
+
+/* ════════════════════════════════════════════════════════
+   BOOTSTRAP
+   ════════════════════════════════════════════════════════ */
 init();
 </script>
 </body>
